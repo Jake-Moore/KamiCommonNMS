@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.wrappers.chunk;
 
 import com.kamikazejam.kamicommon.nms.abstraction.block.IBlockUtil1_13;
-import com.kamikazejam.kamicommon.util.data.XBlockData;
+import com.kamikazejam.kamicommon.nms.util.data.XBlockData;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;

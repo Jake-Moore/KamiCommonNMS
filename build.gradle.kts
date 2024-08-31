@@ -15,10 +15,11 @@ ext {
     // reduced is just a re-zipped version of the original, without some conflicting libraries
     //  gson, org.json, com.yaml.snakeyaml
     set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED")    // luxious nexus (public)
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.5.0.8-20240831.071506-1")
 }
 
 allprojects {
-    group = "com.kamikazejam.kamicommon.nms"
+    group = "com.kamikazejam.kamicommon"
     version = VERSION
     description = "KamikazeJAM's nms library for Paper."
 
@@ -76,39 +77,15 @@ allprojects {
     tasks.withType(ShadowJar::class.java).configureEach {
         archiveClassifier.set("")
 
-        // List of relocation exclusions:
-        // - Jackson libraries
+        exclude("LICENSE*", "META-INF/LICENSE*")
+        exclude("License*", "META-INF/License*")
 
         // --------------------------------------------------- //
         // *** Relocations (will apply to ALL subprojects) *** //
         // --------------------------------------------------- //
-        // TODO enable the relocations we need
-//        // standalone-utils
-//        relocate("org.yaml.snakeyaml", "com.kamikazejam.kamicommon.snakeyaml")
-//        relocate("org.json", "com.kamikazejam.kamicommon.json")
-//        // generic-jar
-//        relocate("com.zaxxer.hikari", "com.kamikazejam.kamicommon.hikari")
-//        relocate("org.apache.commons.pool2", "com.kamikazejam.kamicommon.commons.pool2")
-//        relocate("com.mysql", "com.kamikazejam.kamicommon.mysql")
-//        relocate("com.rabbitmq", "com.kamikazejam.kamicommon.rabbitmq")
-//        relocate("org.slf4j", "com.kamikazejam.kamicommon.slf4j")
-//        relocate("io.netty", "com.kamikazejam.kamicommon.netty")
-//        relocate("reactor", "com.kamikazejam.kamicommon.reactor")
-//        relocate("org.reactivestreams", "com.kamikazejam.kamicommon.reactivestreams")
-//        relocate("io.lettuce.core", "com.kamikazejam.kamicommon.lettuce.core")
-//        // standalone-jar
-//        relocate("com.google.gson", "com.kamikazejam.kamicommon.gson")
-//        relocate("com.google.errorprone", "com.kamikazejam.kamicommon.errorprone")
-//        // spigot-nms:api
-//        relocate("com.cryptomorin.xseries", "com.kamikazejam.kamicommon.xseries")
-//        relocate("com.github.fierioziy.particlenativeapi", "com.kamikazejam.kamicommon.particleapi")
-//        relocate("de.tr7zw.changeme.nbtapi", "com.kamikazejam.kamicommon.nbt.nbtapi")
-//        // spigot-utils
-//        relocate("org.apache.commons.text", "com.kamikazejam.kamicommon.text")
-//        relocate("org.apache.commons.lang3", "com.kamikazejam.kamicommon.lang3")
-//        // spigot-jar
-//        relocate("org.apache.hc.client5", "com.kamikazejam.kamicommon.hc.client5")
-//        relocate("org.apache.hc.core5", "com.kamikazejam.kamicommon.hc.core5")
+        relocate("com.cryptomorin.xseries", "com.kamikazejam.kamicommon.xseries")
+        relocate("com.github.fierioziy.particlenativeapi", "com.kamikazejam.kamicommon.particleapi")
+        relocate("de.tr7zw.changeme.nbtapi", "com.kamikazejam.kamicommon.nbtapi")
     }
     // Ensure all publish tasks depend on build and shadowJar
     tasks.publish.get().dependsOn(tasks.build)

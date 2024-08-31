@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.library.worldguard;
 
+import com.kamikazejam.kamicommon.nms.library.worldguard.WorldGuardApi;
 import com.kamikazejam.kamicommon.nms.wrappers.NMSWrapper;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
 import com.sk89q.worldedit.BlockVector;

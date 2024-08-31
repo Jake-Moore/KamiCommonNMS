@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.chatcolor;
 
 import com.kamikazejam.kamicommon.nms.abstraction.IChatColorNMS;
-import com.kamikazejam.kamicommon.util.Colors;
+import com.kamikazejam.kamicommon.nms.util.Colors;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;

@@ -1,5 +1,7 @@
-package com.kamikazejam.kamicommon.library.worldedit;
+package com.kamikazejam.kamicommon.nms.library.worldedit;
 
+import com.kamikazejam.kamicommon.library.worldedit.WorldEdit6;
+import com.kamikazejam.kamicommon.library.worldedit.WorldEdit7;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

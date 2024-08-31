@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.wrappers.chunk;
 
-import com.kamikazejam.kamicommon.util.data.XBlockData;
-import com.kamikazejam.kamicommon.util.data.XMaterialData;
+import com.kamikazejam.kamicommon.nms.util.data.XBlockData;
+import com.kamikazejam.kamicommon.nms.util.data.XMaterialData;
 import net.minecraft.server.v1_8_R1.ChunkSection;
 import net.minecraft.server.v1_8_R1.IBlockData;
 import org.bukkit.Material;

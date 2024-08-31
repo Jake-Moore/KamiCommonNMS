@@ -1,5 +1,7 @@
-package com.kamikazejam.kamicommon.library.worldguard;
+package com.kamikazejam.kamicommon.nms.library.worldguard;
 
+import com.kamikazejam.kamicommon.library.worldguard.WorldGuard6;
+import com.kamikazejam.kamicommon.library.worldguard.WorldGuard7;
 import com.kamikazejam.kamicommon.nms.NmsAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

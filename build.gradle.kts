@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 @Suppress("PropertyName")
-var VERSION = "1.0.0"
+var VERSION = "1.0.1"
 
 plugins { // needed for the allprojects section to work
     id("java")

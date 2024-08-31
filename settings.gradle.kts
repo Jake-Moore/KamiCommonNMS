@@ -1,8 +1,6 @@
 rootProject.name = "KamiCommonNMS"
 
 include(":api")
-include(":core")
-include(":versions")
 
 include("versions:v1_8_R1")
 include("versions:v1_8_R2")
@@ -32,3 +30,6 @@ include("versions:v1_20_CB")
 include("versions:v1_21_R1")
 include("versions:worlds6")
 include("versions:worlds7")
+
+include(":core")
+include(":versions")

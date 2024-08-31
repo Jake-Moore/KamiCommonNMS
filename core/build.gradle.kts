@@ -1,3 +1,6 @@
+plugins {
+    // Unique plugins for this module
+}
 
 dependencies {
     api(project(":api"))
@@ -47,9 +50,19 @@ java {
 }
 
 tasks {
+    publish.get().dependsOn(build)
     build.get().dependsOn(shadowJar)
     shadowJar {
-        dependsOn(project(":api").tasks.shadowJar.get())
+        dependsOn(project(":api").tasks.shadowJar)
+    }
+}
+
+// Use this to load shadowJar outputs after project evaluation
+// This ensures the userdev reobfJar tasks are present before we use them
+gradle.projectsEvaluated {
+    tasks.getByName("publishShadowPublicationToMavenRepository").dependsOn(tasks.jar)
+
+    tasks.shadowJar {
         // Add the 1.17 to 1.20R3 reobf outputs
         from(project(":versions:v1_17_R1").tasks.getByName("reobfJar").outputs)
         from(project(":versions:v1_18_R1").tasks.getByName("reobfJar").outputs)
@@ -65,14 +78,13 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
+        create<MavenPublication>("shadow") {
             groupId = rootProject.group.toString()
             artifactId = "spigot-nms"
             version = rootProject.version.toString()
-            from(components["java"])
+            project.extensions.getByType<com.github.jengelman.gradle.plugins.shadow.ShadowExtension>().component(this)
         }
     }
-
     repositories {
         maven {
             credentials {

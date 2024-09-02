@@ -13,7 +13,7 @@ ext {
     // reduced is just a re-zipped version of the original, without some conflicting libraries
     //  gson, org.json, com.yaml.snakeyaml
     set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED")    // luxious nexus (public)
-    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.5.0.8-20240831.071506-1")
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.6.0.0")
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.13.2",

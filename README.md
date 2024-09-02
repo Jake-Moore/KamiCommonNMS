@@ -1,5 +1,5 @@
 # KamiCommonNMS
-- The NMS (net.minecraft.server) portion of the KamiCommon library.
+- The NMS (net.minecraft.server) portion of the [KamiCommon](https://github.com/Jake-Moore/KamiCommon) library.
 - On August 31, 2024, this library was removed from KamiCommon into its own repository.
 - It aims to support versions: 1.8.X to LATEST
 

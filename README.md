@@ -4,9 +4,9 @@
 > Repo: [Luxious Repository](https://repo.luxiouslabs.net/)
 
 # KamiCommonNMS
-- The NMS (net.minecraft.server) portion of the [KamiCommon](https://github.com/Jake-Moore/KamiCommon) library.
+- The NMS (`net.minecraft.server`) portion of the [KamiCommon](https://github.com/Jake-Moore/KamiCommon) library.
 - On August 31, 2024, this library was removed from KamiCommon into its own repository.
-- It aims to support versions: 1.8.X to LATEST
+- It aims to provide nms access while supporting versions 1.8.X to LATEST
 
 ## Disclaimers
 - 1.17+ only officially supports **Paper** as the server software.
@@ -26,7 +26,7 @@ These libraries are not shaded. They are defined as **transitive dependencies** 
 
 ## Using the Library
 As a sub-project of KamiCommon, this library is published under that project's package.  
-You'll find it at `com.kamikazejam.kamicommon.spigot-nms`.
+You'll find its code under the package `com.kamikazejam.kamicommon`, and published under `com.kamikazejam.kamicommon:spigot-nms`
 
 ### Repository Information
 Add the following Repository to your build file.

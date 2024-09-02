@@ -41,3 +41,19 @@ jobs:
         LUXIOUS_NEXUS_USER: ${{ secrets.MAVEN_NAME }}
         LUXIOUS_NEXUS_PASS: ${{ secrets.MAVEN_SECRET }}
 
+      #--------------------------------------------------------------------------------------------
+      #           Update Version Badge
+      #--------------------------------------------------------------------------------------------
+
+      # Update the README.md Badge with the new version
+    - name: Create Version Badge
+      if: "!endsWith(steps.extract_version.outputs.version, 'SNAPSHOT')"
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: 25b97e226e0ecf38e0135223111fd115
+        filename: version.json # Use test.svg if you want to use the SVG mode.
+        label: Latest Release
+        message: "${{ steps.extract_version.outputs.version }}"
+        color: blue
+

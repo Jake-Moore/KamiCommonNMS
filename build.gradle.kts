@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-var VERSION = "1.0.2"
+var VERSION = "1.0.3"
 
 plugins { // needed for the allprojects section to work
     id("java")
@@ -13,7 +13,8 @@ ext {
     // reduced is just a re-zipped version of the original, without some conflicting libraries
     //  gson, org.json, com.yaml.snakeyaml
     set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED")    // luxious nexus (public)
-    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.6.0.0")
+    // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.6.0.1")
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.13.2",

@@ -35,7 +35,18 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
+    - name: Extract Version from Gradle
+      id: extract_version
+      run: |
+        gradle clean
+        version=$(gradle properties -q | grep "^version:" | awk '{print $2}')
+        echo "version=$version" >> $GITHUB_OUTPUT
+
+    - name: Display Version
+      run: echo "Version is ${{ steps.extract_version.outputs.version }}"
+
     - name: Publish with Gradle
+      if: "!endsWith(steps.extract_version.outputs.version, 'SNAPSHOT')"
       run: gradle publish
       env:
         LUXIOUS_NEXUS_USER: ${{ secrets.MAVEN_NAME }}

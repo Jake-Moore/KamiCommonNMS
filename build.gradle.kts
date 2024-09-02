@@ -1,13 +1,11 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 @Suppress("PropertyName")
-var VERSION = "1.0.1"
+var VERSION = "1.0.2"
 
 plugins { // needed for the allprojects section to work
     id("java")
     id("java-library")
     id("maven-publish")
-    id("com.gradleup.shadow") version "8.3.0"
+    id("com.gradleup.shadow") version "8.3.0" apply false
     id("io.papermc.paperweight.userdev") version "1.7.2" apply false
 }
 
@@ -17,6 +15,11 @@ ext {
     set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED")    // luxious nexus (public)
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.5.0.8-20240831.071506-1")
 }
+extra["commonDependencies"] = listOf(
+    "de.tr7zw:item-nbt-api:2.13.2",
+    "com.github.cryptomorin:XSeries:11.2.1",
+    "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.3.0"
+)
 
 allprojects {
     group = "com.kamikazejam.kamicommon"
@@ -26,7 +29,6 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
-    apply(plugin = "com.gradleup.shadow")
 
     // Provision Java 17 all subprojects (new modules have version 21 configured)
     java {
@@ -73,25 +75,9 @@ allprojects {
         options.encoding = Charsets.UTF_8.name()
     }
 
-    // Configure shadowJar, including all relocations that are needed anywhere
-    tasks.withType(ShadowJar::class.java).configureEach {
-        archiveClassifier.set("")
-
-        exclude("LICENSE*", "META-INF/LICENSE*")
-        exclude("License*", "META-INF/License*")
-
-        // --------------------------------------------------- //
-        // *** Relocations (will apply to ALL subprojects) *** //
-        // --------------------------------------------------- //
-        relocate("com.cryptomorin.xseries", "com.kamikazejam.kamicommon.xseries")
-        relocate("com.github.fierioziy.particlenativeapi", "com.kamikazejam.kamicommon.particleapi")
-        relocate("de.tr7zw.changeme.nbtapi", "com.kamikazejam.kamicommon.nbtapi")
-    }
     // Ensure all publish tasks depend on build and shadowJar
     tasks.publish.get().dependsOn(tasks.build)
-    tasks.build.get().dependsOn(tasks.withType(ShadowJar::class.java))
 }
 
 // Disable root project build
 tasks.jar.get().enabled = false
-tasks.shadowJar.get().enabled = false

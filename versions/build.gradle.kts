@@ -2,10 +2,13 @@
 subprojects {
     dependencies {
         compileOnly(project(":api"))
-        compileOnly(project.property("standaloneUtils") as String) // standalone-utils from KamiCommon
+        // standalone-utils from KamiCommon
+        compileOnly(project.property("standaloneUtils") as String)
+        // Common Dependencies
+        @Suppress("UNCHECKED_CAST")
+        (rootProject.extra["commonDependencies"] as List<String>).forEach(dependencies::compileOnly)
     }
 }
 
 // Disable root project build
 tasks.jar.get().enabled = false
-tasks.shadowJar.get().enabled = false

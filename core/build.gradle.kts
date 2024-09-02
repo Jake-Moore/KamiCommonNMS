@@ -1,10 +1,19 @@
+@file:Suppress("UNCHECKED_CAST")
+
 plugins {
     // Unique plugins for this module
+    id("com.gradleup.shadow")
 }
 
 dependencies {
-    api(project(":api"))
-    compileOnly(project.property("standaloneUtils") as String) // standalone-utils from KamiCommon
+    // Shade :api code into the core
+    implementation(project(":api"))
+
+    // Common Dependencies (compileOnly to avoid shading)
+    (rootProject.extra["commonDependencies"] as List<String>).forEach(dependencies::shadow)
+
+    // standalone-utils from KamiCommon
+    compileOnly(project.property("standaloneUtils") as String)
 
     implementation(project(":versions:v1_8_R1"))
     implementation(project(":versions:v1_8_R2"))
@@ -53,7 +62,8 @@ tasks {
     publish.get().dependsOn(build)
     build.get().dependsOn(shadowJar)
     shadowJar {
-        dependsOn(project(":api").tasks.shadowJar)
+        archiveClassifier.set("")
+        // configurations = listOf(project.configurations.shadow.get())
     }
 }
 
@@ -82,7 +92,31 @@ publishing {
             groupId = rootProject.group.toString()
             artifactId = "spigot-nms"
             version = rootProject.version.toString()
+            // Use shadow component so that only the shadow() components are added to the publication pom
             project.extensions.getByType<com.github.jengelman.gradle.plugins.shadow.ShadowExtension>().component(this)
+
+            // Modify the commonDependencies to use compile scope (transitive dependencies)
+            pom.withXml {
+                asNode().apply {
+                    // Find dependencies and modify their scope
+                    val dependenciesNode = ((get("dependencies") as groovy.util.NodeList).firstOrNull()
+                        ?: appendNode("dependencies")) as groovy.util.Node
+
+                    // List of common dependencies from rootProject.extra
+                    val commonDependencies = rootProject.extra["commonDependencies"] as List<String>
+
+                    // Iterate over dependency nodes and modify their scope
+                    dependenciesNode.children().forEach { c ->
+                        val dependencyNode = c as groovy.util.Node
+                        val artifactIdNode = (dependencyNode.get("artifactId") as? groovy.util.NodeList)?.firstOrNull() as? groovy.util.Node
+                        val scopeNode = (dependencyNode.get("scope") as? groovy.util.NodeList)?.firstOrNull() as? groovy.util.Node
+
+                        if (artifactIdNode?.text() in commonDependencies.map { it.split(":")[1] }) {
+                            scopeNode?.setValue("compile")
+                        }
+                    }
+                }
+            }
         }
     }
     repositories {

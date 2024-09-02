@@ -3,9 +3,9 @@ plugins {
 }
 
 dependencies {
-    api("de.tr7zw:item-nbt-api:2.13.2")
-    api("com.github.cryptomorin:XSeries:11.2.1")
-    api("com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.3.0")
+    // Common Dependencies (compileOnly so they don't get picked up by shadowJar in :core)
+    @Suppress("UNCHECKED_CAST")
+    (rootProject.extra["commonDependencies"] as List<String>).forEach(dependencies::compileOnly)
 
     compileOnly(project.property("standaloneUtils") as String) // standalone-utils from KamiCommon
     compileOnly(project.property("lowestSpigotDep") as String)

@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.abstraction.block;
 
-import com.kamikazejam.kamicommon.nms.util.data.XBlockData;
 import com.cryptomorin.xseries.XMaterial;
+import com.kamikazejam.kamicommon.nms.util.data.XBlockData;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;

@@ -1,6 +1,5 @@
-package com.kamikazejam.kamicommon.library.worldedit;
+package com.kamikazejam.kamicommon.nms.library.worldedit;
 
-import com.kamikazejam.kamicommon.nms.library.worldedit.WorldEditApi;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;

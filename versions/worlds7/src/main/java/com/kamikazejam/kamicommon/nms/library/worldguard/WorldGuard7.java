@@ -1,6 +1,5 @@
-package com.kamikazejam.kamicommon.library.worldguard;
+package com.kamikazejam.kamicommon.nms.library.worldguard;
 
-import com.kamikazejam.kamicommon.nms.library.worldguard.WorldGuardApi;
 import com.kamikazejam.kamicommon.nms.wrappers.NMSWrapper;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;

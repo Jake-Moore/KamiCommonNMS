@@ -6,8 +6,6 @@ import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 @SuppressWarnings("unused")
 public class NmsItemMethods_1_8_R1 implements NmsItemMethods {
     @Override

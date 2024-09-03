@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.entity;
 
-import com.kamikazejam.kamicommon.nms.abstraction.entity.AbstractEntityMethods;
 import com.cryptomorin.xseries.XMaterial;
+import com.kamikazejam.kamicommon.nms.abstraction.entity.AbstractEntityMethods;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;

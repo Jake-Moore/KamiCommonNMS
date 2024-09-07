@@ -19,4 +19,11 @@ public abstract class AbstractEntityMethods {
     public abstract @NotNull Optional<EntityType> getSpawnerType(@Nullable ItemStack stack);
     public abstract @NotNull ItemStack setSpawnerType(@NotNull ItemStack stack, @NotNull EntityType type);
 
+    /**
+     * Set whether the entity should load chunks
+     * @return If this method could be applied on the server version
+     */
+    public boolean setLoadChunks(@NotNull Entity entity, boolean value) {
+        return false;
+    }
 }

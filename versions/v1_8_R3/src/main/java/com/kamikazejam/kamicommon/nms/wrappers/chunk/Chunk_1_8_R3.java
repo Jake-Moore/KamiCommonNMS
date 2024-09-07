@@ -89,9 +89,9 @@ public class Chunk_1_8_R3 implements NMSChunkDef {
     }
 
     @Override
-    public void saveAndRefresh(boolean withUpdatePackets) {
+    public void saveAndRefresh() {
         // Do regular save and refresh
-        this.saveAndRefreshI(withUpdatePackets);
+        this.saveAndRefreshI();
 
         // Re-cache the chunk, which fixes a race condition if the chunk was currently in use
         World world = this.getNMSChunkProvider().getNMSWorld().getBukkitWorld();

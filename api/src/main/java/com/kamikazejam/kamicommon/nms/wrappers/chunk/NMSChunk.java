@@ -21,6 +21,6 @@ public interface NMSChunk extends NMSObject {
     int getX();
     int getZ();
 
-    void saveAndRefresh(boolean withUpdatePackets);
+    void saveAndRefresh();
 
 }

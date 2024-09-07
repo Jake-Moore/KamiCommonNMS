@@ -36,4 +36,10 @@ public class EntityMethods_1_8_R3 extends EntityMethodsPre_1_13 {
     public void setMobAI(@NotNull Entity entity, boolean value) {
         this.setFromSpawner(entity, !value);
     }
+
+    @Override
+    public boolean setLoadChunks(@NotNull Entity entity, boolean value) {
+        ((CraftEntity) entity).getHandle().loadChunks = value;
+        return true;
+    }
 }

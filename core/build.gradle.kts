@@ -61,6 +61,7 @@ java {
 tasks {
     publish.get().dependsOn(build)
     build.get().dependsOn(shadowJar)
+    shadowJar.get().dependsOn(jar)
     shadowJar {
         archiveClassifier.set("")
         // configurations = listOf(project.configurations.shadow.get())
@@ -93,7 +94,8 @@ publishing {
             artifactId = "spigot-nms"
             version = rootProject.version.toString()
             // Use shadow component so that only the shadow() components are added to the publication pom
-            project.extensions.getByType<com.github.jengelman.gradle.plugins.shadow.ShadowExtension>().component(this)
+            from(components["shadow"])
+            // project.extensions.getByType<com.github.jengelman.gradle.plugins.shadow.ShadowExtension>().component(this)
 
             // Modify the commonDependencies to use compile scope (transitive dependencies)
             pom.withXml {

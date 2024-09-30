@@ -71,6 +71,9 @@ public class NmsAPI {
     public static @Nullable ItemStack getItemInOffHand(@NotNull Player player) {
         return mainHandProvider.get().getItemInOffHand(player);
     }
+    public static void setItemInOffHand(@NotNull Player player, @Nullable ItemStack itemStack) throws UnsupportedOperationException {
+        mainHandProvider.get().setItemInOffHand(player, itemStack);
+    }
 
     public static String getNamespaced(Enchantment enchantment) {
         return enchantIDProvider.get().getNamespaced(enchantment);

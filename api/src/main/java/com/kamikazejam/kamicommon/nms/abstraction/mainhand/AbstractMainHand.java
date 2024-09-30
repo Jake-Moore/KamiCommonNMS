@@ -22,4 +22,6 @@ public abstract class AbstractMainHand {
     public abstract boolean isOffHand(@NotNull PlayerInteractEntityEvent event);
 
     public abstract void setItemInMainHand(@NotNull Player player, @Nullable ItemStack item);
+
+    public abstract void setItemInOffHand(@NotNull Player player, @Nullable ItemStack item) throws UnsupportedOperationException;
 }

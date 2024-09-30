@@ -28,4 +28,9 @@ public class MainHand_1_9_R1 extends AbstractMainHand {
     public @Nullable ItemStack getItemInOffHand(@NotNull PlayerInventory playerInventory) {
         return playerInventory.getItemInOffHand();
     }
+
+    @Override
+    public void setItemInOffHand(@NotNull Player player, @Nullable ItemStack item) throws UnsupportedOperationException {
+        player.getInventory().setItemInOffHand(item);
+    }
 }

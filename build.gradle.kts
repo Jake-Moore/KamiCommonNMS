@@ -14,7 +14,7 @@ ext {
     //  gson, org.json, com.yaml.snakeyaml
     set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED")    // luxious nexus (public)
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
-    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.6.1.0")
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.6.1.2")
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.13.2",

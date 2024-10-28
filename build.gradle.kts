@@ -6,7 +6,7 @@ plugins { // needed for the allprojects section to work
     id("java-library")
     id("maven-publish")
     id("com.gradleup.shadow") version "8.3.2" apply false
-    id("io.papermc.paperweight.userdev") version "1.7.2" apply false
+    id("io.papermc.paperweight.userdev") version "1.7.4" apply false
 }
 
 ext {

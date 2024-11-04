@@ -17,7 +17,7 @@ ext {
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.6.1.0")
 }
 extra["commonDependencies"] = listOf(
-    "de.tr7zw:item-nbt-api:2.13.2",
+    "de.tr7zw:item-nbt-api:2.14.0",
     "com.github.cryptomorin:XSeries:11.3.0",
     "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.3.0"
 )

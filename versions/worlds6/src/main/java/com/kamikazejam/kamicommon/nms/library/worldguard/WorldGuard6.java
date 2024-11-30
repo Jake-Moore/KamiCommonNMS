@@ -10,6 +10,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
-@SuppressWarnings({"deprecation", "SpellCheckingInspection"})
+@SuppressWarnings({"SpellCheckingInspection", "unused"})
 public class WorldGuard6 implements WorldGuardApi {
     private final @NotNull WorldGuardPlugin wg;
     private final @NotNull NMSWrapper<NMSWorld, World> worldWrapper;
@@ -84,6 +85,31 @@ public class WorldGuard6 implements WorldGuardApi {
         }
 
         return foundregions;
+    }
+
+    @Override
+    @NotNull
+    public List<Player> getPlayersInRegion(@NotNull String regionName) {
+        // Must search each world since there is no api to get a region name from all worlds
+        for (World world : Bukkit.getWorlds()) {
+            RegionManager manager = wg.getRegionManager(world);
+            ProtectedRegion region = manager.getRegion(regionName);
+            if (region == null) { continue; }
+
+            // We found the region, now we should check how many players are in it
+            List<Player> players = new ArrayList<>();
+
+            // No Native WorldGuard 6 API, we must check players in the world manually
+            for (Player online : world.getPlayers()) {
+                Location location = online.getLocation();
+                if (region.contains(location.getBlockX(), location.getBlockY(), location.getBlockZ())) {
+                    players.add(online);
+                }
+            }
+            return players;
+        }
+
+        return new ArrayList<>();
     }
 
     @Override

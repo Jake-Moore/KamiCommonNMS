@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-// Verified on 1.20.CB and 1.21
+// Verified on 1.20.CB and 1.21 and 1.21.3
 @SuppressWarnings("unused")
 public class NmsItemMethods_1_21_CB implements NmsItemMethods {
     @Override

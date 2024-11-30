@@ -1,12 +1,12 @@
 @Suppress("PropertyName")
-var VERSION = "1.0.8"
+var VERSION = "1.0.9"
 
 plugins { // needed for the allprojects section to work
     id("java")
     id("java-library")
     id("maven-publish")
     id("com.gradleup.shadow") version "8.3.2" apply false
-    id("io.papermc.paperweight.userdev") version "1.7.2" apply false
+    id("io.papermc.paperweight.userdev") version "1.7.5" apply false
 }
 
 ext {

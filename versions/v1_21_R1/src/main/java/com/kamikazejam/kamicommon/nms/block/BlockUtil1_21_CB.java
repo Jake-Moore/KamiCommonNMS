@@ -12,7 +12,7 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Working for: 1.20.5, 1.20.6, 1.21
+ * Working for: 1.20.5, 1.20.6, 1.21, 1.21.3
  */
 public class BlockUtil1_21_CB extends IBlockUtil1_13<BlockState> {
     @Override

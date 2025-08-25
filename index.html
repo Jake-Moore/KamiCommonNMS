@@ -121,8 +121,8 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             border-radius: 12px;
             border: none;
             background: var(--bg-secondary);
@@ -146,6 +146,58 @@
             transform: scale(0.95);
         }
 
+        /* GitHub Button */
+        .github-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            box-shadow: 0 4px 12px var(--shadow);
+            cursor: pointer;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            padding: 6px;
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .github-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        .github-button:active {
+            transform: scale(0.95);
+        }
+
+        .github-button img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-bottom: 2px;
+        }
+
+        .github-path {
+            font-size: 8px;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.1;
+            max-width: 100%;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             body {
@@ -163,11 +215,26 @@
             }
 
             .theme-toggle {
-                width: 50px;
-                height: 50px;
+                width: 70px;
+                height: 70px;
                 bottom: 15px;
                 right: 15px;
                 border-radius: 10px;
+            }
+
+            .github-button {
+                width: 70px;
+                height: 70px;
+                bottom: 15px;
+                left: 15px;
+                border-radius: 10px;
+                padding: 4px;
+                font-size: 8px;
+            }
+
+            .github-button img {
+                width: 35px;
+                height: 35px;
             }
 
             h1 {
@@ -204,6 +271,9 @@
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
+
+        // GitHub button configuration
+        const GITHUB_PATH = '/Jake-Moore/KamiCommonNMS';
     </script>
 </head>
 <body>
@@ -253,9 +323,15 @@ fetch("versions.json")
     </div>
 </div>
 
+<!-- GitHub Button -->
+<a href="#" class="github-button" id="githubButton" aria-label="View on GitHub" target="_blank" rel="noopener noreferrer">
+    <img id="githubIcon" src="images/github-mark.png" alt="GitHub">
+    <div class="github-path" id="githubPath"></div>
+</a>
+
 <!-- Theme Toggle Button -->
 <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" id="toggleIcon">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" id="toggleIcon">
         <!-- Moon icon (default for light mode) -->
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
     </svg>
@@ -264,6 +340,46 @@ fetch("versions.json")
 <script>
     // Set last updated time
     document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+
+    // GitHub Button Functionality
+    const githubButton = document.getElementById('githubButton');
+    const githubIcon = document.getElementById('githubIcon');
+    const githubPath = document.getElementById('githubPath');
+    
+    // Show GitHub button only if path is provided and not a placeholder
+    if (GITHUB_PATH && GITHUB_PATH !== '/Jake-Moore/KamiCommonNMS' && GITHUB_PATH.trim() !== '') {
+        const fullUrl = 'https://github.com' + GITHUB_PATH;
+        githubButton.href = fullUrl;
+        
+        // Smart path formatting for better display
+        let displayPath = GITHUB_PATH;
+        if (GITHUB_PATH.length > 20) {
+            // For very long paths, show just the repo name
+            const parts = GITHUB_PATH.split('/');
+            if (parts.length >= 3) {
+                displayPath = '/' + parts[1] + '/\n' + parts[2];
+            } else if (parts.length === 2) {
+                displayPath = parts[1];
+            }
+        } else if (GITHUB_PATH.length > 12) {
+            // For medium paths, try to break at the slash
+            displayPath = GITHUB_PATH.replace('/', '/\n');
+        }
+        
+        githubPath.innerHTML = displayPath.replace('\n', '<br>');
+        githubButton.style.display = 'flex';
+    }
+
+    // Update GitHub icon based on theme
+    function updateGithubIcon(theme) {
+        if (githubIcon) {
+            if (theme === 'dark') {
+                githubIcon.src = 'images/github-mark-white.png';
+            } else {
+                githubIcon.src = 'images/github-mark.png';
+            }
+        }
+    }
 
     // Theme Toggle Functionality
     const themeToggle = document.getElementById('themeToggle');
@@ -278,13 +394,18 @@ fetch("versions.json")
         if (theme === 'dark') {
             // Sun icon for dark mode
             toggleIcon.innerHTML = '<circle cx="12" cy="12" r="5" fill="currentColor"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/>';
+            toggleIcon.setAttribute('width', '32');
+            toggleIcon.setAttribute('height', '32');
         } else {
             // Moon icon for light mode
             toggleIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>';
+            toggleIcon.setAttribute('width', '32');
+            toggleIcon.setAttribute('height', '32');
         }
     }
 
     updateToggleIcon(currentTheme);
+    updateGithubIcon(currentTheme);
 
     // Toggle theme function
     function toggleTheme() {
@@ -294,6 +415,7 @@ fetch("versions.json")
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         updateToggleIcon(newTheme);
+        updateGithubIcon(newTheme);
     }
 
     // Add click event listener

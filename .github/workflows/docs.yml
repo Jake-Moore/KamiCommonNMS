@@ -8,7 +8,9 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write      # Allow reading repo contents and writing (for push)
+      pages: write         # Allow writing to GitHub Pages
+      id-token: write      # Allow OIDC token for authentication
 
     steps:
       - uses: actions/checkout@v5

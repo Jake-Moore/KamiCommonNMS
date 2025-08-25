@@ -24,6 +24,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 
+/**
+ * Main Entry Point for all NMS related functionality.
+ */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class NmsAPI {
     // ---------------------------------------------------------------------------------- //

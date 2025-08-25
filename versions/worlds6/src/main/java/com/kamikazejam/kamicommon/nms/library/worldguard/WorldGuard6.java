@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
-@SuppressWarnings({"SpellCheckingInspection", "unused"})
+@SuppressWarnings({"SpellCheckingInspection", "deprecation"})
 public class WorldGuard6 implements WorldGuardApi {
     private final @NotNull WorldGuardPlugin wg;
     private final @NotNull NMSWrapper<NMSWorld, World> worldWrapper;

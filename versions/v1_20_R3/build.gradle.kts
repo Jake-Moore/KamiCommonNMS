@@ -14,8 +14,4 @@ tasks {                                                                 // 4. co
     assemble {
         dependsOn(reobfJar)
     }
-
-    reobfJar {
-        outputJar.set(layout.buildDirectory.file("libs/${project.name}-${project.version}.jar"))
-    }
 }

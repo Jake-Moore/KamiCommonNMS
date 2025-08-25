@@ -5,10 +5,6 @@ import com.kamikazejam.kamicommon.nms.event.EventManager_1_8_R1;
 import com.kamikazejam.kamicommon.nms.event.EventManager_1_9_R1;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * !!! Gradle Compatability Requires this module to be set to Java16 !!!
- * WE ARE BUILDING FOR Java 8, do not use any Java 9+ features
- */
 public class EventManagerProvider extends Provider<EventManager> {
     @Override
     protected @NotNull EventManager provide(int ver) {

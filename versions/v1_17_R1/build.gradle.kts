@@ -14,8 +14,4 @@ dependencies {
 tasks {                                                                 // 3. configure tasks (like reObf automatically)
     assemble {
         dependsOn(reobfJar)
-    }
-    reobfJar {
-        outputJar.set(layout.buildDirectory.file("libs/${project.name}-${project.version}.jar"))
-    }
-}
+    }}

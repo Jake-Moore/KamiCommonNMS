@@ -110,8 +110,9 @@ jobs:
           # Download the HTML template
           curl -s https://raw.githubusercontent.com/Jake-Moore/Jake-Moore.github.io/refs/heads/main/templates/index-template.html -o template.html
 
-          # Create the dynamic content section
-          DYNAMIC_CONTENT='<h2>📚 Latest Version</h2>
+          # Create the dynamic content section in a separate file
+          cat > dynamic_content.html << 'EOF'
+          <h2>📚 Latest Version</h2>
           <a href="latest/" class="version-link latest">Latest (Recommended)</a>
 
           <h2>📋 All Versions</h2>
@@ -146,16 +147,28 @@ jobs:
                   document.getElementById("versions").innerHTML = 
                       "<p style=\"color: #dc3545;\">Error loading versions. Please refresh the page.</p>";
               });
-          </script>'
+          </script>
+          EOF
 
           # Replace placeholders in the template
           sed "s|{{PAGE_TITLE}}|KamiCommon NMS API Documentation|g" template.html | \
           sed "s|{{PAGE_HEADING}}|🚀 KamiCommon NMS API Documentation|g" | \
-          sed "s|{{PAGE_DESCRIPTION}}|Welcome to the KamiCommon NMS API documentation. Choose a version below to browse the API documentation.|g" | \
-          sed "s|{{DYNAMIC_CONTENT}}|$DYNAMIC_CONTENT|g" > index.html
+          sed "s|{{PAGE_DESCRIPTION}}|Welcome to the KamiCommon NMS API documentation. Choose a version below to browse the API documentation.|g" > temp_index.html
+          
+          # Replace the dynamic content placeholder
+          awk '
+          /{{DYNAMIC_CONTENT}}/ {
+              while ((getline line < "dynamic_content.html") > 0) {
+                  print line
+              }
+              close("dynamic_content.html")
+              next
+          }
+          { print }
+          ' temp_index.html > index.html
 
           # Clean up
-          rm template.html
+          rm template.html temp_index.html dynamic_content.html
 
           echo "Generated index.html with modern styling"
 

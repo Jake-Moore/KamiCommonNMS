@@ -69,7 +69,7 @@ public abstract class IBlockUtil1_13<X> extends AbstractBlockUtil {
     }
 
     @Override
-    public final void setBlock(@NotNull Block b, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
+    protected final void setBlockInternal(@NotNull Block b, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
         // In 1.13 the flattening occurred, so now we can disregard the data value in XMaterial
         XMaterial xMaterial = blockData.getMaterialData().getMaterial();
         assert xMaterial.parseMaterial() != null;

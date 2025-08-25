@@ -134,10 +134,18 @@ gradle.projectsEvaluated {
         (options as StandardJavadocDocletOptions).apply {
             encoding = "UTF-8"
             charSet = "UTF-8"
-
-            // Set window title and doc title
             windowTitle = "KamiCommonNMS"
             docTitle = "KamiCommonNMS ${rootProject.version} API"
+
+            // External links
+            links(
+                "https://docs.oracle.com/en/java/javase/21/docs/api/",
+                // Paper API aggregated javadocs site
+                "https://jd.papermc.io/paper/"
+            )
+
+            // Treat missing external links as warnings
+            addBooleanOption("Xdoclint:none", true)
         }
     }
 

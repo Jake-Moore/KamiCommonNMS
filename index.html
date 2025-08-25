@@ -5,115 +5,307 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KamiCommon NMS API Documentation</title>
     <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
-            margin: 0; 
-            padding: 40px 20px;
-            background: #f8f9fa;
-            color: #333;
+        /* CSS Variables for Light/Dark Theme */
+        :root {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: white;
+            --bg-tertiary: #f8f9fa;
+            --text-primary: #333;
+            --text-secondary: #6c757d;
+            --text-accent: #2c3e50;
+            --border-color: #e9ecef;
+            --border-accent: #3498db;
+            --hover-bg: #e9ecef;
+            --shadow: rgba(0,0,0,0.1);
         }
-        .container { 
-            max-width: 800px; 
-            margin: 0 auto; 
-            background: white;
-            padding: 40px;
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #e5e5e5;
+            --text-secondary: #b0b0b0;
+            --text-accent: #8bb8e8;
+            --border-color: #404040;
+            --border-accent: #6ba3d6;
+            --hover-bg: #404040;
+            --shadow: rgba(0,0,0,0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: background-color 0.3s ease;
         }
-        h1 { 
-            color: #2c3e50; 
-            border-bottom: 2px solid #3498db; 
+
+        h1 {
+            color: var(--text-accent);
+            border-bottom: 2px solid var(--border-accent);
             padding-bottom: 10px;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 20px;
         }
-        .version-link { 
-            display: block; 
-            padding: 15px 20px; 
-            margin: 8px 0; 
-            background: #f8f9fa; 
-            text-decoration: none; 
-            border-radius: 6px; 
-            border: 1px solid #e9ecef;
-            color: #495057;
+
+        h2 {
+            color: var(--text-accent);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: clamp(1.3rem, 3vw, 1.6rem);
+        }
+
+        .version-link {
+            display: block;
+            padding: 15px 20px;
+            margin: 8px 0;
+            background: var(--bg-tertiary);
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
             transition: all 0.2s;
         }
-        .version-link:hover { 
-            background: #e9ecef; 
+
+        .version-link:hover {
+            background: var(--hover-bg);
             transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px var(--shadow);
         }
-        .latest { 
-            background: linear-gradient(135deg, #28a745, #20c997); 
-            color: white; 
+
+        .latest {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
             font-weight: bold;
             border-color: #28a745;
         }
+
         .latest:hover {
             background: linear-gradient(135deg, #218838, #1ea085);
         }
+
         .loading {
             text-align: center;
-            color: #6c757d;
+            color: var(--text-secondary);
             font-style: italic;
         }
+
         .updated {
-            color: #6c757d;
+            color: var(--text-secondary);
             font-size: 0.9em;
             text-align: center;
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 1px solid #e9ecef;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            border: none;
+            background: var(--bg-secondary);
+            box-shadow: 0 4px 12px var(--shadow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 6px;
+            }
+
+            .version-link {
+                padding: 12px 16px;
+                margin: 6px 0;
+            }
+
+            .theme-toggle {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 15px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                margin-bottom: 15px;
+            }
+
+            h2 {
+                margin-top: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .version-link {
+                padding: 10px 14px;
+            }
+        }
+
+        /* Smooth transitions for all interactive elements */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
     </style>
+    <script>
+        // Apply saved theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 KamiCommon NMS API Documentation</h1>
+<div class="container">
+    <h1>🚀 KamiCommon NMS API Documentation</h1>
+    <p>Welcome to the KamiCommon NMS API documentation. Choose a version below to browse the API documentation.</p>
 
-        <p>Welcome to the KamiCommon NMS API documentation. Choose a version below to browse the API documentation.</p>
+<h2>📚 Latest Version</h2>
+<a href="latest/" class="version-link latest">Latest (Recommended)</a>
 
-        <h2>📚 Latest Version</h2>
-        <a href="latest/" class="version-link latest">Latest (Recommended)</a>
+<h2>📋 All Versions</h2>
+<div id="versions" class="loading">Loading available versions...</div>
 
-        <h2>📋 All Versions</h2>
-        <div id="versions" class="loading">Loading available versions...</div>
+<script>
+// Load versions
+fetch("versions.json")
+    .then(response => {
+        if (!response.ok) throw new Error("Failed to load versions");
+        return response.json();
+    })
+    .then(data => {
+        const container = document.getElementById("versions");
+        container.innerHTML = "";
+        container.classList.remove("loading");
 
-        <div class="updated">
-            Last updated: <span id="lastUpdated"></span>
-        </div>
+        if (data.versions && data.versions.length > 0) {
+            data.versions.forEach(version => {
+                const link = document.createElement("a");
+                link.href = version + "/";
+                link.textContent = `Version ${version}`;
+                link.className = "version-link";
+                container.appendChild(link);
+            });
+        } else {
+            container.innerHTML = "<p>No versions available yet.</p>";
+        }
+    })
+    .catch(error => {
+        console.error("Error loading versions:", error);
+        document.getElementById("versions").innerHTML = 
+            "<p style=\"color: #dc3545;\">Error loading versions. Please refresh the page.</p>";
+    });
+</script>
+
+    <div class="updated">
+        Last updated: <span id="lastUpdated"></span>
     </div>
+</div>
 
-    <script>
+<!-- Theme Toggle Button -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" id="toggleIcon">
+        <!-- Moon icon (default for light mode) -->
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
+    </svg>
+</button>
+
+<script>
     // Set last updated time
     document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
 
-    // Load versions
-    fetch('versions.json')
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to load versions');
-            return response.json();
-        })
-        .then(data => {
-            const container = document.getElementById('versions');
-            container.innerHTML = '';
-            container.classList.remove('loading');
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
 
-            if (data.versions && data.versions.length > 0) {
-                data.versions.forEach(version => {
-                    const link = document.createElement('a');
-                    link.href = version + '/';
-                    link.textContent = `Version ${version}`;
-                    link.className = 'version-link';
-                    container.appendChild(link);
-                });
-            } else {
-                container.innerHTML = '<p>No versions available yet.</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading versions:', error);
-            document.getElementById('versions').innerHTML = 
-                '<p style="color: #dc3545;">Error loading versions. Please refresh the page.</p>';
-        });
-    </script>
+    // Get the theme that was already applied in the head
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+    // Update toggle button icon based on current theme
+    function updateToggleIcon(theme) {
+        const toggleIcon = document.getElementById('toggleIcon');
+        if (theme === 'dark') {
+            // Sun icon for dark mode
+            toggleIcon.innerHTML = '<circle cx="12" cy="12" r="5" fill="currentColor"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/>';
+        } else {
+            // Moon icon for light mode
+            toggleIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>';
+        }
+    }
+
+    updateToggleIcon(currentTheme);
+
+    // Toggle theme function
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateToggleIcon(newTheme);
+    }
+
+    // Add click event listener
+    themeToggle.addEventListener('click', toggleTheme);
+
+    // Add keyboard support for accessibility
+    themeToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleTheme();
+        }
+    });
+</script>
 </body>
 </html>

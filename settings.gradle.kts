@@ -33,3 +33,9 @@ include("versions:worlds7")
 
 include(":core")
 include(":versions")
+
+pluginManagement {
+    plugins {
+        kotlin("jvm") version "2.2.10"
+    }
+}

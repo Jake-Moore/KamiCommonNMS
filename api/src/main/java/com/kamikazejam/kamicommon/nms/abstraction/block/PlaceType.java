@@ -12,7 +12,7 @@ public enum PlaceType {
      */
     NO_PHYSICS,
     /**
-     * Neither Physics nor Light are handled (NMS Handling, light=false & physics=false)
+     * Neither Physics nor Light are handled (NMS Handling, light=false and physics=false)
      * Fastest possible
      */
     NMS

@@ -4,10 +4,6 @@ import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
 import com.kamikazejam.kamicommon.nms.block.*;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * !!! Gradle Compatability Requires this module to be set to Java16 !!!
- * WE ARE BUILDING FOR Java 8, do not use any Java 9+ features
- */
 public class BlockUtilProvider extends Provider<AbstractBlockUtil> {
     @Override
     protected @NotNull AbstractBlockUtil provide(int ver) {

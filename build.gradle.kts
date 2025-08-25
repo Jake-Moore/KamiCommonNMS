@@ -5,21 +5,21 @@ plugins { // needed for the allprojects section to work
     id("java")
     id("java-library")
     id("maven-publish")
-    id("com.gradleup.shadow") version "8.3.2" apply false
-    id("io.papermc.paperweight.userdev") version "1.7.5" apply false
+    id("com.gradleup.shadow") version "9.0.2" apply false
+    id("io.papermc.paperweight.userdev") version "1.7.7" apply false
 }
 
 ext {
     // reduced is just a re-zipped version of the original, without some conflicting libraries
     //  gson, org.json, com.yaml.snakeyaml
-    set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED")    // luxious nexus (public)
+    set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC")    // luxious nexus (public)
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
-    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:3.6.1.0")
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:4.0.0")
 }
 extra["commonDependencies"] = listOf(
-    "de.tr7zw:item-nbt-api:2.13.2",
-    "com.github.cryptomorin:XSeries:11.3.0",
-    "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.3.0"
+    "de.tr7zw:item-nbt-api:2.15.1",
+    "com.github.cryptomorin:XSeries:13.3.3",
+    "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.4.0"
 )
 
 allprojects {
@@ -62,13 +62,13 @@ allprojects {
 
     dependencies {
         // Lombok
-        compileOnly("org.projectlombok:lombok:1.18.34")
-        annotationProcessor("org.projectlombok:lombok:1.18.34")
-        testImplementation("org.projectlombok:lombok:1.18.34")
-        testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
+        compileOnly("org.projectlombok:lombok:1.18.38")
+        annotationProcessor("org.projectlombok:lombok:1.18.38")
+        testImplementation("org.projectlombok:lombok:1.18.38")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
 
         // IntelliJ annotations
-        compileOnly("org.jetbrains:annotations:25.0.0")
+        compileOnly("org.jetbrains:annotations:26.0.2")
     }
 
     // We want UTF-8 for everything

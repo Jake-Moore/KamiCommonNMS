@@ -37,11 +37,11 @@ jobs:
         run: echo "Version is ${{ steps.version.outputs.version }}"
 
       - name: Generate Javadocs
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
+        if: '!endsWith(steps.version.outputs.version, "SNAPSHOT")'
         run: gradle :core:aggregateJavadoc
 
       - name: Checkout gh-pages
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
+        if: '!endsWith(steps.version.outputs.version, "SNAPSHOT")'
         uses: actions/checkout@v5
         with:
           ref: gh-pages
@@ -49,7 +49,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy versioned docs
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
+        if: '!endsWith(steps.version.outputs.version, "SNAPSHOT")'
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           echo "Deploying docs for version: $VERSION"
@@ -73,12 +73,12 @@ jobs:
           echo "Updated latest to point to: $VERSION"
 
       - name: Generate versions.json
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
+        if: '!endsWith(steps.version.outputs.version, "SNAPSHOT")'
         run: |
           cd gh-pages
           
-          # Get all version directories (excluding 'latest')
-          VERSIONS=$(find . -maxdepth 1 -type d -name "*.*.*" -o -name "v*" | sed 's|./||' | grep -v '^latest$' | sort -V -r)
+          # Get all version directories (excluding 'latest' and any files)
+          VERSIONS=$(find . -maxdepth 1 -type d \( -name "*.*.*" -o -name "v*" \) | sed 's|./||' | grep -v '^latest$' | grep -v '^\.$' | sort -V -r)
           
           echo "Found versions: $VERSIONS"
           
@@ -103,7 +103,7 @@ jobs:
           cat versions.json
 
       - name: Generate index.html
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
+        if: '!endsWith(steps.version.outputs.version, "SNAPSHOT")'
         run: |
           cd gh-pages
 
@@ -173,7 +173,7 @@ jobs:
           echo "Generated index.html with modern styling"
 
       - name: Commit and push
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
+        if: '!endsWith(steps.version.outputs.version, "SNAPSHOT")'
         run: |
           cd gh-pages
           git config user.name "github-actions[bot]"

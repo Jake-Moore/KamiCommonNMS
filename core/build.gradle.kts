@@ -142,7 +142,7 @@ gradle.projectsEvaluated {
     }
 
     // Create the Javadoc JAR task (provides rich javadocs in IDEs)
-    tasks.register<Jar>("aggregateJavadocJar") {
+    val aggregateJavadocJar = tasks.register<Jar>("aggregateJavadocJar") {
         group = "documentation"
         description = "Assembles a JAR archive containing the combined Javadocs"
 
@@ -153,7 +153,7 @@ gradle.projectsEvaluated {
     }
 
     // Create the combined sources JAR (contains .java files) (provides fallback sources in IDEs)
-    tasks.register<Jar>("aggregateSourcesJar") {
+    val aggregateSourcesJar = tasks.register<Jar>("aggregateSourcesJar") {
         group = "build"
         description = "Assembles sources JAR for all modules"
 
@@ -174,6 +174,8 @@ gradle.projectsEvaluated {
     // -------------------------------------------------- //
     //                     publishing                     //
     // -------------------------------------------------- //
+    tasks.publish.get().dependsOn(aggregateJavadocJar)
+    tasks.publish.get().dependsOn(aggregateSourcesJar)
     publishing {
         publications {
             create<MavenPublication>("shadow") {

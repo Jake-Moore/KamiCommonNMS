@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-val VERSION = "1.0.11-SNAPSHOT"
+val VERSION = "1.0.11"
 
 plugins {
     id("com.gradleup.shadow") version "9.0.2" apply false

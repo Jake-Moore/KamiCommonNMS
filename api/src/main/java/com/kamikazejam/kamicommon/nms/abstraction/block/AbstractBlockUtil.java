@@ -18,13 +18,18 @@ public abstract class AbstractBlockUtil {
     // ---------------------------------------------------------------------------------------- //
     //                                     ABSTRACTION                                          //
     // ---------------------------------------------------------------------------------------- //
-    public abstract void setBlock(@NotNull Block block, @NotNull XBlockData blockData, @NotNull PlaceType placeType);
-    private void setBlockInternal(@NotNull Block block, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
+
+    /**
+     * @hidden
+     */
+    protected abstract void setBlockInternal(@NotNull Block block, @NotNull XBlockData blockData, @NotNull PlaceType placeType);
+
+    private void setBlockCheck(@NotNull Block block, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
         // Validate nulls
         Preconditions.checkNotNull(block, "Block cannot be null");
         Preconditions.checkNotNull(blockData, "XBlockData blockData cannot be null");
         Preconditions.checkNotNull(placeType, "PlaceType cannot be null");
-        this.setBlock(block, blockData, placeType);
+        this.setBlockInternal(block, blockData, placeType);
     }
 
 
@@ -38,7 +43,7 @@ public abstract class AbstractBlockUtil {
      * @param placeType The {@link PlaceType} to use
      */
     public final void setBlockSuperFast(@NotNull Block block, @NotNull XMaterial xMaterial, @NotNull PlaceType placeType) {
-        this.setBlockInternal(block, new XBlockData(xMaterial), placeType);
+        this.setBlockCheck(block, new XBlockData(xMaterial), placeType);
     }
     /**
      * Set a block with the following parameters.
@@ -47,7 +52,7 @@ public abstract class AbstractBlockUtil {
      * @param placeType The {@link PlaceType} to use
      */
     public final void setBlockSuperFast(@NotNull Block block, @NotNull Material material, @NotNull PlaceType placeType) {
-        this.setBlockInternal(block, new XBlockData(XMaterial.matchXMaterial(material)), placeType);
+        this.setBlockCheck(block, new XBlockData(XMaterial.matchXMaterial(material)), placeType);
     }
     /**
      * Set a block with the following parameters.
@@ -56,7 +61,7 @@ public abstract class AbstractBlockUtil {
      * @param placeType The {@link PlaceType} to use
      */
     public final void setBlockSuperFast(@NotNull Block block, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
-        this.setBlockInternal(block, blockData, placeType);
+        this.setBlockCheck(block, blockData, placeType);
     }
 
     /**
@@ -66,7 +71,7 @@ public abstract class AbstractBlockUtil {
      * @param placeType The {@link PlaceType} to use
      */
     public final void setBlockSuperFast(@NotNull Location location, @NotNull XMaterial xMaterial, @NotNull PlaceType placeType) {
-        this.setBlockInternal(location.getBlock(), new XBlockData(xMaterial), placeType);
+        this.setBlockCheck(location.getBlock(), new XBlockData(xMaterial), placeType);
     }
     /**
      * Set a block with the following parameters.
@@ -75,7 +80,7 @@ public abstract class AbstractBlockUtil {
      * @param placeType The {@link PlaceType} to use
      */
     public final void setBlockSuperFast(@NotNull Location location, @NotNull Material material, @NotNull PlaceType placeType) {
-        this.setBlockInternal(location.getBlock(), new XBlockData(XMaterial.matchXMaterial(material)), placeType);
+        this.setBlockCheck(location.getBlock(), new XBlockData(XMaterial.matchXMaterial(material)), placeType);
     }
     /**
      * Set a block with the following parameters.
@@ -84,7 +89,7 @@ public abstract class AbstractBlockUtil {
      * @param placeType The {@link PlaceType} to use
      */
     public final void setBlockSuperFast(@NotNull Location location, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
-        this.setBlockInternal(location.getBlock(), blockData, placeType);
+        this.setBlockCheck(location.getBlock(), blockData, placeType);
     }
 
 
@@ -92,6 +97,7 @@ public abstract class AbstractBlockUtil {
     //                                    UTIL METHODS                                          //
     // ---------------------------------------------------------------------------------------- //
     /**
+     * @hidden
      * Always available pre v1.13
      */
     @Deprecated @ApiStatus.Internal
@@ -99,10 +105,18 @@ public abstract class AbstractBlockUtil {
         assert xMaterial.parseMaterial() != null;
         return this.legacyGetCombined(xMaterial.parseMaterial().getId(), xMaterial.getData());
     }
+
+    /**
+     * @hidden
+     */
     @Deprecated @ApiStatus.Internal
     protected final int legacyGetCombined(Material material, byte data) {
         return this.legacyGetCombined(material.getId(), data);
     }
+
+    /**
+     * @hidden
+     */
     @ApiStatus.Internal
     protected final int legacyGetCombined(int id, byte data) {
         return id + (data << 12);

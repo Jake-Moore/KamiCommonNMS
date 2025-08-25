@@ -15,8 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"DuplicatedCode", "deprecation"})
 public class BlockUtil1_9_R2 extends AbstractBlockUtil {
-    @Override
-    public void setBlock(@NotNull Block b, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
+    @Override protected void setBlockInternal(@NotNull Block b, @NotNull XBlockData blockData, @NotNull PlaceType placeType) {
         XMaterialData materialData = blockData.getMaterialData();
 
         byte data = materialData.getData();

@@ -32,7 +32,7 @@ jobs:
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Display Version
-        run: echo "Version is ${{ steps.extract_version.outputs.version }}"
+        run: echo "Version is ${{ steps.version.outputs.version }}"
 
       - name: Generate Javadocs
         if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"

@@ -153,8 +153,9 @@ jobs:
           # Replace placeholders in the template
           sed "s|{{PAGE_TITLE}}|KamiCommon NMS API Documentation|g" template.html | \
           sed "s|{{PAGE_HEADING}}|🚀 KamiCommon NMS API Documentation|g" | \
-          sed "s|{{PAGE_DESCRIPTION}}|Welcome to the KamiCommon NMS API documentation. Choose a version below to browse the API documentation.|g" > temp_index.html
-          
+          sed "s|{{PAGE_DESCRIPTION}}|Welcome to the KamiCommon NMS API documentation. Choose a version below to browse the API documentation.|g" | \
+          sed "s|{{GITHUB_PATH}}|/Jake-Moore/KamiCommonNMS|g" > temp_index.html
+
           # Replace the dynamic content placeholder
           awk '
           /{{DYNAMIC_CONTENT}}/ {
@@ -170,7 +171,7 @@ jobs:
           # Clean up
           rm template.html temp_index.html dynamic_content.html
 
-          echo "Generated index.html with modern styling"
+          echo "Generated index.html"
 
       - name: Commit and push
         if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"

@@ -24,9 +24,6 @@ jobs:
         with:
           gradle-version: '9.0.0'
 
-      - name: Generate Javadocs
-        run: gradle :core:aggregateJavadoc
-
       - name: Extract Version from Gradle
         id: version
         run: |
@@ -36,6 +33,10 @@ jobs:
 
       - name: Display Version
         run: echo "Version is ${{ steps.extract_version.outputs.version }}"
+
+      - name: Generate Javadocs
+        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
+        run: gradle :core:aggregateJavadoc
 
       - name: Checkout gh-pages
         if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"

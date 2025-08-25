@@ -92,7 +92,7 @@ public abstract class AbstractBlockUtil {
     //                                    UTIL METHODS                                          //
     // ---------------------------------------------------------------------------------------- //
     /**
-     * Always available < v1.13
+     * Always available pre v1.13
      */
     @Deprecated @ApiStatus.Internal
     protected final int legacyGetCombined(XMaterial xMaterial) {

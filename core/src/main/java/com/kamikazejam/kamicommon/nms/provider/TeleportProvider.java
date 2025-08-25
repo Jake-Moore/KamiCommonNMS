@@ -4,10 +4,6 @@ import com.kamikazejam.kamicommon.nms.abstraction.teleport.AbstractTeleporter;
 import com.kamikazejam.kamicommon.nms.teleport.*;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * !!! Gradle Compatability Requires this module to be set to Java16 !!!
- * WE ARE BUILDING FOR Java 8, do not use any Java 9+ features
- */
 public class TeleportProvider extends Provider<AbstractTeleporter> {
     @Override
     protected @NotNull AbstractTeleporter provide(int ver) {

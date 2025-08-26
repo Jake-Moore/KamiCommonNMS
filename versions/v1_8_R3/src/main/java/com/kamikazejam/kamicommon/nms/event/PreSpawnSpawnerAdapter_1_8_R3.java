@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+// Taco for 1.8.8 had its own event for this: SpawnerPreSpawnEvent
 public class PreSpawnSpawnerAdapter_1_8_R3 implements Listener {
     @EventHandler
     public void onSpawn(SpawnerPreSpawnEvent e) {

@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 
+// Paper before 1.13 had only the SpawnerSpawnEvent.
 public class PreSpawnSpawnerAdapter_1_12_R1 implements Listener {
 
     @EventHandler

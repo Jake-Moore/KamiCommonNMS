@@ -33,7 +33,7 @@ public class MessageManager_1_8_R1 extends AbstractMessageManager {
     }
 
     @Override
-    public void processAndSend(@NotNull CommandSender sender, @NotNull KMessage kMessage) {
+    protected void processAndSendInternal(@NotNull CommandSender sender, @NotNull KMessage kMessage) {
         for (String line : kMessage.getLines()) {
             if (sender instanceof Player player) {
                 // Use BaseComponent -> will support all actions

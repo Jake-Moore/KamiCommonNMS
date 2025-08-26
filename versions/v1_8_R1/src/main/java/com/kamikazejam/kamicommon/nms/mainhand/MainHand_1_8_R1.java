@@ -27,11 +27,13 @@ public class MainHand_1_8_R1 extends AbstractMainHand {
 
     @Override
     public @Nullable ItemStack getItemInOffHand(@NotNull PlayerInventory playerInventory) {
+        // No offhand in 1.8
         return null;
     }
 
     @Override
     public void setItemInOffHand(@NotNull Player player, @Nullable ItemStack item) throws UnsupportedOperationException {
+        // No offhand in 1.8
         throw new UnsupportedOperationException("Offhand is not supported in 1.8");
     }
 }

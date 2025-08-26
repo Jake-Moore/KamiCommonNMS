@@ -151,9 +151,9 @@ jobs:
           EOF
 
           # Replace placeholders in the template
-          sed "s|{{PAGE_TITLE}}|KamiCommon NMS API Documentation|g" template.html | \
-          sed "s|{{PAGE_HEADING}}|🚀 KamiCommon NMS API Documentation|g" | \
-          sed "s|{{PAGE_DESCRIPTION}}|Welcome to the KamiCommon NMS API documentation. Choose a version below to browse the API documentation.|g" | \
+          sed "s|{{PAGE_TITLE}}|KamiCommon NMS Javadocs|g" template.html | \
+          sed "s|{{PAGE_HEADING}}|🚀 KamiCommon NMS Javadocs|g" | \
+          sed "s|{{PAGE_DESCRIPTION}}|Welcome to the KamiCommon NMS API documentation. Choose a version below to browse its Javadocs.|g" | \
           sed "s|{{GITHUB_PATH}}|/Jake-Moore/KamiCommonNMS|g" > temp_index.html
 
           # Replace the dynamic content placeholder

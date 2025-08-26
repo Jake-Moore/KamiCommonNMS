@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.wrappers.chunk;
 
+import com.kamikazejam.kamicommon.nms.abstraction.block.PlaceType;
 import com.kamikazejam.kamicommon.nms.util.data.XBlockData;
 import com.kamikazejam.kamicommon.nms.wrappers.NMSObject;
 import org.bukkit.Material;
@@ -57,7 +58,8 @@ public interface NMSChunkSection extends NMSObject {
     NMSChunk getNMSChunk();
 
     /**
-     * Sets the block type at the specified coordinates within this section.
+     * Sets the block type at the specified coordinates within this section.<br>
+     * USES {@link PlaceType#NMS} for fastest placement. Don't use the NMSChunk API if you want physics or updates.
      * <p>
      * This method places a block of the specified material at the given
      * coordinates within the section. Coordinates are relative to the
@@ -77,7 +79,8 @@ public interface NMSChunkSection extends NMSObject {
     void setType(int x, int y, int z, @NotNull Material material);
 
     /**
-     * Sets the block type and data at the specified coordinates within this section.
+     * Sets the block type and data at the specified coordinates within this section.<br>
+     * USES {@link PlaceType#NMS} for fastest placement. Don't use the NMSChunk API if you want physics or updates.
      * <p>
      * This method places a block with the specified block data at the given
      * coordinates within the section. The {@link XBlockData} provides

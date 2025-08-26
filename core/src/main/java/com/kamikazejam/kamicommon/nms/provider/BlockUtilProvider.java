@@ -96,8 +96,11 @@ public class BlockUtilProvider extends Provider<AbstractBlockUtil> {
             return new BlockUtil1_20_R2();
         }else if (ver <= f("1.20.4")) {
             return new BlockUtil1_20_R3();
+        }else if (ver <= f("1.21.4")) {
+            // breaks in 1.21.5 with new block state bitmask flag argument
+            return new BlockUtil1_21_4();
         }
         // With the mojang-mapped paper nms now, we might be good to use this version indefinitely
-        return new BlockUtil1_21_CB(); // Confirmed for 1.20.5, 1.20.6, 1.21
+        return new BlockUtil1_21_CB(); // Confirmed for 1.21.5, 1.21.8
     }
 }

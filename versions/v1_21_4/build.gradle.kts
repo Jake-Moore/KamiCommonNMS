@@ -5,9 +5,9 @@ plugins {
 
 dependencies {
     // Unique dependencies for this module
-    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT") // 2. add the dev bundle (contains all apis)
-    // Confirmed working for 1.20.5 and 1.20.6
-    
+    // Confirmed working for 1.21.4, see 1_21_CB for 1.21.5+
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT") // 2. add the dev bundle (contains all apis)
+
     compileOnly(project(":versions:v1_13_R1"))
     compileOnly(project(":versions:v1_14_R1"))
 }

@@ -2,7 +2,7 @@ package com.kamikazejam.kamicommon.nms.provider.event;
 
 import com.kamikazejam.kamicommon.nms.NmsVersion;
 import com.kamikazejam.kamicommon.nms.event.PreSpawnSpawnerAdapter_1_12_R1;
-import com.kamikazejam.kamicommon.nms.event.PreSpawnSpawnerAdapter_1_21_R1;
+import com.kamikazejam.kamicommon.nms.event.PreSpawnSpawnerAdapter_1_21_CB;
 import com.kamikazejam.kamicommon.nms.event.PreSpawnSpawnerAdapter_1_8_R3;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
 import org.bukkit.event.Listener;
@@ -81,7 +81,7 @@ public class PreSpawnSpawnerAdapter {
         }
 
         // 1.13+      -> Assume PaperSpigot and use PreSpawnerSpawnEvent
-        return new PreSpawnSpawnerAdapter_1_21_R1();
+        return new PreSpawnSpawnerAdapter_1_21_CB();
     }
 
     /**

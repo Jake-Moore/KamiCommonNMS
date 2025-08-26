@@ -114,8 +114,11 @@ public class NMSWorldWrapper extends NMSWrapper<NMSWorld, World> {
             return new NMSWorld_1_20_R2(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.20.4")) {
             return new NMSWorld_1_20_R3(world, NmsAPI.getBlockUtilProvider());
+        }else if (ver <= f("1.21.4")) {
+            // For up to 1.21.4 (breaks in 1.21.5)
+            return new NMSWorld_1_21_4(world, NmsAPI.getBlockUtilProvider());
         }
-        // With the mojang-mapped paper nms now, we might be good to use this version indefinitely
-        return new NMSWorld_1_21_CB(world, NmsAPI.getBlockUtilProvider()); // Confirmed for 1.20.5, 1.20.6, 1.21
+        // Includes chunk code for 1.21.5+
+        return new NMSWorld_1_21_CB(world, NmsAPI.getBlockUtilProvider()); // Confirmed for 1.21.5, 1.21.8
     }
 }

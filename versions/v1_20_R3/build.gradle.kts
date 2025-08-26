@@ -1,11 +1,11 @@
 plugins {
     // Unique plugins for this module
-    id("io.papermc.paperweight.userdev")                                 // 1. add the Paperweight plugin
+    id("io.papermc.paperweight.userdev") // 1. add the Paperweight plugin
 }
 
 dependencies {
     // Unique dependencies for this module
-    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")           // 2. add the dev bundle (contains all apis)
+    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT") // 2. add the dev bundle (contains all apis)
     compileOnly(project(":versions:v1_13_R1"))
     compileOnly(project(":versions:v1_14_R1"))
 }

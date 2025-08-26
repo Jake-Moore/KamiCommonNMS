@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-val VERSION = "1.1.1"
+val VERSION = "1.1.2"
 
 plugins {
     id("com.gradleup.shadow") version "9.0.2" apply false
@@ -10,6 +10,9 @@ ext {
     // reduced is just a re-zipped version of the original, without some conflicting libraries
     //  gson, org.json, com.yaml.snakeyaml
     set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC")    // luxious nexus (public)
+    // project property exposing the highest paper version currently verified to work
+    //   the project may support newer versions, but we have not tested or compiled against them yet
+    set("highestPaperDep", "1.21.8-R0.1-SNAPSHOT")
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:4.0.0")
     // Lombok Dependency

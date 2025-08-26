@@ -70,7 +70,8 @@ dependencies {
 
     // Starting with 1_20_CB we can opt to not re-obf, so we can shade again
     implementation(project(":versions:v1_20_CB"))
-    implementation(project(":versions:v1_21_R1"))
+    implementation(project(":versions:v1_21_4"))
+    implementation(project(":versions:v1_21_CB"))
 
     implementation(project(":versions:worlds6"))
     implementation(project(":versions:worlds7"))
@@ -136,6 +137,10 @@ gradle.projectsEvaluated {
             charSet = "UTF-8"
             windowTitle = "KamiCommonNMS"
             docTitle = "KamiCommonNMS ${rootProject.version} API"
+
+            // Apply a header documenting the NMS version this was built against
+            val highestPaperDep = (rootProject.property("highestPaperDep") as String).removeSuffix("-SNAPSHOT")
+            header = "NMS Verified For: 1.8-R0.1 - $highestPaperDep"
 
             // External links
             links(

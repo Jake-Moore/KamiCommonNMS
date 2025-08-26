@@ -3,13 +3,13 @@ val VERSION = "1.1.0"
 
 plugins {
     id("com.gradleup.shadow") version "9.0.2" apply false
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT" apply false
 }
 
 ext {
     // reduced is just a re-zipped version of the original, without some conflicting libraries
     //  gson, org.json, com.yaml.snakeyaml
-    set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED")    // luxious nexus (public)
+    set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC")    // luxious nexus (public)
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:4.0.0")
     // Lombok Dependency
@@ -18,8 +18,8 @@ ext {
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.15.1",
-    "com.github.cryptomorin:XSeries:11.3.0",
-    "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.3.0"
+    "com.github.cryptomorin:XSeries:13.3.3",
+    "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.4.0"
 )
 
 allprojects {

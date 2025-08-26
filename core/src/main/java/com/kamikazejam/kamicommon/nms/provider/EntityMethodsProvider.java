@@ -4,7 +4,46 @@ import com.kamikazejam.kamicommon.nms.abstraction.entity.AbstractEntityMethods;
 import com.kamikazejam.kamicommon.nms.entity.*;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Provider for version-specific entity manipulation implementations.
+ * <p>
+ * This provider selects the appropriate {@link AbstractEntityMethods} implementation
+ * based on the current Minecraft version, handling the evolution of entity APIs
+ * and spawner mechanics across different Minecraft releases. Entity methods provide
+ * advanced entity manipulation capabilities including dimension handling, AI control,
+ * and spawner item management.
+ * </p>
+ * <p>
+ * The provider covers major changes in entity handling systems:
+ * <ul>
+ * <li><strong>1.8-1.12:</strong> Legacy entity manipulation with NBT-based spawner items</li>
+ * <li><strong>1.13+:</strong> Updated entity systems with improved spawner handling</li>
+ * <li><strong>1.17+:</strong> Significant NMS restructuring affecting entity APIs</li>
+ * <li><strong>1.20.5+:</strong> Mojang-mapped Paper NMS for enhanced compatibility</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Each implementation provides methods for entity dimension queries, persistence
+ * settings, AI control, and advanced spawner item manipulation that are essential
+ * for plugins dealing with custom entities or spawner mechanics.
+ * </p>
+ *
+ * @see AbstractEntityMethods
+ */
 public class EntityMethodsProvider extends Provider<AbstractEntityMethods> {
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Selects the appropriate entity methods implementation based on Minecraft version,
+     * accounting for significant changes in entity handling and spawner mechanics.
+     * The selection ensures compatibility with both legacy NBT systems and modern
+     * entity management approaches.
+     * </p>
+     *
+     * @param ver the formatted NMS version integer
+     * @return the version-appropriate {@link AbstractEntityMethods} implementation
+     * @throws IllegalArgumentException if the version is below 1.8 (unsupported)
+     */
     @Override
     protected @NotNull AbstractEntityMethods provide(int ver) {
         if (ver < f("1.8")) {

@@ -9,15 +9,64 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+/**
+ * Default implementation interface for NMS chunk operations.
+ * <p>
+ * This interface provides default implementations for common chunk operations
+ * that can be shared across different Minecraft versions. It extends the
+ * base {@link NMSChunk} interface and provides concrete implementations
+ * for complex operations like chunk saving and refreshing.
+ * </p>
+ * <p>
+ * The implementation focuses on handling the nuances of chunk dirty state
+ * management across different Minecraft versions, particularly addressing
+ * the lazy saving behavior introduced in newer versions where chunks
+ * may not be saved automatically after modifications.
+ * </p>
+ * <p>
+ * This interface is typically implemented by version-specific chunk wrapper
+ * classes that want to inherit the standard save and refresh behavior
+ * while providing their own version-specific implementations for other
+ * chunk operations.
+ * </p>
+ */
 @SuppressWarnings("unused")
 public interface NMSChunkDef extends NMSChunk {
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation delegates to the internal {@link #saveAndRefreshI()}
+     * method to provide a complete save and refresh cycle for the chunk.
+     * </p>
+     */
     @Override
     default void saveAndRefresh() {
         this.saveAndRefreshI();
     }
 
-    // Create a default inside this internal interface, to not expose this method
+    /**
+     * Internal implementation of the save and refresh operation.
+     * <p>
+     * This method provides a robust implementation for chunk saving and
+     * refreshing that works across multiple Minecraft versions. It addresses
+     * the lazy saving behavior of newer versions by explicitly marking the
+     * chunk as dirty through a temporary block modification.
+     * </p>
+     * <p>
+     * The implementation strategy:
+     * <ol>
+     * <li>Temporarily modifies a block at the world's minimum height to trigger dirty state</li>
+     * <li>Immediately reverts the block to its original state</li>
+     * <li>Refreshes the chunk for all connected clients</li>
+     * <li>Forces chunk unloading with save to ensure persistence</li>
+     * </ol>
+     * </p>
+     * <p>
+     * <strong>Note:</strong> This method is marked as internal and should not
+     * be called directly by external code. Use {@link #saveAndRefresh()} instead.
+     * </p>
+     */
     @SuppressWarnings("deprecation")
     default void saveAndRefreshI() {
         // Higher versions are lazy about saving chunks, relying on dirty flags

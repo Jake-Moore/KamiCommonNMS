@@ -6,8 +6,60 @@ import com.kamikazejam.kamicommon.nms.wrappers.world.*;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Version-specific wrapper factory for creating NMS world instances.
+ * <p>
+ * This wrapper extends the {@link NMSWrapper} pattern to provide context-dependent
+ * NMS world creation based on both the current Minecraft version and a specific
+ * Bukkit world instance. It integrates with the block utility provider system
+ * to ensure that each world wrapper has access to appropriate high-performance
+ * block manipulation capabilities.
+ * </p>
+ * <p>
+ * The wrapper handles the evolution of world management across Minecraft versions:
+ * <ul>
+ * <li><strong>1.8-1.12:</strong> Legacy world systems with stable NMS structure</li>
+ * <li><strong>1.13+:</strong> Updated world handling with flattened block systems</li>
+ * <li><strong>1.17+:</strong> Significant NMS restructuring affecting world access</li>
+ * <li><strong>1.20.5+:</strong> Mojang-mapped implementations for enhanced stability</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Each world wrapper provides access to:
+ * <ul>
+ * <li>Chunk management and manipulation systems</li>
+ * <li>High-performance block operations</li>
+ * <li>Entity spawning and world queries</li>
+ * <li>World boundary information (min/max height)</li>
+ * <li>Direct client update mechanisms</li>
+ * </ul>
+ * </p>
+ * <p>
+ * The wrapper ensures that each world instance is paired with the appropriate
+ * block utility implementation, enabling consistent performance characteristics
+ * and API compatibility across all supported Minecraft versions.
+ * </p>
+ *
+ * @see NMSWorld
+ * @see com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil
+ */
 public class NMSWorldWrapper extends NMSWrapper<NMSWorld, World> {
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Creates a version-appropriate NMS world wrapper for the specified Bukkit world.
+     * Each wrapper is integrated with the corresponding block utility provider to
+     * ensure consistent performance and API compatibility. The selection covers
+     * major world system changes including chunk handling, entity management,
+     * and block manipulation optimizations.
+     * </p>
+     *
+     * @param ver the formatted NMS version integer
+     * @param world the Bukkit {@link World} to wrap with NMS functionality
+     * @return the version-appropriate {@link NMSWorld} wrapper
+     * @throws IllegalArgumentException if the version is below 1.8 (unsupported)
+     */
     @Override
     protected @NotNull NMSWorld provide(int ver, @NotNull World world) {
         if (ver < f("1.8")) {

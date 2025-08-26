@@ -21,7 +21,7 @@ import java.util.List;
 public class MessageManager_1_17_R1 extends AbstractMessageManager {
 
     @Override
-    public void processAndSend(@NotNull CommandSender sender, @NotNull KMessage kMessage) {
+    protected void processAndSendInternal(@NotNull CommandSender sender, @NotNull KMessage kMessage) {
         for (String line : kMessage.getLines()) {
             this.processAndSend(sender, line, kMessage.isTranslate(), kMessage.getActions());
         }

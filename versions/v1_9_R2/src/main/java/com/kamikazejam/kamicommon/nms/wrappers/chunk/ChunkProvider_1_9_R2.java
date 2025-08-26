@@ -25,7 +25,7 @@ public class ChunkProvider_1_9_R2 implements NMSChunkProvider {
     }
 
     @Override
-    public void saveChunk(NMSChunk chunk) {
+    public void saveChunk(@NotNull NMSChunk chunk) {
         this.handle.saveChunk((Chunk) chunk.getHandle());
     }
 

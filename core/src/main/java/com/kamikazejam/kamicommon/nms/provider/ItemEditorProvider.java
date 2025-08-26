@@ -5,7 +5,42 @@ import com.kamikazejam.kamicommon.nms.item.ItemEditor_1_11_R1;
 import com.kamikazejam.kamicommon.nms.item.ItemEditor_1_8_R1;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Provider for version-specific item editor implementations.
+ * <p>
+ * This provider selects the appropriate {@link AbstractItemEditor} implementation
+ * based on the current Minecraft version, handling the introduction of new item
+ * properties and metadata systems. Item editors provide advanced ItemMeta
+ * manipulation capabilities that extend beyond standard Bukkit API functionality.
+ * </p>
+ * <p>
+ * The provider addresses the introduction of new item features:
+ * <ul>
+ * <li><strong>1.8-1.10:</strong> Basic item metadata with limited unbreakable support</li>
+ * <li><strong>1.11+:</strong> Enhanced item properties including proper unbreakable flags</li>
+ * </ul>
+ * </p>
+ * <p>
+ * This enables consistent item manipulation across versions while providing access
+ * to advanced features like unbreakable items, custom attributes, and other
+ * metadata properties that may not be fully supported by the standard Bukkit API.
+ * </p>
+ *
+ * @see AbstractItemEditor
+ */
 public class ItemEditorProvider extends Provider<AbstractItemEditor> {
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Selects the item editor implementation based on the introduction of enhanced
+     * item properties in Minecraft 1.11. The selection ensures access to the most
+     * appropriate item manipulation methods for each version.
+     * </p>
+     *
+     * @param ver the formatted NMS version integer
+     * @return the version-appropriate {@link AbstractItemEditor} implementation
+     * @throws IllegalArgumentException if the version is below 1.8 (unsupported)
+     */
     @Override
     protected @NotNull AbstractItemEditor provide(int ver) {
         if (ver < f("1.8")) {

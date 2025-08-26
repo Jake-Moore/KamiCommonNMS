@@ -4,7 +4,44 @@ import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
 import com.kamikazejam.kamicommon.nms.block.*;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Provider for version-specific block utility implementations.
+ * <p>
+ * This provider selects the appropriate {@link AbstractBlockUtil} implementation
+ * based on the current Minecraft version, handling the evolution of NMS block
+ * manipulation APIs across different Minecraft releases. Block utilities provide
+ * high-performance block placement operations that bypass normal Bukkit overhead.
+ * </p>
+ * <p>
+ * The provider covers major API changes in Minecraft's block handling system:
+ * <ul>
+ * <li><strong>1.8-1.12:</strong> Legacy block manipulation with data values</li>
+ * <li><strong>1.13+:</strong> Flattened block system with block states</li>
+ * <li><strong>1.17+:</strong> Significant NMS restructuring and mapping changes</li>
+ * <li><strong>1.20.5+:</strong> Mojang-mapped Paper NMS for improved stability</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Each implementation provides optimized block placement methods that can significantly
+ * outperform standard Bukkit block operations, particularly for bulk operations
+ * like world generation, schematic pasting, or large-scale modifications.
+ * </p>
+ *
+ * @see AbstractBlockUtil
+ */
 public class BlockUtilProvider extends Provider<AbstractBlockUtil> {
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Selects the appropriate block utility implementation based on Minecraft version,
+     * accounting for major API changes in block handling systems. The selection
+     * covers the evolution from legacy data values to modern block states.
+     * </p>
+     *
+     * @param ver the formatted NMS version integer
+     * @return the version-appropriate {@link AbstractBlockUtil} implementation
+     * @throws IllegalArgumentException if the version is below 1.8 (unsupported)
+     */
     @Override
     protected @NotNull AbstractBlockUtil provide(int ver) {
         if (ver < f("1.8")) {

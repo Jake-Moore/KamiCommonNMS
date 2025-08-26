@@ -6,13 +6,14 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
 }
 
+val highestPaperDep = "1.21.8-R0.1-SNAPSHOT"
 ext {
     // reduced is just a re-zipped version of the original, without some conflicting libraries
     //  gson, org.json, com.yaml.snakeyaml
     set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC")    // luxious nexus (public)
     // project property exposing the highest paper version currently verified to work
     //   the project may support newer versions, but we have not tested or compiled against them yet
-    set("highestPaperDep", "1.21.8-R0.1-SNAPSHOT")
+    set("highestPaperDep", highestPaperDep)
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:4.0.0")
     // Lombok Dependency
@@ -72,5 +73,11 @@ subprojects {
 tasks.register("printVersion") {
     doLast {
         println(project.version)
+    }
+}
+
+tasks.register("printPaperVersion") {
+    doLast {
+        println(highestPaperDep)
     }
 }

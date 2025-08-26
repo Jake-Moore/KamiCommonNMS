@@ -1,6 +1,9 @@
 &nbsp;
-> <a href="https://repo.luxiouslabs.net/#browse/browse:maven-releases:com%2Fkamikazejam%2Fkamicommon%2Fspigot-nms"> <img alt="Latest Release" src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Jake-Moore/25b97e226e0ecf38e0135223111fd115/raw/version.json" /></a>
->
+> <a href="https://repo.luxiouslabs.net/#browse/browse:maven-releases:com%2Fkamikazejam%2Fkamicommon%2Fspigot-nms"> <img alt="Latest Release" src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Jake-Moore/25b97e226e0ecf38e0135223111fd115/raw/version.json" /></a> <a href="https://repo.luxiouslabs.net/#browse/browse:maven-releases:com%2Fkamikazejam%2Fkamicommon%2Fspigot-nms"> <img alt="Latest Release" src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Jake-Moore/25b97e226e0ecf38e0135223111fd115/raw/paperVersion.json" /></a>
+> 
+> **The Last NMS Update may not match the latest Minecraft Version.**  
+> This is okay, as NMS updates are not always required for every Minecraft version.
+> 
 > Repo: [Luxious Repository](https://repo.luxiouslabs.net/)
 
 # KamiCommonNMS

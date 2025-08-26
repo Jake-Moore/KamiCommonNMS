@@ -42,6 +42,8 @@ jobs:
         gradle clean
         version=$(gradle properties -q | grep "^version:" | awk '{print $2}')
         echo "version=$version" >> $GITHUB_OUTPUT
+        paperVersion=$(gradle printPaperVersion -q | tr -d '[:space:]')
+        echo "paperVersion=$paperVersion" >> $GITHUB_OUTPUT
 
     - name: Display Version
       run: echo "Version is ${{ steps.extract_version.outputs.version }}"
@@ -64,8 +66,19 @@ jobs:
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: 25b97e226e0ecf38e0135223111fd115
-        filename: version.json # Use test.svg if you want to use the SVG mode.
+        filename: version.json
         label: Latest Release
         message: "${{ steps.extract_version.outputs.version }}"
         color: blue
 
+      # Update the README.md Badge with the new paper version
+    - name: Create Version Badge
+      if: "!endsWith(steps.extract_version.outputs.version, 'SNAPSHOT')"
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: 25b97e226e0ecf38e0135223111fd115
+        filename: paperVersion.json
+        label: Last NMS Update
+        message: "${{ steps.extract_version.outputs.paperVersion }}"
+        color: orange

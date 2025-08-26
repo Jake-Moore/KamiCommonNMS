@@ -338,16 +338,44 @@ fetch("versions.json")
 </button>
 
 <script>
-    // Set last updated time
-    document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+    // Set last updated time from GitHub API
+    async function setLastUpdated() {
+        const lastUpdatedElement = document.getElementById('lastUpdated');
+        lastUpdatedElement.textContent = 'Loading...';
+        
+        try {
+            if (GITHUB_PATH && GITHUB_PATH.trim() !== '' && !GITHUB_PATH.includes('{{')) {
+                const response = await fetch(`https://api.github.com/repos${GITHUB_PATH}/commits?sha=gh-pages&per_page=1`);
+                if (response.ok) {
+                    const commits = await response.json();
+                    if (commits[0]) {
+                        const date = new Date(commits[0].commit.author.date);
+                        lastUpdatedElement.textContent = date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        return;
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Could not fetch last updated date:', error);
+        }
+        
+        // Fallback if GitHub API fails or no GitHub path
+        lastUpdatedElement.textContent = 'Recently';
+    }
+    
+    setLastUpdated();
 
     // GitHub Button Functionality
     const githubButton = document.getElementById('githubButton');
     const githubIcon = document.getElementById('githubIcon');
     const githubPath = document.getElementById('githubPath');
     
-    // Show GitHub button only if path is provided and not a placeholder
-    if (GITHUB_PATH && GITHUB_PATH !== '/Jake-Moore/KamiCommonNMS' && GITHUB_PATH.trim() !== '') {
+    // Show GitHub button only if path is provided and not empty
+    if (GITHUB_PATH && GITHUB_PATH.trim() !== '' && !GITHUB_PATH.includes('{{')) {
         const fullUrl = 'https://github.com' + GITHUB_PATH;
         githubButton.href = fullUrl;
         

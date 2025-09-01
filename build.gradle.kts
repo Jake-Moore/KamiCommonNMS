@@ -3,7 +3,7 @@ val VERSION = "1.1.3"
 
 plugins {
     id("com.gradleup.shadow") version "9.1.0" apply false
-    id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
 }
 
 val highestPaperDep = "1.21.8-R0.1-SNAPSHOT"

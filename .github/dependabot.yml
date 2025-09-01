@@ -13,7 +13,6 @@ updates:
       - dependency-name: "io.papermc.paperweight.userdev"
         versions:
           - "2.0.0-SNAPSHOT"
-          - "*-SNAPSHOT"
     groups:
       default:
         patterns:

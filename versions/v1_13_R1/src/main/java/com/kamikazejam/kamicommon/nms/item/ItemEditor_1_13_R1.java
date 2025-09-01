@@ -40,4 +40,10 @@ public class ItemEditor_1_13_R1 extends AbstractItemEditor {
         }
         throw new IllegalArgumentException("ItemMeta is not Damageable");
     }
+
+    @Override
+    public boolean isDamageable(@NotNull ItemStack item) {
+        // 1.13+ method
+        return item.getItemMeta() instanceof Damageable;
+    }
 }

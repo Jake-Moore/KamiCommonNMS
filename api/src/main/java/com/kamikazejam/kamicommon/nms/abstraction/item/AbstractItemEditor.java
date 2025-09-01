@@ -80,4 +80,18 @@ public abstract class AbstractItemEditor {
      * @throws IllegalArgumentException if the item's meta does not support damage (e.g., non-damageable items)
      */
     public abstract int getDamage(@NotNull ItemStack item);
+
+    /**
+     * @since 1.1.5
+     * Checks if the given item is damageable (i.e., has durability).
+     * <p>
+     * This method determines if the provided {@link ItemStack} can take damage.<br>
+     * - In pre-1.13 versions this checks if the item's material has a max durability greater than 0.<br>
+     * - In 1.13 and later versions this checks if the item's meta is an instance of Damageable.
+     * </p>
+     *
+     * @param item the {@link ItemStack} to check
+     * @return {@code true} if the item is damageable, {@code false} otherwise
+     */
+    public abstract boolean isDamageable(@NotNull ItemStack item);
 }

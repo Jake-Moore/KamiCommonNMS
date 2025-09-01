@@ -35,6 +35,7 @@ public abstract class AbstractItemEditor {
     public abstract ItemMeta setUnbreakable(@NotNull ItemMeta meta, boolean unbreakable);
 
     /**
+     * @since 1.1.3
      * Checks if an item is unbreakable through its {@link ItemMeta}.
      * <p>
      * This method retrieves the unbreakable status from the provided

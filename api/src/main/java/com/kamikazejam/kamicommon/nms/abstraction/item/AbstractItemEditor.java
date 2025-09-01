@@ -33,4 +33,21 @@ public abstract class AbstractItemEditor {
      * @return the modified {@link ItemMeta} for method chaining
      */
     public abstract ItemMeta setUnbreakable(@NotNull ItemMeta meta, boolean unbreakable);
+
+    /**
+     * Checks if an item is unbreakable through its {@link ItemMeta}.
+     * <p>
+     * This method retrieves the unbreakable status from the provided
+     * {@link ItemMeta}. It returns {@code true} if the item is unbreakable,
+     * and {@code false} otherwise.
+     * </p>
+     * <p>
+     * The implementation handles version-specific differences in how
+     * the unbreakable flag is stored and accessed in item metadata.
+     * </p>
+     *
+     * @param meta the {@link ItemMeta} to check
+     * @return {@code true} if the item is unbreakable, {@code false} otherwise
+     */
+    public abstract boolean isUnbreakable(@NotNull ItemMeta meta);
 }

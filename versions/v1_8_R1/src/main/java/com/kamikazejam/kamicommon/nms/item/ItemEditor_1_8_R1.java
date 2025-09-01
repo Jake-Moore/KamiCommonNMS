@@ -11,4 +11,9 @@ public class ItemEditor_1_8_R1 extends AbstractItemEditor {
         meta.spigot().setUnbreakable(unbreakable);
         return meta;
     }
+
+    @Override
+    public boolean isUnbreakable(@NotNull ItemMeta meta) {
+        return meta.spigot().isUnbreakable();
+    }
 }

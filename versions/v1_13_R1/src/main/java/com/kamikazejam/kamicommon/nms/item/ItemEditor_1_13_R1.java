@@ -2,11 +2,12 @@ package com.kamikazejam.kamicommon.nms.item;
 
 import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemEditor;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public class ItemEditor_1_11_R1 extends AbstractItemEditor {
+public class ItemEditor_1_13_R1 extends AbstractItemEditor {
     @Override
     public ItemMeta setUnbreakable(@NotNull ItemMeta meta, boolean unbreakable) {
         // 1.11+ method
@@ -22,14 +23,21 @@ public class ItemEditor_1_11_R1 extends AbstractItemEditor {
 
     @Override
     public ItemStack setDamage(@NotNull ItemStack item, int damage) {
-        // Pre 1.13 method
-        item.setDurability((short) damage);
-        return item;
+        // 1.13+ method
+        if (item.getItemMeta() instanceof Damageable damageable) {
+            damageable.setDamage(damage);
+            item.setItemMeta((ItemMeta) damageable);
+            return item;
+        }
+        throw new IllegalArgumentException("ItemMeta is not Damageable");
     }
 
     @Override
     public int getDamage(@NotNull ItemStack item) {
-        // Pre 1.13 method
-        return item.getDurability();
+        // 1.13+ method
+        if (item.getItemMeta() instanceof Damageable damageable) {
+            return damageable.getDamage();
+        }
+        throw new IllegalArgumentException("ItemMeta is not Damageable");
     }
 }

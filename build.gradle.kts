@@ -2,8 +2,8 @@
 val VERSION = "1.1.3"
 
 plugins {
-    id("com.gradleup.shadow") version "9.0.2" apply false
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
+    id("com.gradleup.shadow") version "9.1.0" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT" apply false
 }
 
 val highestPaperDep = "1.21.8-R0.1-SNAPSHOT"
@@ -21,7 +21,7 @@ ext {
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
 }
 extra["commonDependencies"] = listOf(
-    "de.tr7zw:item-nbt-api:2.15.1",
+    "de.tr7zw:item-nbt-api:2.15.2",
     "com.github.cryptomorin:XSeries:13.3.3",
     "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.4.0"
 )

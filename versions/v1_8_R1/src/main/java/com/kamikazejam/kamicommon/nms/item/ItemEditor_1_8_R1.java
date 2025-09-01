@@ -32,4 +32,10 @@ public class ItemEditor_1_8_R1 extends AbstractItemEditor {
         // Pre 1.13 method
         return item.getDurability();
     }
+
+    @Override
+    public boolean isDamageable(@NotNull ItemStack item) {
+        // Pre 1.13 method
+        return item.getType().getMaxDurability() > 0;
+    }
 }

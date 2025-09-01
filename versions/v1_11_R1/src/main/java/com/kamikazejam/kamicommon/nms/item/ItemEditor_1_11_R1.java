@@ -11,4 +11,9 @@ public class ItemEditor_1_11_R1 extends AbstractItemEditor {
         meta.setUnbreakable(unbreakable);
         return meta;
     }
+
+    @Override
+    public boolean isUnbreakable(@NotNull ItemMeta meta) {
+        return meta.isUnbreakable();
+    }
 }

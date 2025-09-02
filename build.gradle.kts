@@ -18,7 +18,7 @@ ext {
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:4.0.0")
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.38")
-    set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
+    set("jetbrainsDep", "org.jetbrains:annotations:26.0.2-1")
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.15.2",

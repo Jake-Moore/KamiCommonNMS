@@ -101,6 +101,6 @@ public class TeleportProvider extends Provider<AbstractTeleporter> {
             return new Teleporter1_20_CB();
         }
         // Confirmed for 1.21
-        return new Teleporter1_21_CB();
+        return new Teleporter_LATEST();
     }
 }

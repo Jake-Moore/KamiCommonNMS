@@ -11,6 +11,9 @@
 - On August 31, 2024, this library was removed from KamiCommon into its own repository.
 - It aims to provide nms access while supporting versions 1.8.X to LATEST
 
+## JavaDoc
+- https://docs.jake-moore.dev/KamiCommonNMS/
+
 ## Disclaimers
 - 1.17+ only officially supports **Paper** as the server software.
 - This library requires **Java 21** to be used, as such any version of server jar must be runnable on Java 21 as well.

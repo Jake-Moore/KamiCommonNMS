@@ -23,10 +23,10 @@ dependencies {
     (rootProject.extra["commonDependencies"] as List<String>).forEach(dependencies::compileOnly)
 
     compileOnly(project.property("standaloneUtils") as String) // standalone-utils from KamiCommon
-    compileOnly(project.property("lowestSpigotDep") as String)
+    compileOnly(project.property("serverAPI") as String)
 }
 
-// Provision Java 17 (no J21 requirements here yet)
+// Requires J21 since target jar is Java 21
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }

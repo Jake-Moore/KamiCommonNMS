@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-val VERSION = "1.1.5"
+val VERSION = "1.2.0"
 
 plugins {
     id("com.gradleup.shadow") version "9.1.0" apply false
@@ -7,10 +7,25 @@ plugins {
 }
 
 val highestPaperDep = "1.21.8-R0.1-SNAPSHOT"
+
+// Testing server APIs (the earliest supported version, and the latest PaperMC version)
+val oldestServerAPI = "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC"
+val newestServerAPI = "io.papermc.paper:paper-api:$highestPaperDep"
+
 ext {
-    // reduced is just a re-zipped version of the original, without some conflicting libraries
-    //  gson, org.json, com.yaml.snakeyaml
-    set("lowestSpigotDep", "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC")    // luxious nexus (public)
+    // Use ENV variable to switch between oldest and newest API for testing
+    val useNewestAPI: String? = System.getenv("MC_SERVER_NEWEST_API")
+    val testingServerAPI = if (useNewestAPI != null && useNewestAPI.equals("true", true)) {
+        newestServerAPI
+    } else {
+        oldestServerAPI
+    }
+
+    // Run Configurations can be set up to supply alternate server API dependencies for quick compilation testing.
+    //  This is used by the `api` and `core` modules which just use generic version-independent server APIs
+    val serverVersionAPI = System.getenv("MC_SERVER_API") ?: testingServerAPI
+    set("serverAPI", serverVersionAPI)
+
     // project property exposing the highest paper version currently verified to work
     //   the project may support newer versions, but we have not tested or compiled against them yet
     set("highestPaperDep", highestPaperDep)
@@ -79,5 +94,36 @@ tasks.register("printVersion") {
 tasks.register("printPaperVersion") {
     doLast {
         println(highestPaperDep)
+    }
+}
+
+tasks.register("printOldestServerAPI") {
+    doLast {
+        println(oldestServerAPI)
+    }
+}
+tasks.register("printNewestServerAPI") {
+    doLast {
+        println(newestServerAPI)
+    }
+}
+
+tasks.register("printOldestServerAPI-short") {
+    val version = oldestServerAPI.split(":").lastOrNull()
+        ?: throw GradleException("Invalid oldestServerAPI format")
+    val semver = version.split("-").firstOrNull()
+        ?: throw GradleException("Invalid oldestServerAPI version format")
+    doLast {
+        println(semver)
+    }
+}
+
+tasks.register("printNewestServerAPI-short") {
+    val version = newestServerAPI.split(":").lastOrNull()
+        ?: throw GradleException("Invalid newestServerAPI format")
+    val semver = version.split("-").firstOrNull()
+        ?: throw GradleException("Invalid newestServerAPI version format")
+    doLast {
+        println(semver)
     }
 }

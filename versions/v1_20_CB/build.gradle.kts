@@ -12,10 +12,6 @@ dependencies {
     compileOnly(project(":versions:v1_14_R1"))
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21)) // 3. Need Java 21 for 1.20.5+
-}
-
 // Starting with 1.20.5 Paper we can choose not to reobf the jar, leaving it mojang mapped
 //  we forfeit spigot compatibility, but it will natively work on paper
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION

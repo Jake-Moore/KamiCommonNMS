@@ -32,7 +32,7 @@ ext {
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:4.0.0")
     // Lombok Dependency
-    set("lombokDep", "org.projectlombok:lombok:1.18.38")
+    set("lombokDep", "org.projectlombok:lombok:1.18.40")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
 }
 extra["commonDependencies"] = listOf(

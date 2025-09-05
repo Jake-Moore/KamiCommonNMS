@@ -1,11 +1,130 @@
-name: Generate and Deploy Javadocs
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Gradle Publish & Deploy Docs (on push)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract_version.outputs.version }}
+      paperVersion: ${{ steps.extract_version.outputs.paperVersion }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        with:
+          gradle-version: '9.0.0'
+
+      - name: Build with Gradle (1.8.8)
+        run: gradle build
+        env:
+          LUXIOUS_NEXUS_USER: ${{ secrets.MAVEN_NAME }}
+          LUXIOUS_NEXUS_PASS: ${{ secrets.MAVEN_SECRET }}
+          MC_SERVER_NEWEST_API: "false"
+
+      - name: Build with Gradle (Latest Paper 1.21+)
+        run: gradle build
+        env:
+          LUXIOUS_NEXUS_USER: ${{ secrets.MAVEN_NAME }}
+          LUXIOUS_NEXUS_PASS: ${{ secrets.MAVEN_SECRET }}
+          MC_SERVER_NEWEST_API: "true"
+
+      - name: Extract Version from Gradle
+        id: extract_version
+        run: |
+          gradle clean
+          version=$(gradle properties -q | grep "^version:" | awk '{print $2}')
+          echo "version=$version" >> $GITHUB_OUTPUT
+          paperVersion=$(gradle printPaperVersion -q | tr -d '[:space:]')
+          echo "paperVersion=$paperVersion" >> $GITHUB_OUTPUT
+
+      - name: Display Version
+        run: |
+          echo "Version is ${{ steps.extract_version.outputs.version }}"
+          echo "Paper Version is ${{ steps.extract_version.outputs.paperVersion }}"
+
+  build:
+    needs: validate
+    # Run only on non snapshot versions
+    if: "!endsWith(needs.validate.outputs.version, 'SNAPSHOT')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Access to Publish a Release
+      packages: write # Access to Publish a Package
+
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v5
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        server-id: github
+        settings-path: ${{ github.workspace }}
+
+      # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+      with:
+        gradle-version: '9.0.0'
+
+    - name: Publish with Gradle
+      run: gradle publish
+      env:
+        LUXIOUS_NEXUS_USER: ${{ secrets.MAVEN_NAME }}
+        LUXIOUS_NEXUS_PASS: ${{ secrets.MAVEN_SECRET }}
+
+      #--------------------------------------------------------------------------------------------
+      #           Update Version Badge
+      #--------------------------------------------------------------------------------------------
+
+      # Update the README.md Badge with the new version
+    - name: Create Version Badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: 25b97e226e0ecf38e0135223111fd115
+        filename: version.json
+        label: Latest Release
+        message: "${{ needs.validate.outputs.version }}"
+        color: blue
+
+      # Update the README.md Badge with the new paper version
+    - name: Create Paper NMS Version Badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: 25b97e226e0ecf38e0135223111fd115
+        filename: paperVersion.json
+        label: Last NMS Update
+        message: "${{ needs.validate.outputs.paperVersion }}"
+        color: orange
+
   docs:
+    needs: validate
+    # Run only on non snapshot versions
+    if: "!endsWith(needs.validate.outputs.version, 'SNAPSHOT')"
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Allow reading repo contents and writing (for push)
@@ -26,22 +145,10 @@ jobs:
         with:
           gradle-version: '9.0.0'
 
-      - name: Extract Version from Gradle
-        id: version
-        run: |
-          gradle clean
-          version=$(gradle properties -q | grep "^version:" | awk '{print $2}')
-          echo "version=$version" >> $GITHUB_OUTPUT
-
-      - name: Display Version
-        run: echo "Version is ${{ steps.version.outputs.version }}"
-
       - name: Generate Javadocs
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
         run: gradle :core:aggregateJavadoc
 
       - name: Checkout gh-pages
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
         uses: actions/checkout@v5
         with:
           ref: gh-pages
@@ -49,39 +156,37 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy versioned docs
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
+          VERSION="${{ needs.validate.outputs.version }}"
           echo "Deploying docs for version: $VERSION"
-          
+
           cd gh-pages
-          
+
           # Delete existing version folder if it exists
           rm -rf "$VERSION"
-          
+
           # Create version directory
           mkdir -p "$VERSION"
-          
+
           # Copy new docs to version folder
           cp -r ../core/build/docs/aggregateJavadoc/* "$VERSION"/
-          
+
           # Update or create 'latest' to point to this version
           rm -rf latest
           cp -r "$VERSION" latest
-          
+
           echo "Created version folder: $VERSION"
           echo "Updated latest to point to: $VERSION"
 
       - name: Generate versions.json
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
         run: |
           cd gh-pages
-          
+
           # Get all version directories (excluding 'latest' and any files)
           VERSIONS=$(find . -maxdepth 1 -type d \( -name "*.*.*" -o -name "v*" \) | sed 's|./||' | grep -v '^latest$' | grep -v '^\.$' | sort -V -r)
-          
+
           echo "Found versions: $VERSIONS"
-          
+
           # Generate versions.json
           echo "{" > versions.json
           echo '  "versions": [' >> versions.json
@@ -96,14 +201,13 @@ jobs:
           done
           echo "" >> versions.json
           echo '  ],' >> versions.json
-          echo "  \"latest\": \"${{ steps.version.outputs.version }}\"" >> versions.json
+          echo "  \"latest\": \"${{ needs.validate.outputs.version }}\"" >> versions.json
           echo '}' >> versions.json
-          
+
           echo "Generated versions.json:"
           cat versions.json
 
       - name: Generate index.html
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
         run: |
           cd gh-pages
 
@@ -174,18 +278,17 @@ jobs:
           echo "Generated index.html"
 
       - name: Commit and push
-        if: "!endsWith(steps.version.outputs.version, 'SNAPSHOT')"
         run: |
           cd gh-pages
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          
+
           # Check if there are changes to commit
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📚 Deploy docs for v${{ steps.version.outputs.version }} - $(date)"
+            git commit -m "📚 Deploy docs for v${{ needs.validate.outputs.version }} - $(date)"
             git push
             echo "✅ Documentation deployed successfully!"
           fi

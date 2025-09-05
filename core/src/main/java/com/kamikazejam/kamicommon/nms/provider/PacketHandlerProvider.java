@@ -97,6 +97,6 @@ public class PacketHandlerProvider extends Provider<NMSPacketHandler> {
             return new NMSPacketHandler_1_20_R3();
         }
         // With the mojang-mapped paper nms now, we might be good to use this version indefinitely
-        return new NMSPacketHandler_1_21_CB(); // Confirmed for 1.20.5, 1.20.6, 1.21
+        return new NMSPacketHandler_LATEST(); // Confirmed for 1.20.5, 1.20.6, 1.21
     }
 }

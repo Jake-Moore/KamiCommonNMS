@@ -3,7 +3,7 @@ package com.kamikazejam.kamicommon.nms.provider;
 import com.kamikazejam.kamicommon.nms.NmsAPI;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.AbstractMessageManager;
 import com.kamikazejam.kamicommon.nms.abstraction.itemtext.AbstractItemTextPre_1_17;
-import com.kamikazejam.kamicommon.nms.chat.MessageManager_1_17_R1;
+import com.kamikazejam.kamicommon.nms.chat.MessageManager_LATEST;
 import com.kamikazejam.kamicommon.nms.chat.MessageManager_1_8_R1;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,6 +56,6 @@ public class MessageManagerProvider extends Provider<AbstractMessageManager> {
         }
 
         // Use kyori adventure Component post 1.17
-        return new MessageManager_1_17_R1();
+        return new MessageManager_LATEST();
     }
 }

@@ -3,10 +3,10 @@ subprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
 
-    // Provision Java 17 all subprojects (new modules have version 21 configured)
+    // Provision Java 21 all subprojects
     plugins.withId("java") {
         extensions.configure<JavaPluginExtension> {
-            toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+            toolchain.languageVersion.set(JavaLanguageVersion.of(21))
         }
 
         // After removing the "java" plugin from this parent module (:versions), calls to "compileOnly" in subprojects broke.

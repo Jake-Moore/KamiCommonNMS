@@ -99,7 +99,7 @@ public class NmsItemProvider extends Provider<NmsItemMethods> {
         }
 
         // With the mojang-mapped paper nms now, we might be good to use this version indefinitely
-        return new NmsItemMethods_1_21_CB(); // Confirmed for 1.20.5, 1.20.6, 1.21
+        return new NmsItemMethods_LATEST(); // Confirmed for 1.20.5, 1.20.6, 1.21
     }
 }
 

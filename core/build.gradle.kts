@@ -71,7 +71,7 @@ dependencies {
     // Starting with 1_20_CB we can opt to not re-obf, so we can shade again
     implementation(project(":versions:v1_20_CB"))
     implementation(project(":versions:v1_21_4"))
-    implementation(project(":versions:v1_21_CB"))
+    implementation(project(":versions:v_latest"))
 
     implementation(project(":versions:worlds6"))
     implementation(project(":versions:worlds7"))
@@ -79,7 +79,7 @@ dependencies {
     // So we have access to the Clipboard class
     compileOnly("com.sk89q.worldedit:bukkit:6.1.9")
 
-    compileOnly(project.property("lowestSpigotDep") as String)
+    compileOnly(project.property("serverAPI") as String)
 }
 
 // Requires J21 since some submodules (which are shaded) are Java 21
@@ -96,6 +96,13 @@ tasks {
         // configurations = listOf(project.configurations.shadow.get())
     }
 }
+
+tasks.register("printServerAPI") {
+    doFirst {
+        println("Using Server API: ${project.property("serverAPI") as String}")
+    }
+}
+tasks.compileJava.get().dependsOn(tasks.named("printServerAPI"))
 
 // Javadoc module detection requires project evaluation (so api module is detected)
 gradle.projectsEvaluated {

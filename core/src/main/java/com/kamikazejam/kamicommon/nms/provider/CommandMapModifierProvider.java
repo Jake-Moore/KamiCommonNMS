@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.command.CommandMapModifier;
-import com.kamikazejam.kamicommon.nms.command.CommandMapModifier_1_17_R1;
+import com.kamikazejam.kamicommon.nms.command.CommandMapModifier_LATEST;
 import com.kamikazejam.kamicommon.nms.command.CommandMapModifier_1_8_R1;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +50,7 @@ public class CommandMapModifierProvider extends Provider<CommandMapModifier> {
         if (ver < f("1.17")) {
             return new CommandMapModifier_1_8_R1();
         }else {
-            return new CommandMapModifier_1_17_R1();
+            return new CommandMapModifier_LATEST();
         }
     }
 }

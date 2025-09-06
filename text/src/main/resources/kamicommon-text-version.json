@@ -1,0 +1,4 @@
+{
+  "version": "${version}",
+  "kyori_adventure_version": "${kyori_adventure_version}"
+}

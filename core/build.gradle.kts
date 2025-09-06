@@ -35,6 +35,8 @@ allprojects {
 dependencies {
     // Shade :api code into the core
     implementation(project(":api"))
+    // Shade our adventure relocated api into core
+    implementation(project.property("adventureDep") as String)
 
     // Common Dependencies (compileOnly to avoid shading)
     (rootProject.extra["commonDependencies"] as List<String>).forEach(dependencies::shadow)

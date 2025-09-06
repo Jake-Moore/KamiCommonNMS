@@ -26,5 +26,8 @@ subprojects {
         dependencies.add("testAnnotationProcessor", project.property("lombokDep") as String)
         // IntelliJ annotations
         dependencies.add("compileOnly", project.property("jetbrainsDep") as String)
+
+        // Add our shaded Adventure version so that subprojects can use it in their code
+        dependencies.add("compileOnly", project.property("adventureDep") as String)
     }
 }

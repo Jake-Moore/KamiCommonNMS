@@ -8,7 +8,19 @@ import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemEditor;
 import com.kamikazejam.kamicommon.nms.abstraction.item.NmsItemMethods;
 import com.kamikazejam.kamicommon.nms.abstraction.itemtext.AbstractItemTextPre_1_17;
 import com.kamikazejam.kamicommon.nms.abstraction.teleport.AbstractTeleporter;
-import com.kamikazejam.kamicommon.nms.provider.*;
+import com.kamikazejam.kamicommon.nms.provider.BlockUtilProvider;
+import com.kamikazejam.kamicommon.nms.provider.ChatColorProvider;
+import com.kamikazejam.kamicommon.nms.provider.CommandMapModifierProvider;
+import com.kamikazejam.kamicommon.nms.provider.EnchantIDProvider;
+import com.kamikazejam.kamicommon.nms.provider.EntityMethodsProvider;
+import com.kamikazejam.kamicommon.nms.provider.ItemEditorProvider;
+import com.kamikazejam.kamicommon.nms.provider.ItemTextProviderPre_1_17;
+import com.kamikazejam.kamicommon.nms.provider.MainHandProvider;
+import com.kamikazejam.kamicommon.nms.provider.MessageManagerProvider;
+import com.kamikazejam.kamicommon.nms.provider.NmsItemProvider;
+import com.kamikazejam.kamicommon.nms.provider.PacketHandlerProvider;
+import com.kamikazejam.kamicommon.nms.provider.TeleportProvider;
+import com.kamikazejam.kamicommon.nms.serializer.VersionedComponentSerializer;
 import com.kamikazejam.kamicommon.nms.wrapper.NMSWorldWrapper;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.NMSPacketHandler;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
@@ -21,7 +33,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * Central API facade for all NMS (Net Minecraft Server) functionality in KamiCommon.
@@ -118,6 +130,9 @@ public class NmsAPI {
     
     /** Provider for dynamic command registration and management. */
     @Getter private static final CommandMapModifierProvider commandMapModifierProvider = new CommandMapModifierProvider();
+
+    /** Wrappers for adventure text components. */
+    @Getter private static final VersionedComponentSerializer versionedComponentSerializer = new VersionedComponentSerializer();
 
     // ---------------------------------------------------------------------------------- //
     //                                     WRAPPERS                                       //

@@ -3,11 +3,16 @@ package com.kamikazejam.kamicommon.nms.text;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -39,5 +44,19 @@ public class VersionedComponent_1_11_R1 implements VersionedComponent {
     @Override
     public @NotNull String plainText() {
         return PlainTextComponentSerializer.plainText().serialize(this.component);
+    }
+
+    @Override
+    public @NotNull Inventory createInventory(@NotNull InventoryHolder owner, int size) {
+        // Needs to be serialized into legacy string that contains section symbols for title
+        String title = LegacyComponentSerializer.legacySection().serialize(this.component);
+        return Bukkit.createInventory(owner, size, title);
+    }
+
+    @Override
+    public @NotNull Inventory createInventory(@NotNull InventoryHolder owner, @NotNull InventoryType type) {
+        // Needs to be serialized into legacy string that contains section symbols for title
+        String title = LegacyComponentSerializer.legacySection().serialize(this.component);
+        return Bukkit.createInventory(owner, type, title);
     }
 }

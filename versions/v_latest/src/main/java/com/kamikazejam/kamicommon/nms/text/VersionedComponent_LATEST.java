@@ -5,7 +5,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,6 +38,16 @@ public class VersionedComponent_LATEST implements VersionedComponent {
     @Override
     public @NotNull String plainText() {
         return PlainTextComponentSerializer.plainText().serialize(this.component);
+    }
+
+    @Override
+    public @NotNull Inventory createInventory(@NotNull InventoryHolder owner, int size) {
+        return Bukkit.createInventory(owner, size, this.component);
+    }
+
+    @Override
+    public @NotNull Inventory createInventory(@NotNull InventoryHolder owner, @NotNull InventoryType type) {
+        return Bukkit.createInventory(owner, type, this.component);
     }
 
     @Internal

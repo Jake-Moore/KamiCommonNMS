@@ -1,6 +1,9 @@
 package com.kamikazejam.kamicommon.nms.text;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -32,6 +35,20 @@ public interface VersionedComponent {
      * Serializes the current message component to a plain text string using the PlainTextComponentSerializer on the current platform.
      */
     @NotNull String plainText();
+
+    /**
+     * Create a new menu with the current message as the title, other arguments are passed as normal.
+     * @param owner The inventory holder for this inventory. (inherited from Bukkit.createInventory)
+     * @param size The size of the inventory. (inherited from Bukkit.createInventory)
+     */
+    @NotNull Inventory createInventory(@NotNull InventoryHolder owner, int size);
+
+    /**
+     * Create a new menu with the current message as the title, other arguments are passed as normal.
+     * @param owner The inventory holder for this inventory. (inherited from Bukkit.createInventory)
+     * @param type The type of the inventory. (inherited from Bukkit.createInventory)
+     */
+    @NotNull Inventory createInventory(@NotNull InventoryHolder owner, @NotNull InventoryType type);
 
     /**
      * Sends the current message component to multiple senders.

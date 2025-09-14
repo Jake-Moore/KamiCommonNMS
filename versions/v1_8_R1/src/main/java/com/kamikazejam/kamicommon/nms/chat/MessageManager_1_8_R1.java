@@ -4,7 +4,7 @@ import com.kamikazejam.kamicommon.actions.*;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.AbstractMessageManager;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.KMessage;
 import com.kamikazejam.kamicommon.nms.abstraction.itemtext.AbstractItemTextPre_1_17;
-import com.kamikazejam.kamicommon.util.StringUtil;
+import com.kamikazejam.kamicommon.util.LegacyColors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -46,7 +46,7 @@ public class MessageManager_1_8_R1 extends AbstractMessageManager {
                 for (Action action : kMessage.getActions()) {
                     msg = msg.replace(action.getPlaceholder(), action.getReplacement());
                 }
-                sender.sendMessage((kMessage.isTranslate()) ? StringUtil.t(msg) : msg);
+                sender.sendMessage((kMessage.isTranslate()) ? LegacyColors.t(msg) : msg);
             }
         }
     }
@@ -59,7 +59,7 @@ public class MessageManager_1_8_R1 extends AbstractMessageManager {
      * @return A list of TextComponent[], each array meant to be sent to the player as one message
      */
     private BaseComponent[] processPlaceholders(@NotNull String line, boolean translate, @NotNull List<Action> actions) {
-        if (translate) { line = StringUtil.t(line); }
+        if (translate) { line = LegacyColors.t(line); }
         List<BaseComponent> components = new ArrayList<>();
 
         BaseComponent[] legacies = TextComponent.fromLegacyText(line);

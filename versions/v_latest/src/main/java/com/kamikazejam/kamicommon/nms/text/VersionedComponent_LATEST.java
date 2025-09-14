@@ -52,6 +52,12 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
     }
 
     @Internal
+    public static @NotNull VersionedComponent_LATEST fromPlainText(@NotNull String plainText) {
+        Preconditions.checkNotNull(plainText, "plainText cannot be null");
+        return new VersionedComponent_LATEST(PlainTextComponentSerializer.plainText().deserialize(plainText));
+    }
+
+    @Internal
     public static @NotNull VersionedComponent_LATEST fromMiniMessage(@NotNull String miniMessage) {
         Preconditions.checkNotNull(miniMessage, "miniMessage cannot be null");
         return new VersionedComponent_LATEST(MiniMessage.miniMessage().deserialize(miniMessage));

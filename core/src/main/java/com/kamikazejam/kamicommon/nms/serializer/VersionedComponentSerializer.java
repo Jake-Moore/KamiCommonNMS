@@ -9,6 +9,7 @@ import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_18_R1;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent_LATEST;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import com.kamikazejam.kamicommon.util.Preconditions;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,37 @@ import org.jetbrains.annotations.NotNull;
  */
 @SuppressWarnings("unused")
 public class VersionedComponentSerializer {
+
+    /**
+     * Convert a string (treated as plain text) into a {@link VersionedComponent} for this version.<br>
+     * <br>
+     * Does not support any color codes or mini message parsings. See other methods for those.
+     */
+    public @NotNull VersionedComponent fromPlainText(@NotNull String miniMessage) {
+        Preconditions.checkNotNull(miniMessage, "miniMessage cannot be null");
+        int ver = NmsVersion.getFormattedNmsInteger();
+        if (ver < f("1.8")) {
+            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
+        }
+
+        // Select the correct wrapper which knows how to send this kind of component
+        if (ver < f("1.12")) {
+            // uses shaded PlainTextComponentSerializer - 1.8 to 1.11.X
+            return new VersionedComponent_1_11_R1(PlainTextComponentSerializer.plainText().deserialize(miniMessage));
+        } else if (ver < f("1.16")) {
+            // uses shaded PlainTextComponentSerializer - 1.12 to 1.15.X
+            return new VersionedComponent_1_15_R1(PlainTextComponentSerializer.plainText().deserialize(miniMessage));
+        } else if (ver < f("1.17")) {
+            // uses shaded PlainTextComponentSerializer - 1.16.X (added hex support)
+            return new VersionedComponent_1_16_R3(PlainTextComponentSerializer.plainText().deserialize(miniMessage));
+        } else if (ver <= f("1.18.1")) {
+            // uses shaded PlainTextComponentSerializer - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
+            return new VersionedComponent_1_18_R1(PlainTextComponentSerializer.plainText().deserialize(miniMessage));
+        }
+
+        // 1.18.2+ has adventure bundled, so we can use the native apis
+        return VersionedComponent_LATEST.fromPlainText(miniMessage);
+    }
 
     /**
      * Convert a MiniMessage string into a {@link VersionedComponent} for this version.<br>

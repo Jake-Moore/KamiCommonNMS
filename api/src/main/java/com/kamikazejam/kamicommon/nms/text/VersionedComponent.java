@@ -35,7 +35,26 @@ public interface VersionedComponent {
     /**
      * Serializes the current message component to a plain text string using the PlainTextComponentSerializer on the current platform.
      */
-    @NotNull String plainText();
+    @NotNull String serializePlainText();
+
+    /**
+     * Serializes the current message component to a string formatted using legacy ampersand (&amp;) color codes.
+     */
+    @NotNull String serializeLegacyAmpersand();
+
+    /**
+     * Serializes the current message component to a string formatted using legacy section (&sect;) color codes.
+     */
+    @NotNull String serializeLegacySection();
+
+    /**
+     * Serializes the current message component to a plain text string using the PlainTextComponentSerializer on the current platform.
+     * @deprecated Replace with {@link #serializePlainText()}.
+     */
+    @Deprecated
+    default @NotNull String plainText() {
+        return this.serializePlainText();
+    }
 
     /**
      * Create a new menu with the current message as the title, other arguments are passed as normal.

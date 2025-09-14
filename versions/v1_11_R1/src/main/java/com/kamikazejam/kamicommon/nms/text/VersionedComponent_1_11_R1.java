@@ -64,4 +64,9 @@ public class VersionedComponent_1_11_R1 implements VersionedComponent {
     public @NotNull Component asInternalComponent() {
         return this.component;
     }
+
+    @Override
+    public @NotNull VersionedComponent append(@NotNull VersionedComponent other) {
+        return new VersionedComponent_1_11_R1(this.component.append(other.asInternalComponent()));
+    }
 }

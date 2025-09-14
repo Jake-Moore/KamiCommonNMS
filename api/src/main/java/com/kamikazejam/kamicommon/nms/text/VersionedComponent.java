@@ -59,6 +59,12 @@ public interface VersionedComponent {
     @NotNull Component asInternalComponent();
 
     /**
+     * Appends another VersionedComponent to this one, returning a new instance.<br>
+     * The original instances are not modified.
+     */
+    @NotNull VersionedComponent append(@NotNull VersionedComponent other);
+
+    /**
      * Sends the current message component to multiple senders.
      */
     default void sendTo(@NotNull CommandSender... senders) {

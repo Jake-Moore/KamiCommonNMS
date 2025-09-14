@@ -94,4 +94,16 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
     public @NotNull Component asNativeComponent() {
         return this.component;
     }
+
+    @Override
+    public @NotNull VersionedComponent append(@NotNull VersionedComponent other) {
+        Component otherComp;
+        if (other instanceof VersionedComponent_LATEST vcLatest) {
+            otherComp = vcLatest.component;
+        } else {
+            String miniMessage = other.serializeMiniMessage();
+            otherComp = MiniMessage.miniMessage().deserialize(miniMessage);
+        }
+        return new VersionedComponent_LATEST(this.component.append(otherComp));
+    }
 }

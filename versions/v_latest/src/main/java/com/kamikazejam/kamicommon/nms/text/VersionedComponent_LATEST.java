@@ -11,8 +11,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Confirmed For: 1_18_R2 to 1.21.8 (latest)
@@ -97,7 +103,7 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
 
     @Override
     public @NotNull VersionedComponent append(@NotNull VersionedComponent other) {
-        Component otherComp;
+        @NotNull Component otherComp;
         if (other instanceof VersionedComponent_LATEST vcLatest) {
             otherComp = vcLatest.component;
         } else {
@@ -105,5 +111,80 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
             otherComp = MiniMessage.miniMessage().deserialize(miniMessage);
         }
         return new VersionedComponent_LATEST(this.component.append(otherComp));
+    }
+
+    // ------------------------------------------------------------ //
+    //                        STATIC METHODS                        //
+    // ------------------------------------------------------------ //
+    public static @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent name) {
+        if (name == null) {
+            meta.displayName(null);
+            return meta;
+        }
+
+        @NotNull Component nameComponent;
+        if (name instanceof VersionedComponent_LATEST vcLatest) {
+            nameComponent = vcLatest.component;
+        } else {
+            String miniMessage = name.serializeMiniMessage();
+            nameComponent = MiniMessage.miniMessage().deserialize(miniMessage);
+        }
+        meta.customName(nameComponent);
+        return meta;
+    }
+    public static @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
+        if (lore == null) {
+            meta.lore(null);
+            return meta;
+        }
+        List<Component> serializedLore = new ArrayList<>();
+        for (VersionedComponent vc : lore) {
+            if (vc instanceof VersionedComponent_LATEST vcLatest) {
+                serializedLore.add(vcLatest.component);
+            } else {
+                String miniMessage = vc.serializeMiniMessage();
+                Component comp = MiniMessage.miniMessage().deserialize(miniMessage);
+                serializedLore.add(comp);
+            }
+        }
+        meta.lore(serializedLore);
+        return meta;
+    }
+    public static @Nullable List<VersionedComponent> getLore(@NotNull ItemMeta meta) {
+        if (!meta.hasLore()) {
+            return null;
+        }
+        @Nullable List<Component> lore = meta.lore();
+        if (lore == null) {
+            return null;
+        }
+        List<VersionedComponent> vcList = new ArrayList<>();
+        for (Component line : lore) {
+            vcList.add(new VersionedComponent_LATEST(line));
+        }
+        return vcList;
+    }
+    public static @Nullable VersionedComponent getDisplayName(@NotNull ItemMeta meta) {
+        if (!meta.hasCustomName()) {
+            return null;
+        }
+        Component name = meta.customName();
+        if (name == null) {
+            return null;
+        }
+        return new VersionedComponent_LATEST(name);
+    }
+    public static @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent line) {
+        List<Component> lore = (meta.hasLore() && meta.lore() != null) ? meta.lore() : List.of();
+        List<Component> newLore = new ArrayList<>(Objects.requireNonNull(lore));
+        if (line instanceof VersionedComponent_LATEST vcLatest) {
+            newLore.add(vcLatest.component);
+        } else {
+            String miniMessage = line.serializeMiniMessage();
+            Component comp = MiniMessage.miniMessage().deserialize(miniMessage);
+            newLore.add(comp);
+        }
+        meta.lore(newLore);
+        return meta;
     }
 }

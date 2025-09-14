@@ -34,7 +34,7 @@ public class VersionedComponentUtil {
         return NmsAPI.getVersionedComponentSerializer();
     }
 
-    private int f(String mcVersion) {
+    private static int f(String mcVersion) {
         return NmsVersionParser.getFormattedNmsInteger(mcVersion);
     }
 
@@ -44,7 +44,7 @@ public class VersionedComponentUtil {
      * On older versions the component is serialized to legacy codes, while on newer versions it uses the native adventure api.
      * @return the same {@link ItemMeta} instance (for chaining).
      */
-    public @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent component) {
+    public static @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent component) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
         int ver = NmsVersion.getFormattedNmsInteger();
         if (ver < f("1.8")) {
@@ -69,7 +69,7 @@ public class VersionedComponentUtil {
      * @param lore the lore lines as versioned components, or null to remove lore
      * @return the same {@link ItemMeta} instance (for chaining).
      */
-    public @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
+    public static @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
         int ver = NmsVersion.getFormattedNmsInteger();
         if (ver < f("1.8")) {
@@ -93,7 +93,7 @@ public class VersionedComponentUtil {
      * @param meta the item meta to read from
      * @return the lore lines as versioned components, or null if no lore
      */
-    public @Nullable List<VersionedComponent> getLore(@NotNull ItemMeta meta) {
+    public static @Nullable List<VersionedComponent> getLore(@NotNull ItemMeta meta) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
         int ver = NmsVersion.getFormattedNmsInteger();
         if (ver < f("1.8")) {
@@ -117,7 +117,7 @@ public class VersionedComponentUtil {
      * @param meta the item meta to read from
      * @return the display name as a versioned component, or null if no custom name
      */
-    public @Nullable VersionedComponent getDisplayName(@NotNull ItemMeta meta) {
+    public static @Nullable VersionedComponent getDisplayName(@NotNull ItemMeta meta) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
         int ver = NmsVersion.getFormattedNmsInteger();
         if (ver < f("1.8")) {
@@ -142,7 +142,7 @@ public class VersionedComponentUtil {
      * @param component the lore line to add
      * @return the same {@link ItemMeta} instance (for chaining).
      */
-    public @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent component) {
+    public static @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent component) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
         Preconditions.checkNotNull(component, "component cannot be null");
         int ver = NmsVersion.getFormattedNmsInteger();

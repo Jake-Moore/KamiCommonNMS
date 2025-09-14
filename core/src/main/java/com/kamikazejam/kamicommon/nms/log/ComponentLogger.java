@@ -44,6 +44,10 @@ public class ComponentLogger extends LoggerService {
     // ------------------------------------------------------------ //
     //    String Method Inherited from LoggerService (uncolored)    //
     // ------------------------------------------------------------ //
+    /**
+     * @deprecated Use {@link #error(Throwable, VersionedComponent)} instead for better component support
+     */
+    @Deprecated
     @Override
     public void logToConsole(@NotNull String message, @NotNull Level level) {
         Preconditions.checkNotNull(message, "message cannot be null");
@@ -75,13 +79,15 @@ public class ComponentLogger extends LoggerService {
         logToConsole(message, Level.INFO);
     }
 
+    @Override
     public void info(@NotNull Throwable throwable) {
-        logToConsole(throwable.getMessage(), Level.INFO);
+        logToConsole(NmsAPI.getVersionedComponentSerializer().fromPlainText(throwable.getMessage()), Level.INFO);
         throwable.printStackTrace();
     }
 
     public void info(@NotNull Throwable throwable, @NotNull VersionedComponent message) {
-        logToConsole(message + " - " + throwable.getMessage(), Level.INFO);
+        VersionedComponent suffix = NmsAPI.getVersionedComponentSerializer().fromPlainText(" - " + throwable.getMessage());
+        logToConsole(message.append(suffix), Level.INFO);
         throwable.printStackTrace();
     }
 
@@ -96,13 +102,15 @@ public class ComponentLogger extends LoggerService {
         logToConsole(message, Level.WARNING);
     }
 
+    @Override
     public void warn(@NotNull Throwable throwable) {
-        logToConsole(throwable.getMessage(), Level.WARNING);
+        logToConsole(NmsAPI.getVersionedComponentSerializer().fromPlainText(throwable.getMessage()), Level.WARNING);
         throwable.printStackTrace();
     }
 
     public void warn(@NotNull Throwable throwable, @NotNull VersionedComponent message) {
-        logToConsole(message + " - " + throwable.getMessage(), Level.WARNING);
+        VersionedComponent suffix = NmsAPI.getVersionedComponentSerializer().fromPlainText(" - " + throwable.getMessage());
+        logToConsole(message.append(suffix), Level.WARNING);
         throwable.printStackTrace();
     }
 
@@ -110,6 +118,7 @@ public class ComponentLogger extends LoggerService {
         this.warn(message);
     }
 
+    @Override
     public void warning(@NotNull Throwable throwable) {
         this.warn(throwable);
     }
@@ -122,13 +131,15 @@ public class ComponentLogger extends LoggerService {
         logToConsole(message, Level.SEVERE);
     }
 
+    @Override
     public void severe(@NotNull Throwable throwable) {
-        logToConsole(throwable.getMessage(), Level.SEVERE);
+        logToConsole(NmsAPI.getVersionedComponentSerializer().fromPlainText(throwable.getMessage()), Level.SEVERE);
         throwable.printStackTrace();
     }
 
     public void severe(@NotNull Throwable throwable, @NotNull VersionedComponent message) {
-        logToConsole(message + " - " + throwable.getMessage(), Level.SEVERE);
+        VersionedComponent suffix = NmsAPI.getVersionedComponentSerializer().fromPlainText(" - " + throwable.getMessage());
+        logToConsole(message.append(suffix), Level.SEVERE);
         throwable.printStackTrace();
     }
 
@@ -150,5 +161,108 @@ public class ComponentLogger extends LoggerService {
 
         // Use the NMS logger adapter to send the component to the console
         NmsAPI.getComponentLoggerAdapter().log(this.plugin, message, level);
+    }
+
+    // ------------------------------------------------------------ //
+    //  Deprecated String Methods (use VersionedComponent instead)  //
+    // ------------------------------------------------------------ //
+
+    /**
+     * @deprecated Use {@link #info(VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void info(@NotNull String message) {
+        super.info(message);
+    }
+
+    /**
+     * @deprecated Use {@link #info(Throwable, VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void info(@NotNull Throwable throwable, @NotNull String message) {
+        super.info(throwable, message);
+    }
+
+    /**
+     * @deprecated Use {@link #debug(VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void debug(@NotNull String message) {
+        super.debug(message);
+    }
+
+    /**
+     * @deprecated Use {@link #warn(VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void warn(@NotNull String message) {
+        super.warn(message);
+    }
+
+    /**
+     * @deprecated Use {@link #warn(Throwable, VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void warn(@NotNull Throwable throwable, @NotNull String message) {
+        super.warn(throwable, message);
+    }
+
+    /**
+     * @deprecated Use {@link #warning(VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void warning(@NotNull String message) {
+        super.warning(message);
+    }
+
+    /**
+     * @deprecated Use {@link #warning(Throwable, VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void warning(@NotNull Throwable throwable, @NotNull String message) {
+        super.warning(throwable, message);
+    }
+
+    /**
+     * @deprecated Use {@link #severe(VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void severe(@NotNull String message) {
+        super.severe(message);
+    }
+
+    /**
+     * @deprecated Use {@link #severe(Throwable, VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void severe(@NotNull Throwable throwable, @NotNull String message) {
+        super.severe(throwable, message);
+    }
+
+    /**
+     * @deprecated Use {@link #error(VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void error(@NotNull String message) {
+        super.error(message);
+    }
+
+    /**
+     * @deprecated Use {@link #error(Throwable, VersionedComponent)} instead for better component support
+     */
+    @Deprecated
+    @Override
+    public void error(@NotNull Throwable throwable, @NotNull String message) {
+        super.error(throwable, message);
     }
 }

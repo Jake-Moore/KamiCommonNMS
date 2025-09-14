@@ -11,6 +11,7 @@ import com.kamikazejam.kamicommon.nms.abstraction.teleport.AbstractTeleporter;
 import com.kamikazejam.kamicommon.nms.provider.BlockUtilProvider;
 import com.kamikazejam.kamicommon.nms.provider.ChatColorProvider;
 import com.kamikazejam.kamicommon.nms.provider.CommandMapModifierProvider;
+import com.kamikazejam.kamicommon.nms.provider.ComponentLoggerAdapterProvider;
 import com.kamikazejam.kamicommon.nms.provider.EnchantIDProvider;
 import com.kamikazejam.kamicommon.nms.provider.EntityMethodsProvider;
 import com.kamikazejam.kamicommon.nms.provider.ItemEditorProvider;
@@ -21,6 +22,7 @@ import com.kamikazejam.kamicommon.nms.provider.NmsItemProvider;
 import com.kamikazejam.kamicommon.nms.provider.PacketHandlerProvider;
 import com.kamikazejam.kamicommon.nms.provider.TeleportProvider;
 import com.kamikazejam.kamicommon.nms.serializer.VersionedComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.ComponentLoggerAdapter;
 import com.kamikazejam.kamicommon.nms.wrapper.NMSWorldWrapper;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.NMSPacketHandler;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
@@ -130,6 +132,9 @@ public class NmsAPI {
     
     /** Provider for dynamic command registration and management. */
     @Getter private static final CommandMapModifierProvider commandMapModifierProvider = new CommandMapModifierProvider();
+
+    /** Provider for the server's component logging method. */
+    @Getter private static final ComponentLoggerAdapterProvider componentLoggerAdapterProvider = new ComponentLoggerAdapterProvider();
 
     /** Wrappers for adventure text components. */
     @Getter private static final VersionedComponentSerializer versionedComponentSerializer = new VersionedComponentSerializer();
@@ -259,7 +264,7 @@ public class NmsAPI {
      * @return the {@link NMSPacketHandler} for the current Minecraft version
      */
     public static NMSPacketHandler getPacketHandler() { return packetHandlerProvider.get(); }
-    
+
     /**
      * Retrieves the version-appropriate command map modifier implementation.
      * <p>
@@ -271,6 +276,13 @@ public class NmsAPI {
      * @return the {@link CommandMapModifier} for the current Minecraft version
      */
     public static CommandMapModifier getCommandMapModifier() { return commandMapModifierProvider.get(); }
+
+    /**
+     * Retrieves the version-appropriate logger adapter that supports component logging.
+     *
+     * @return the {@link ComponentLoggerAdapter} for the current Minecraft version
+     */
+    public static ComponentLoggerAdapter getComponentLoggerAdapter() { return componentLoggerAdapterProvider.get(); }
 
     // Hand Management Methods
     

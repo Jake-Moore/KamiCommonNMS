@@ -3,7 +3,7 @@ package com.kamikazejam.kamicommon.nms.chat;
 import com.kamikazejam.kamicommon.actions.*;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.AbstractMessageManager;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.KMessage;
-import com.kamikazejam.kamicommon.util.StringUtil;
+import com.kamikazejam.kamicommon.util.LegacyColors;
 import com.kamikazejam.kamicommon.util.chat.MessagePart;
 import com.kamikazejam.kamicommon.util.chat.MessageParter;
 import net.kyori.adventure.text.Component;
@@ -31,7 +31,7 @@ public class MessageManager_LATEST extends AbstractMessageManager {
     }
 
     private void processAndSend(@NotNull CommandSender sender, @NotNull String s, boolean translate, @NotNull List<Action> actions) {
-        if (translate) { s = StringUtil.t(s); }
+        if (translate) { s = LegacyColors.t(s); }
 
         LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
 

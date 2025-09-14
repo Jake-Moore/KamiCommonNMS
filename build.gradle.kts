@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-val VERSION = "1.2.3"
+val VERSION = "1.2.4"
 
 plugins {
     id("com.gradleup.shadow") version "9.1.0" apply false
@@ -30,7 +30,7 @@ ext {
     //   the project may support newer versions, but we have not tested or compiled against them yet
     set("highestPaperDep", highestPaperDep)
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
-    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:4.0.0")
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.26-20250914.051801-7")
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.40")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")

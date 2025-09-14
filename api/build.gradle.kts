@@ -24,6 +24,9 @@ dependencies {
 
     compileOnly(project.property("standaloneUtils") as String) // standalone-utils from KamiCommon
     compileOnly(project.property("serverAPI") as String)
+
+    // Add nms-text for text components
+    compileOnly(project.property("adventureDep") as String)
 }
 
 // Requires J21 since target jar is Java 21

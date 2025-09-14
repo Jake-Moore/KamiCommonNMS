@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import com.kamikazejam.kamicommon.util.Preconditions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * 1_18_R2 was the first version of paper to ship with kyori adventure **MiniMessage** support.
  */
-public class VersionedComponent_LATEST implements VersionedComponent {
+public class VersionedComponent_LATEST implements ModernVersionedComponent {
     private final @NotNull Component component;
     private VersionedComponent_LATEST(@NotNull Component component) {
         this.component = component;
@@ -66,5 +67,17 @@ public class VersionedComponent_LATEST implements VersionedComponent {
     public static @NotNull VersionedComponent_LATEST fromLegacySection(@NotNull String legacy) {
         Preconditions.checkNotNull(legacy, "legacy cannot be null");
         return new VersionedComponent_LATEST(LegacyComponentSerializer.legacySection().deserialize(legacy));
+    }
+
+    @Override
+    public @NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component asInternalComponent() {
+        // We need to adapt the native component to the shaded component type. Use JSON as a bridge
+        String json = net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().serialize(this.component);
+        return JSONComponentSerializer.json().deserialize(json);
+    }
+
+    @Override
+    public @NotNull Component asNativeComponent() {
+        return this.component;
     }
 }

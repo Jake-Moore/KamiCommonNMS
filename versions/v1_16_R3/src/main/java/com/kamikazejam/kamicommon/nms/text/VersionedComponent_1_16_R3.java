@@ -52,4 +52,9 @@ public class VersionedComponent_1_16_R3 implements VersionedComponent {
         String title = LegacyComponentSerializer.legacySection().serialize(this.component);
         return Bukkit.createInventory(owner, type, title);
     }
+
+    @Override
+    public @NotNull Component asInternalComponent() {
+        return this.component;
+    }
 }

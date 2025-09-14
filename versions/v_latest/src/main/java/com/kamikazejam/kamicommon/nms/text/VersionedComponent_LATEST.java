@@ -52,6 +52,14 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
     }
 
     @Internal
+    public static @NotNull VersionedComponent_LATEST fromInternalComponent(@NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component component) {
+        Preconditions.checkNotNull(component, "component cannot be null");
+        // Use JSON to convert between shaded and native component types
+        String json = JSONComponentSerializer.json().serialize(component);
+        return new VersionedComponent_LATEST(net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().deserialize(json));
+    }
+
+    @Internal
     public static @NotNull VersionedComponent_LATEST fromPlainText(@NotNull String plainText) {
         Preconditions.checkNotNull(plainText, "plainText cannot be null");
         return new VersionedComponent_LATEST(PlainTextComponentSerializer.plainText().deserialize(plainText));

@@ -42,8 +42,18 @@ public class VersionedComponent_1_11_R1 implements VersionedComponent {
     }
 
     @Override
-    public @NotNull String plainText() {
+    public @NotNull String serializePlainText() {
         return PlainTextComponentSerializer.plainText().serialize(this.component);
+    }
+
+    @Override
+    public @NotNull String serializeLegacyAmpersand() {
+        return LegacyComponentSerializer.legacyAmpersand().serialize(this.component);
+    }
+
+    @Override
+    public @NotNull String serializeLegacySection() {
+        return LegacyComponentSerializer.legacySection().serialize(this.component);
     }
 
     @Override

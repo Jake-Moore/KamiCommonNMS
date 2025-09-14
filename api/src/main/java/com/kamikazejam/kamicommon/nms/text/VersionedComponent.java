@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -49,6 +50,13 @@ public interface VersionedComponent {
      * @param type The type of the inventory. (inherited from Bukkit.createInventory)
      */
     @NotNull Inventory createInventory(@NotNull InventoryHolder owner, @NotNull InventoryType type);
+
+    /**
+     * Fetches (or Creates) an instance of the internal adventure {@link Component}<br>
+     * <br>
+     * Advanced users may use this in order to interact with advanced Adventure component APIs that are shaded.<br>
+     */
+    @NotNull Component asInternalComponent();
 
     /**
      * Sends the current message component to multiple senders.

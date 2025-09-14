@@ -8,8 +8,10 @@ import com.kamikazejam.kamicommon.util.Preconditions;
 import com.kamikazejam.kamicommon.util.log.LoggerService;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.logging.Level;
 
@@ -17,7 +19,7 @@ import java.util.logging.Level;
  * A simple logger service for a specific plugin, providing additional support for sending components to the console.
  */
 @SuppressWarnings("unused")
-@Getter
+@Getter @Accessors(chain = true)
 public class ComponentLogger extends LoggerService {
     private final @NotNull Plugin plugin;
     @Setter
@@ -26,6 +28,8 @@ public class ComponentLogger extends LoggerService {
     private boolean translateLegacyAmpersandColors  = true;
     @Setter
     private boolean parseLegacySectionColors = true;
+    @Setter
+    private @Nullable VersionedComponent messagePrefix = null;
     public ComponentLogger(@NotNull Plugin plugin) {
         Preconditions.checkNotNull(plugin, "plugin cannot be null");
         this.plugin = plugin;
@@ -160,7 +164,11 @@ public class ComponentLogger extends LoggerService {
         Preconditions.checkNotNull(level, "level cannot be null");
 
         // Use the NMS logger adapter to send the component to the console
-        NmsAPI.getComponentLoggerAdapter().log(this.plugin, message, level);
+        if (this.messagePrefix != null) {
+            NmsAPI.getComponentLoggerAdapter().log(this.plugin, this.messagePrefix.append(message), level);
+        } else {
+            NmsAPI.getComponentLoggerAdapter().log(this.plugin, message, level);
+        }
     }
 
     // ------------------------------------------------------------ //

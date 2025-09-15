@@ -38,7 +38,7 @@ ext {
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.15.2",
-    "com.github.cryptomorin:XSeries:13.3.3",
+    "com.github.cryptomorin:XSeries:v13.4.0",
     "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.4.0"
 )
 

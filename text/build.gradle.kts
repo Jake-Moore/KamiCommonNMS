@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName")
+@file:Suppress("PropertyName", "VulnerableLibrariesLocal")
 
 plugins {
     id("java")
@@ -10,7 +10,7 @@ plugins {
 // Uses its own version independent of the root project since this is published separately
 // It is also a standalone artifact that does not need to match the root project version
 //   primarily for shading and creating an artifact of adventure that then gets bundled into NMS here
-val TEXT_VERSION = "1.0.4"
+val TEXT_VERSION = "1.0.5"
 version = TEXT_VERSION
 
 val adventureVersion = "4.24.0"
@@ -37,6 +37,9 @@ tasks {
         relocate("net.kyori", "com.kamikazejam.kamicommon.nms.text.kyori")
         // the gson serializer comes with a dependency on com.google.gson, so relocate that
         relocate("com.google.gson", "com.kamikazejam.kamicommon.nms.text.gson")
+
+        // Ensure the service files that Adventure uses for providers are relocated properly
+        mergeServiceFiles()
     }
     processResources {
         filteringCharset = Charsets.UTF_8.name()

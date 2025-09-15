@@ -10,7 +10,7 @@ plugins {
 // Uses its own version independent of the root project since this is published separately
 // It is also a standalone artifact that does not need to match the root project version
 //   primarily for shading and creating an artifact of adventure that then gets bundled into NMS here
-val TEXT_VERSION = "1.0.2"
+val TEXT_VERSION = "1.0.3"
 version = TEXT_VERSION
 
 val adventureVersion = "4.24.0"
@@ -19,6 +19,7 @@ dependencies {
     implementation("net.kyori:adventure-api:$adventureVersion")
     implementation("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
     implementation("net.kyori:adventure-text-serializer-plain:$adventureVersion")
+    implementation("net.kyori:adventure-text-serializer-gson:$adventureVersion")
     implementation("net.kyori:adventure-text-minimessage:$adventureVersion")
     val platform = "4.4.1"
     implementation("net.kyori:adventure-platform-bukkit:$platform")

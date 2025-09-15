@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-val VERSION = "1.2.13"
+val VERSION = "1.2.14"
 
 plugins {
     id("com.gradleup.shadow") version "9.1.0" apply false
@@ -34,7 +34,7 @@ ext {
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.40")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
-    set("adventureDep", "com.kamikazejam.kamicommon:spigot-nms-text:1.0.3")
+    set("adventureDep", "com.kamikazejam.kamicommon:spigot-nms-text:1.0.4")
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.15.2",

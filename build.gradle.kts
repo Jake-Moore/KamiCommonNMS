@@ -32,13 +32,13 @@ ext {
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.26")
     // Lombok Dependency
-    set("lombokDep", "org.projectlombok:lombok:1.18.40")
+    set("lombokDep", "org.projectlombok:lombok:1.18.42")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
     set("adventureDep", "com.kamikazejam.kamicommon:spigot-nms-text:1.0.5")
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.15.2",
-    "com.github.cryptomorin:XSeries:13.3.3",
+    "com.github.cryptomorin:XSeries:v13.4.0",
     "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.4.0"
 )
 

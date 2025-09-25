@@ -2,11 +2,11 @@
 val VERSION = "1.2.16-SNAPSHOT"
 
 plugins {
-    id("com.gradleup.shadow") version "9.1.0" apply false
+    id("com.gradleup.shadow") version "9.2.1" apply false
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
 }
 
-val highestPaperDep = "1.21.8-R0.1-SNAPSHOT"
+val highestPaperDep = "1.21.9-pre4-R0.1-SNAPSHOT"
 
 // Testing server APIs (the earliest supported version, and the latest PaperMC version)
 val oldestServerAPI = "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC"
@@ -32,13 +32,13 @@ ext {
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.26")
     // Lombok Dependency
-    set("lombokDep", "org.projectlombok:lombok:1.18.40")
+    set("lombokDep", "org.projectlombok:lombok:1.18.42")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
     set("adventureDep", "com.kamikazejam.kamicommon:spigot-nms-text:1.0.5")
 }
 extra["commonDependencies"] = listOf(
     "de.tr7zw:item-nbt-api:2.15.2",
-    "com.github.cryptomorin:XSeries:13.3.3",
+    "com.github.cryptomorin:XSeries:v13.4.0",
     "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.4.0"
 )
 

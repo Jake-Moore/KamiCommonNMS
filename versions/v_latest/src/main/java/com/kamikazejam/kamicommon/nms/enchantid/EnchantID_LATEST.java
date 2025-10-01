@@ -5,7 +5,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Working for: 1.13, 1.21.8
+ * Working for: 1.13, 1.21.8, 1.21.9
  */
 public class EnchantID_LATEST extends AbstractEnchantID {
     @Override

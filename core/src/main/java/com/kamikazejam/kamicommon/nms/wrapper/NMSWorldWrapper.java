@@ -119,6 +119,6 @@ public class NMSWorldWrapper extends NMSWrapper<NMSWorld, World> {
             return new NMSWorld_1_21_4(world, NmsAPI.getBlockUtilProvider());
         }
         // Includes chunk code for 1.21.5+
-        return new NMSWorld_LATEST(world, NmsAPI.getBlockUtilProvider()); // Confirmed for 1.21.5, 1.21.8
+        return new NMSWorld_LATEST(world, NmsAPI.getBlockUtilProvider());
     }
 }

@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Working for: 1.21 CB, 1.21.8
+ * Working for: 1.21 CB, 1.21.8, 1.21.9
  */
 @SuppressWarnings("unused")
 public class EntityMethods_LATEST extends EntityMethodsPost_1_14 {

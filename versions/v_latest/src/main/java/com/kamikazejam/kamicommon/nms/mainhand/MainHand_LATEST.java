@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Working for: 1.9.X, 1.21.8
+ * Working for: 1.9.X, 1.21.8, 1.21.9
  */
 public class MainHand_LATEST extends AbstractMainHand {
     @Override

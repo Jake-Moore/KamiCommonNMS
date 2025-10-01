@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.logging.Level;
 
 /**
- * Confirmed For: 1_18_R2 --> 1.21.8 (latest)
+ * Confirmed For: 1_18_R2 --> 1.21.8, 1.21.9
  */
 public class ComponentLoggerAdapter_LATEST implements ComponentLoggerAdapter {
     public void log(@NotNull Plugin plugin, @NotNull VersionedComponent message, @NotNull Level level) {

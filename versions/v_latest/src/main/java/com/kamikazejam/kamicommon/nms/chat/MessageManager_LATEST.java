@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Working for: 1.17.X, 1.21.8
+ * Working for: 1.17.X, 1.21.8, 1.21.9
  */
 public class MessageManager_LATEST extends AbstractMessageManager {
 

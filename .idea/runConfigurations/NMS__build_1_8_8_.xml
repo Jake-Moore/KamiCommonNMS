@@ -1,6 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="KamiCommonNMS [:text:build]" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="NMS [build 1.8.8]" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="MC_SERVER_NEWEST_API" value="false" />
+        </map>
+      </option>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
@@ -10,7 +15,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":text:build" />
+          <option value="build" />
         </list>
       </option>
       <option name="vmOptions" />

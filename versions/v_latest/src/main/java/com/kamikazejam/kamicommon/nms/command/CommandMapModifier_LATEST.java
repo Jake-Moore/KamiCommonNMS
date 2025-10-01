@@ -15,7 +15,7 @@ import java.util.Map;
  *  which also haas the getKnownCommands() method. Prior to 1.17 the logic in the 1_8_R1 version of this class is fine
  * <br>
  * <br>
- * Working for: 1.17+, 1.21.8
+ * Working for: 1.17+, 1.21.8, 1.21.9
  */
 public class CommandMapModifier_LATEST implements CommandMapModifier {
     private final CommandMap commandMap;

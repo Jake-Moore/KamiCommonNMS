@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.kamikazejam.kamicommon.nms.wrappers.chunk.ChunkSection_LATEST.SET_BLOCK_STATE_FLAG;
 
 /**
- * Working for: 1.21.5, 1.21.8
+ * Working for: 1.21.5, 1.21.8, 1.21.9
  */
 public class BlockUtil_LATEST extends IBlockUtil1_13<BlockState> {
     @Override
@@ -36,6 +36,7 @@ public class BlockUtil_LATEST extends IBlockUtil1_13<BlockState> {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        //noinspection ConstantValue
         w.sendBlockUpdated(bp, (old == null) ? ibd : old, ibd, 3);
     }
 }

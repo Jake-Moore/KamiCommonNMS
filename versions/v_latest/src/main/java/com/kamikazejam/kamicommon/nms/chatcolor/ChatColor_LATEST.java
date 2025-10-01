@@ -7,8 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 /**
- * Working for: 1.16.2+, 1.21.8
+ * Working for: 1.16.2+, 1.21.8, 1.21.9
  */
+@SuppressWarnings("deprecation")
 public class ChatColor_LATEST implements IChatColorNMS {
     @Override
     public @NotNull Color getColor(ChatColor chatColor) {

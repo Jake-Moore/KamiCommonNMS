@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Confirmed For: 1_18_R2 to 1.21.8 (latest)
+ * Confirmed For: 1_18_R2 to 1.21.8, 1.21.9
  * <br>
  * 1_18_R2 was the first version of paper to ship with kyori adventure **MiniMessage** support.
  */

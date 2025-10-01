@@ -101,6 +101,6 @@ public class BlockUtilProvider extends Provider<AbstractBlockUtil> {
             return new BlockUtil1_21_4();
         }
         // With the mojang-mapped paper nms now, we might be good to use this version indefinitely
-        return new BlockUtil_LATEST(); // Confirmed for 1.21.5, 1.21.8
+        return new BlockUtil_LATEST();
     }
 }

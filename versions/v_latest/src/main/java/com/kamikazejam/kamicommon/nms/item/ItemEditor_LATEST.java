@@ -7,7 +7,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Working for: 1.13, 1.21.8
+ * Working for: 1.13, 1.21.8, 1.21.9
  */
 @SuppressWarnings("unused")
 public class ItemEditor_LATEST extends AbstractItemEditor {
@@ -29,6 +29,7 @@ public class ItemEditor_LATEST extends AbstractItemEditor {
         // 1.13+ method
         if (item.getItemMeta() instanceof Damageable damageable) {
             damageable.setDamage(damage);
+            //noinspection RedundantCast
             item.setItemMeta((ItemMeta) damageable);
             return item;
         }

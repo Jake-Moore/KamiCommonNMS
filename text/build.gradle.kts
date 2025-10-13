@@ -13,7 +13,7 @@ plugins {
 val TEXT_VERSION = "1.0.5"
 version = TEXT_VERSION
 
-val adventureVersion = "4.24.0"
+val adventureVersion = "4.25.0"
 dependencies {
     // Shade All Adventure APIs we need, used by older versions without native Adventure support
     implementation("net.kyori:adventure-api:$adventureVersion")

@@ -5,8 +5,8 @@ plugins {
 
 dependencies {
     // Unique dependencies for this module
-    // Confirmed working for 1.21.5, 1.21.8, 1.21.9 & 1.21.10
-    paperweight.paperDevBundle(rootProject.property("highestPaperDep") as String) // 2. add the dev bundle (contains all apis)
+    // Confirmed working up to and including 1.21.9
+    paperweight.paperDevBundle("1.21.9-R0.1-SNAPSHOT") // 2. add the dev bundle (contains all apis)
 
     compileOnly(project(":versions:v1_13_R1"))
     compileOnly(project(":versions:v1_14_R1"))

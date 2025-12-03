@@ -73,6 +73,7 @@ dependencies {
     // Starting with 1_20_CB we can opt to not re-obf, so we can shade again
     implementation(project(":versions:v1_20_CB"))
     implementation(project(":versions:v1_21_4"))
+    implementation(project(":versions:v1_21_9"))
     implementation(project(":versions:v_latest"))
 
     implementation(project(":versions:worlds6"))

@@ -25,12 +25,34 @@ public class Teleporter_LATEST extends AbstractTeleporter {
         final ServerLevel fromWorld = ((CraftWorld)player.getWorld()).getHandle();
         final ServerPlayer entityPlayer = ((CraftPlayer)player).getHandle();
         if (toWorld == fromWorld) {
-            entityPlayer.connection.teleport(location);
+            // Starting in 1.21.10 this method no longer accepts a Location
+            //  and requires each coordinate separately.
+            entityPlayer.connection.teleport(
+                    location.getX(),
+                    location.getY(),
+                    location.getZ(),
+                    location.getYaw(),
+                    location.getPitch()
+            );
         }
         else {
+            // Starting in 1.21.10 minecraft changed some internal methods regarding teleportation between dimensions
+            //  they also removed the location parameter from respawn method preventing direct cross-dimensional teleports
+            // Our solution? Attempt to respawn the player in the target world (at the default spawn location)
+            //  then immediately teleport them to the desired location in that world.
+
+            // 1. Respawn the player in the target dimension (AT THE DEFAULT SPAWN LOCATION)
             MinecraftServer.getServer().getPlayerList().respawn(
                     entityPlayer, true, Entity.RemovalReason.DISCARDED,
-                    PlayerRespawnEvent.RespawnReason.PLUGIN, location
+                    PlayerRespawnEvent.RespawnReason.PLUGIN
+            );
+            // 2. Teleport the player to the desired location (which should work now that they are in the correct dimension)
+            entityPlayer.connection.teleport(
+                    location.getX(),
+                    location.getY(),
+                    location.getZ(),
+                    location.getYaw(),
+                    location.getPitch()
             );
         }
     }

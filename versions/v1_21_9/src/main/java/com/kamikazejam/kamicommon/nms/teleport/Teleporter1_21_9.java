@@ -11,6 +11,9 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+/**
+ * Confirmed Working for versions: 1.21 to 1.21.10
+ */
 @SuppressWarnings({"DuplicatedCode"})
 public class Teleporter1_21_9 extends AbstractTeleporter {
 

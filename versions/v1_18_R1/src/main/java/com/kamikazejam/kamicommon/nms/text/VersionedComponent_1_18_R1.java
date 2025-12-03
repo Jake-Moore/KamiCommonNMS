@@ -20,6 +20,7 @@ import java.util.List;
 /**
  * Confirmed For: 1_17_R1, 1_18_R1
  */
+@SuppressWarnings("deprecation")
 public class VersionedComponent_1_18_R1 implements VersionedComponent {
     final @NotNull Component component;
     public VersionedComponent_1_18_R1(@NotNull Component component) {

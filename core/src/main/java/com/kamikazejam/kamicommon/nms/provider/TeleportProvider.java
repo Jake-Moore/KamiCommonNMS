@@ -126,7 +126,7 @@ public class TeleportProvider extends Provider<AbstractTeleporter> {
             // Confirmed for 1.20.5 and 1.20.6
             return new Teleporter1_20_CB();
         }else if (ver <= f("1.21.9")) {
-            // Confirmed for up to 1.21.9
+            // Confirmed for 1.21 to 1.21.9
             return new Teleporter1_21_9();
         }
         // Confirmed for 1.21.10

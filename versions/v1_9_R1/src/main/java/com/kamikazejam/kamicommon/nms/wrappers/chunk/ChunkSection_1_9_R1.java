@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("deprecation")
 public class ChunkSection_1_9_R1 implements NMSChunkSection {
     private final @NotNull Chunk_1_9_R1 chunk;
     private final @NotNull ChunkSection section;

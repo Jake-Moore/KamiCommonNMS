@@ -31,6 +31,7 @@ public class ChunkSection_1_8_R1 implements NMSChunkSection {
         this.section.setType(x, y, z, CraftMagicNumbers.getBlock(material).getBlockData());
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setType(int x, int y, int z, @NotNull XBlockData xBlockData) {
         // For pre-1.13 we use data values

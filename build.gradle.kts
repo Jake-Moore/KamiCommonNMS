@@ -6,7 +6,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" apply false
 }
 
-val highestPaperDep = "1.21.11-pre4-R0.1-SNAPSHOT"
+val highestPaperDep = "1.21.11-pre5-R0.1-SNAPSHOT"
 
 // Testing server APIs (the earliest supported version, and the latest PaperMC version)
 val oldestServerAPI = "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC"
@@ -30,7 +30,7 @@ ext {
     //   the project may support newer versions, but we have not tested or compiled against them yet
     set("highestPaperDep", highestPaperDep)
     // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
-    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.32")
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.34")
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.42")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")

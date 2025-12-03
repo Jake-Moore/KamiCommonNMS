@@ -1,7 +1,33 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.teleport.AbstractTeleporter;
-import com.kamikazejam.kamicommon.nms.teleport.*;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_10_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_11_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_12_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_13_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_13_R2;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_14_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_15_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_16_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_16_R2;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_16_R3;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_17_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_18_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_18_R2;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_19_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_19_R2;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_19_R3;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_CB;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_R2;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_R3;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_21_9;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_8_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_8_R2;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_8_R3;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_9_R1;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_9_R2;
+import com.kamikazejam.kamicommon.nms.teleport.Teleporter_LATEST;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -99,8 +125,11 @@ public class TeleportProvider extends Provider<AbstractTeleporter> {
         }else if (ver <= f("1.20.6")) {
             // Confirmed for 1.20.5 and 1.20.6
             return new Teleporter1_20_CB();
+        }else if (ver <= f("1.21.9")) {
+            // Confirmed for up to 1.21.9
+            return new Teleporter1_21_9();
         }
-        // Confirmed for 1.21
+        // Confirmed for 1.21.10
         return new Teleporter_LATEST();
     }
 }

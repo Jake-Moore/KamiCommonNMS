@@ -1,12 +1,12 @@
 @Suppress("PropertyName")
-val VERSION = "1.2.17-SNAPSHOT"
+val VERSION = "1.2.17"
 
 plugins {
     id("com.gradleup.shadow") version "9.2.2" apply false
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" apply false
 }
 
-val highestPaperDep = "1.21.9-R0.1-SNAPSHOT"
+val highestPaperDep = "1.21.10-R0.1-SNAPSHOT"
 
 // Testing server APIs (the earliest supported version, and the latest PaperMC version)
 val oldestServerAPI = "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC"

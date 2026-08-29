@@ -261,4 +261,5 @@ gradle.projectsEvaluated {
 }
 
 apply(from = "$rootDir/gradle/verify-nms-bundles.gradle.kts")
+apply(from = "$rootDir/gradle/verify-dispatch-floors.gradle.kts")
 

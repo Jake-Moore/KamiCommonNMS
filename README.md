@@ -55,17 +55,19 @@ The table lives in `gradle/module-floors.properties`, read by the build and by b
 module missing from it fails the build rather than inheriting whatever the build was running.
 
 `v_latest` can target 25 only because every capability a 1.21.11 server reaches has a twin in
-`v1_21_11`. Those twins are duplicated on purpose rather than moved: `v_latest` is the module that
-gets recompiled against a new Paper dev bundle when `highestPaperDep` moves, so anything living only
-in an older module is not compile-checked against bleeding-edge Paper.
+`v1_21_11`. Those twins are duplicated on purpose rather than moved, and the reason generalises.
 
-**That coverage is currently partial, and it is a known gap.** `v_latest` implements 6 of the 27
-capabilities on `NmsBundle`: `blockUtil`, `entityMethods`, `nmsItemMethods`, `nmsWorld`,
-`packetHandler` and `teleporter`. The rest are served on 26.x by modules built against much older
-dev bundles, because the class that works from 1.13 onward belongs in the 1.13 module under the
-convention above. So if Paper 26.x removed, say, `Bukkit.getCommandMap()`, the build would not see
-it and a 26.x server would fail at runtime. Bumping `highestPaperDep` proves those six and nothing
-else.
+**`v_latest` holds a copy of every implementation a 26.x server runs, and nothing dispatches to those
+copies.** They exist to be compiled. The convention above puts a class in the module named for the
+earliest version it supports, which is right for dispatch but means the code a 26.x server actually
+executes is only ever compiled against an old dev bundle. A Paper API it uses could disappear in 26.x
+and the build would not notice until a server did. The `_LATEST` copies compile against
+`highestPaperDep`, so bumping that version compile-checks every capability against bleeding-edge
+Paper. If a copy stops compiling, that is the finding.
+
+`verifyDispatchFloors` enforces it: any implementation a 26.x server reaches with no `_LATEST` twin
+fails the build. Ten had already drifted out before that check existed. The single exemption is
+`ItemText`, which throws above 1.16.5 by design, and the check fails if a twin for it ever appears.
 
 Four build tasks keep this honest.
 

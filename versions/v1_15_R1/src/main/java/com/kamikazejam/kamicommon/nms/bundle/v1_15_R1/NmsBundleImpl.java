@@ -24,6 +24,9 @@ import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.jetbrains.annotations.Nullable;
+import java.util.List;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * The {@code v1_15_R1} module's implementation of {@link NmsBundle}.
@@ -98,4 +101,30 @@ public class NmsBundleImpl implements NmsBundle {
     public @NotNull AbstractEntityMethods entityMethods() {
         return new EntityMethods_1_15_R1();
     }
+
+    @Override
+    public @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent component) {
+        return VersionedComponent_1_15_R1.setDisplayName(meta, component);
+    }
+
+    @Override
+    public @Nullable VersionedComponent getDisplayName(@NotNull ItemMeta meta) {
+        return VersionedComponent_1_15_R1.getDisplayName(meta);
+    }
+
+    @Override
+    public @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
+        return VersionedComponent_1_15_R1.setLore(meta, lore);
+    }
+
+    @Override
+    public @Nullable List<VersionedComponent> getLore(@NotNull ItemMeta meta) {
+        return VersionedComponent_1_15_R1.getLore(meta);
+    }
+
+    @Override
+    public @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent component) {
+        return VersionedComponent_1_15_R1.addLoreLine(meta, component);
+    }
+
 }

@@ -76,6 +76,52 @@ val literalCalls = Regex("forModule\\(\"")
 /** `if (cond) {` opening a branch, or a `forModule("x")` call. Ordered, so the pairs stay aligned. */
 val token = Regex("""if \(([^\n]*?)\)\s*\{|forModule\("([^"]+)"\)""")
 
+/**
+ * Blanks out comments, which are NOT source.
+ *
+ * Commenting a branch out is the ordinary way to disable a module for a moment, and the parser read
+ * the commented rows as live: the dead branch went into the ladder and swallowed the versions the
+ * real fallthrough should have caught, so the check went green on a jar that no longer had that
+ * branch. The forModule count guard cannot see it either, since a dead call is counted on both
+ * sides and cancels.
+ *
+ * Hand written rather than a regex. The obvious block-comment pattern backtracks catastrophically on
+ * these files and took the task out with a StackOverflowError. It also has to respect string and
+ * char literals, or a "//" inside a string would blank the rest of the line.
+ *
+ * Replaced with spaces rather than removed, so lengths and line numbers still line up.
+ */
+fun stripComments(text: String): String {
+    val out = StringBuilder(text.length)
+    var i = 0
+    while (i < text.length) {
+        val c = text[i]
+        val next = if (i + 1 < text.length) text[i + 1] else '\u0000'
+        when {
+            c == '/' && next == '/' -> {
+                while (i < text.length && text[i] != '\n') { out.append(' '); i++ }
+            }
+            c == '/' && next == '*' -> {
+                out.append("  "); i += 2
+                while (i < text.length && !(text[i] == '*' && i + 1 < text.length && text[i + 1] == '/')) {
+                    out.append(if (text[i] == '\n') '\n' else ' '); i++
+                }
+                if (i < text.length) { out.append("  "); i += 2 }
+            }
+            c == '"' || c == '\'' -> {
+                out.append(c); i++
+                while (i < text.length && text[i] != c) {
+                    if (text[i] == '\\' && i + 1 < text.length) { out.append(text[i]); i++ }
+                    if (i < text.length) { out.append(text[i]); i++ }
+                }
+                if (i < text.length) { out.append(text[i]); i++ }
+            }
+            else -> { out.append(c); i++ }
+        }
+    }
+    return out.toString()
+}
+
 /** A method declaration at class-body indentation. Its body is taken by matching braces. */
 val methodHeader = Regex("""\n {4}(?:private|protected|public)[^\n{]*\b(\w+)\([^)]*\)\s*\{""")
 
@@ -161,13 +207,14 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
 
         val violations = ArrayList<String>()
         val undecidable = LinkedHashSet<String>()
+        val ladders = ArrayList<Pair<String, List<Pair<String?, String>>>>()
         var sites = 0
         var decided = 0
         var callsSeen = 0
         var callsParsed = 0
 
         sourceRoot.walkTopDown().filter { it.extension == "java" }.sortedBy { it.path }.forEach { file ->
-            val text = file.readText()
+            val text = stripComments(file.readText())
             // Gate on forModule in ANY form, not just forModule("literal"). WorldEditHook dispatches
             // through a helper taking the module as a parameter, so a literal-only gate skipped that
             // whole file rather than reporting that it could not read it.
@@ -206,6 +253,7 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
                     else { ladder.add(pending to t.groupValues[2]); pending = null }
                 }
                 callsParsed += ladder.size
+                ladders.add(site to ladder)
 
                 for ((mcVersion, jvm) in serverJvms) {
                     val ver = encode(mcVersion)
@@ -252,6 +300,63 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
             throw GradleException(
                 "only $sites ladder sites and $decided decisions, far below what this project has. " +
                         "A check evaluating almost nothing reports success no matter what is wrong."
+            )
+        }
+
+        // Every capability a 26.x server reaches must have a twin in v_latest.
+        //
+        // This is the requirement the module convention quietly breaks. A class lives in the module
+        // named for the FIRST version it works on, which is right for dispatch but means the
+        // implementation a 26.x server actually runs is only ever compiled against an old dev
+        // bundle. v_latest is the module that recompiles when highestPaperDep moves, so a capability
+        // with nothing in v_latest is a capability no bump can check. Ten of them had drifted out
+        // before this check existed, and nothing said so.
+        // ItemText is pre-1.17 only BY DESIGN, not by drift. ItemTextProviderPre_1_17 throws above
+        // 1.16.5 and /kc nmsproviders reports it as "n/a on this version", so a 26.x twin would be a
+        // twin of something 26.x never runs. It appears here only because it is a parameter type on
+        // adapters that DO serve 26.x. The assertion below keeps the exemption honest.
+        val noLatestByDesign = setOf("ItemText")
+        val latestDir = rootProject.file("versions/v_latest/src/main/java")
+        val latestTwins = latestDir.walkTopDown().filter { it.name.endsWith("_LATEST.java") }
+            .map { it.name.removeSuffix(".java").removeSuffix("_LATEST") }.toSet()
+        val topVersion = encode(serverJvms.last().first)
+        val missingTwins = ArrayList<String>()
+        for ((site, ladder) in ladders) {
+            var target: String? = null
+            for ((cond, module) in ladder) {
+                if (cond == null) { target = module; break }
+                val m = comparison.matchEntire(cond) ?: break
+                val rhs = m.groupValues[2].takeIf { it.isNotEmpty() }?.let { encode(it) }
+                    ?: m.groupValues[3].toInt()
+                val hit = when (m.groupValues[1]) {
+                    "<=" -> topVersion <= rhs; ">=" -> topVersion >= rhs; "==" -> topVersion == rhs
+                    "<" -> topVersion < rhs; else -> topVersion > rhs
+                }
+                if (hit) { target = module; break }
+            }
+            if (target == null || target == "v_latest") continue
+            val impl = rootProject.file("versions/$target/src/main/java/com/kamikazejam/kamicommon/nms/bundle/$target/NmsBundleImpl.java")
+            if (!impl.isFile) continue
+            // The implementation classes that module's adapter names, e.g. ChatColor_1_16_R2.
+            Regex("""\b([A-Z]\w*)_1_\d+_R?\d*\b""").findAll(stripComments(impl.readText()))
+                .map { it.groupValues[1] }.toSet()
+                .filterNot { it in latestTwins || it in noLatestByDesign }
+                .forEach { missingTwins.add("$it (reached on 26.x through $target, from $site)") }
+        }
+        val wronglyExempt = noLatestByDesign.filter { it in latestTwins }
+        if (wronglyExempt.isNotEmpty()) {
+            throw GradleException(
+                "these are exempt from needing a v_latest twin, but one now exists: " +
+                        wronglyExempt.joinToString() + ". Remove them from noLatestByDesign so the " +
+                        "twin is actually checked."
+            )
+        }
+        if (missingTwins.isNotEmpty()) {
+            throw GradleException(
+                "these run on 26.x but have no _LATEST twin in versions/v_latest, so bumping " +
+                        "highestPaperDep does not compile-check them against the Paper they run on:\n  " +
+                        missingTwins.distinct().sorted().joinToString("\n  ") +
+                        "\nCopy each into v_latest as a compile canary. Nothing dispatches to the copy."
             )
         }
 

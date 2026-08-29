@@ -1,11 +1,12 @@
 @Suppress("PropertyName")
-val VERSION = "1.2.21" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
+val VERSION = "1.2.22" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
 
 plugins {
     id("com.gradleup.shadow") version "9.2.2" apply false
-    // Newest that works: beta.23 is Java 21, and paperweight runs its workers in each
-    //  module's toolchain JVM, so the Java 17 modules cannot host it.
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.22" apply false
+    // beta.23's own task classes are Java 21, and paperweight runs its workers in each module's
+    //  toolchain JVM. That is fine because no module's toolchain is below 21: see the TOOLCHAIN
+    //  note in versions/build.gradle.kts, where the toolchain is deliberately not the floor.
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
 }
 
 val highestPaperDep = "26.2.build.120-stable"
@@ -36,7 +37,7 @@ ext {
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.42")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
-    set("adventureDep", "com.kamikazejam.kamicommon:spigot-nms-text:1.0.5")
+    set("adventureDep", ":text")
 }
 extra["commonDependencies"] = listOf(
     // 2.15.3's MinecraftVersion stops at MC1_21_R6; 2.16.0 adds MC26_1 and MC26_2.

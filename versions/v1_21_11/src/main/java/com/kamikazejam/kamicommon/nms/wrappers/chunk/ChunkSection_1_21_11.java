@@ -9,7 +9,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.jetbrains.annotations.NotNull;
-
 /**
  * Working for: 1.20.5, 1.20.6, 1.21, 1.21.3, 1.21.4<br>
  * <br>

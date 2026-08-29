@@ -1,6 +1,7 @@
 package com.kamikazejam.kamicommon.nms.wrapper;
 
 import com.kamikazejam.kamicommon.nms.NmsAPI;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.kamikazejam.kamicommon.nms.wrappers.NMSWrapper;
 import com.kamikazejam.kamicommon.nms.wrappers.world.*;
 import org.bukkit.World;
@@ -67,61 +68,61 @@ public class NMSWorldWrapper extends NMSWrapper<NMSWorld, World> {
         }
 
         if (ver == f("1.8")) {
-            return new NMSWorld_1_8_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_8_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.8.3")) {
-            return new NMSWorld_1_8_R2(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_8_R2").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.8.8")) {
-            return new NMSWorld_1_8_R3(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_8_R3").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.9.2")) {
-            return new NMSWorld_1_9_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_9_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.9.4")) {
-            return new NMSWorld_1_9_R2(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_9_R2").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.10.2")) {
-            return new NMSWorld_1_10_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_10_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.11.2")) {
-            return new NMSWorld_1_11_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_11_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.12.2")) {
-            return new NMSWorld_1_12_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_12_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.13")) {
-            return new NMSWorld_1_13_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_13_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.13.2")) {
-            return new NMSWorld_1_13_R2(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_13_R2").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.14.4")) {
-            return new NMSWorld_1_14_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_14_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.15.2")) {
-            return new NMSWorld_1_15_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_15_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.16.1")) {
-            return new NMSWorld_1_16_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_16_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.16.3")) {
-            return new NMSWorld_1_16_R2(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_16_R2").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.16.5")) {
-            return new NMSWorld_1_16_R3(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_16_R3").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.17.1")) {
-            return new NMSWorld_1_17_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_17_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.18.1")) {
-            return new NMSWorld_1_18_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_18_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.18.2")) {
-            return new NMSWorld_1_18_R2(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_18_R2").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.19.2")) {
-            return new NMSWorld_1_19_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_19_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.19.3")) {
-            return new NMSWorld_1_19_R2(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_19_R2").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.19.4")) {
-            return new NMSWorld_1_19_R3(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_19_R3").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.20.1")) {
-            return new NMSWorld_1_20_R1(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_20_R1").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.20.2")) {
-            return new NMSWorld_1_20_R2(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_20_R2").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.20.4")) {
-            return new NMSWorld_1_20_R3(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_20_R3").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.21.4")) {
             // For up to 1.21.4 (breaks in 1.21.5)
-            return new NMSWorld_1_21_4(world, NmsAPI.getBlockUtilProvider());
-        }else if (ver <= f("1.21.11")) {
+            return NmsBundles.forModule("v1_21_4").nmsWorld(world, NmsAPI.getBlockUtilProvider());
+        }else if (ver < f("26")) {
             // For 1.21.5 through 1.21.11 (breaks in 26.1)
-            return new NMSWorld_1_21_11(world, NmsAPI.getBlockUtilProvider());
+            return NmsBundles.forModule("v1_21_11").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }
         // Includes chunk code for 26.1+
-        return new NMSWorld_LATEST(world, NmsAPI.getBlockUtilProvider());
+        return NmsBundles.forModule("v_latest").nmsWorld(world, NmsAPI.getBlockUtilProvider());
     }
 }

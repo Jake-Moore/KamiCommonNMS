@@ -1,5 +1,15 @@
 @file:Suppress("UNCHECKED_CAST")
 
+// Modules shaded from their plain jar. Kept beside reobfVersions because between them they must
+// account for every entry in settings.gradle.kts. verifyFloors fails if a module has no compiled
+// output, and verifyNmsBundles fails if its adapter is missing from the shaded jar.
+val plainVersions = listOf(
+    "v1_8_R1", "v1_8_R2", "v1_8_R3", "v1_9_R1", "v1_9_R2", "v1_10_R1", "v1_11_R1", "v1_12_R1",
+    "v1_13_R1", "v1_13_R2", "v1_14_R1", "v1_15_R1", "v1_16_R1", "v1_16_R2", "v1_16_R3",
+    "v1_20_CB", "v1_21_4", "v1_21_9", "v1_21_11", "v_latest",
+    "worlds6", "worlds7",
+)
+
 val reobfVersions = listOf(
     "v1_17_R1",
     "v1_18_R1",
@@ -36,7 +46,7 @@ dependencies {
     // Shade :api code into the core
     implementation(project(":api"))
     // Shade our adventure relocated api into core
-    implementation(project.property("adventureDep") as String)
+    implementation(project(project.property("adventureDep") as String))
 
     // Common Dependencies (compileOnly to avoid shading)
     (rootProject.extra["commonDependencies"] as List<String>).forEach(dependencies::shadow)
@@ -44,41 +54,11 @@ dependencies {
     // standalone-utils from KamiCommon
     compileOnly(project.property("standaloneUtils") as String)
 
-    implementation(project(":versions:v1_8_R1"))
-    implementation(project(":versions:v1_8_R2"))
-    implementation(project(":versions:v1_8_R3"))
-    implementation(project(":versions:v1_9_R1"))
-    implementation(project(":versions:v1_9_R2"))
-    implementation(project(":versions:v1_10_R1"))
-    implementation(project(":versions:v1_11_R1"))
-    implementation(project(":versions:v1_12_R1"))
-    implementation(project(":versions:v1_13_R1"))
-    implementation(project(":versions:v1_13_R2"))
-    implementation(project(":versions:v1_14_R1"))
-    implementation(project(":versions:v1_15_R1"))
-    implementation(project(":versions:v1_16_R1"))
-    implementation(project(":versions:v1_16_R2"))
-    implementation(project(":versions:v1_16_R3"))
-    // These are compileOnly so that we can include the reobfJar outputs
-    compileOnly(project(":versions:v1_17_R1"))
-    compileOnly(project(":versions:v1_18_R1"))
-    compileOnly(project(":versions:v1_18_R2"))
-    compileOnly(project(":versions:v1_19_R1"))
-    compileOnly(project(":versions:v1_19_R2"))
-    compileOnly(project(":versions:v1_19_R3"))
-    compileOnly(project(":versions:v1_20_R1"))
-    compileOnly(project(":versions:v1_20_R2"))
-    compileOnly(project(":versions:v1_20_R3"))
 
-    // Starting with 1_20_CB we can opt to not re-obf, so we can shade again
-    implementation(project(":versions:v1_20_CB"))
-    implementation(project(":versions:v1_21_4"))
-    implementation(project(":versions:v1_21_9"))
-    implementation(project(":versions:v1_21_11"))
-    implementation(project(":versions:v_latest"))
-
-    implementation(project(":versions:worlds6"))
-    implementation(project(":versions:worlds7"))
+    // The versions/* modules are deliberately absent here. :core resolves them by name at runtime
+    // (see NmsBundles), so it must not compile against them, and it cannot. They now target the
+    // JVM their own Minecraft version required, and a Java 8 consumer cannot resolve a Java 21
+    // producer. They are bundled into the shaded jar below, from their jar task outputs.
 
     // So we have access to the Clipboard class
     compileOnly("com.sk89q.worldedit:bukkit:6.1.9")
@@ -86,7 +66,9 @@ dependencies {
     compileOnly(project.property("serverAPI") as String)
 }
 
-apply(from = "$rootDir/gradle/paper-toolchain.gradle.kts")
+// A 1.8.8 server loads this module in full, so it sits at the same floor as :api.
+extra["moduleFloor"] = 8
+apply(from = "$rootDir/gradle/module-floor.gradle.kts")
 
 tasks {
     publish.get().dependsOn(build)
@@ -98,7 +80,7 @@ tasks {
     }
 }
 
-apply(from = "$rootDir/gradle/verify-java-compat.gradle.kts")
+apply(from = "$rootDir/gradle/verify-floors.gradle.kts")
 
 tasks.register("printServerAPI") {
     doFirst {
@@ -264,5 +246,20 @@ gradle.projectsEvaluated {
             val task = project(":versions:$version").tasks.getByName("reobfJar")
             from(zipTree(task.outputs.files.singleFile))
         }
+
+        // Everything else comes from its plain jar. These used to arrive as `implementation`
+        // dependencies, which put them on :core's compile classpath. That was fine while every module
+        // shared one toolchain, impossible now that each targets its own Minecraft version's JVM.
+        // Taking the task output instead sidesteps dependency resolution entirely, which is correct:
+        // this is a packaging relationship, not a compilation one.
+        dependsOn(plainVersions.map { ":versions:$it:jar" })
+        plainVersions.forEach { version ->
+            val task = project(":versions:$version").tasks.getByName("jar")
+            from(zipTree(task.outputs.files.singleFile))
+        }
     }
 }
+
+apply(from = "$rootDir/gradle/verify-nms-bundles.gradle.kts")
+apply(from = "$rootDir/gradle/verify-dispatch-floors.gradle.kts")
+

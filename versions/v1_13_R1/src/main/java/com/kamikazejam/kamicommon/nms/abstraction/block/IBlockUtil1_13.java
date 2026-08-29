@@ -117,7 +117,8 @@ public abstract class IBlockUtil1_13<X> extends AbstractBlockUtil {
         if (xData.getLevel() != null) {
             // We have a level, so make a BlockData with this value
             blockData = getOrCreateBlockData(blockData, xMaterial);
-            if (blockData instanceof Levelled levelled) {
+            if (blockData instanceof Levelled) {
+                Levelled levelled = (Levelled) blockData;
                 levelled.setLevel(xData.getLevel());
             }else {
                 throw new IllegalArgumentException("[KamiCommon] [IBlockUtil] tried setting block at "
@@ -133,7 +134,8 @@ public abstract class IBlockUtil1_13<X> extends AbstractBlockUtil {
         if (xData.getSlabType() != null) {
             Slab.Type slabType = Slab.Type.valueOf(xData.getSlabType().name());
             blockData = getOrCreateBlockData(blockData, xMaterial);
-            if (blockData instanceof Slab slab) {
+            if (blockData instanceof Slab) {
+                Slab slab = (Slab) blockData;
                 slab.setType(slabType);
             }else {
                 throw new IllegalArgumentException("[KamiCommon] [IBlockUtil] tried setting block at "

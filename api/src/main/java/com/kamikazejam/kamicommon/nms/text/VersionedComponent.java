@@ -1,6 +1,7 @@
 package com.kamikazejam.kamicommon.nms.text;
 
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
+import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -87,7 +88,7 @@ public interface VersionedComponent {
      * Sends the current message component to multiple senders.
      */
     default void sendTo(@NotNull CommandSender... senders) {
-        this.sendTo(List.of(senders));
+        this.sendTo(Arrays.asList(senders));
     }
 
     /**

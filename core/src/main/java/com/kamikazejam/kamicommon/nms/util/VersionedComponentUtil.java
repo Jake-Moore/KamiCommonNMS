@@ -2,10 +2,10 @@ package com.kamikazejam.kamicommon.nms.util;
 
 import com.kamikazejam.kamicommon.nms.NmsAPI;
 import com.kamikazejam.kamicommon.nms.NmsVersion;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundle;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.kamikazejam.kamicommon.nms.serializer.VersionedComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_18_R1;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_LATEST;
 import com.kamikazejam.kamicommon.util.Preconditions;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,149 +14,67 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * Utility for interacting with {@link VersionedComponent} and various server apis.
- * <p>
- * This provider selects the appropriate {@link VersionedComponent} implementation
- * based on the current Minecraft version, handling the evolution of
- * the adventure api and its integration natively into paper.
- * </p>
- *
- * @see VersionedComponent
- */
 @SuppressWarnings("unused")
 public class VersionedComponentUtil {
 
-    /**
-     * Mirror method to {@link NmsAPI#getVersionedComponentSerializer()} for convenience.
-     */
     public static @NotNull VersionedComponentSerializer serializer() {
         return NmsAPI.getVersionedComponentSerializer();
     }
 
-    private static int f(String mcVersion) {
-        return NmsVersionParser.getFormattedNmsInteger(mcVersion);
+    /**
+     * Picks the module that knows how to write components onto an {@link ItemMeta} here.
+     * <p>
+     * Same two-way split every method below used to repeat: up to 1.18.1 the shaded adventure is
+     * used, and from 1.18.2 the server's own.
+     * </p>
+     *
+     * @return the module to call through
+     */
+    private static @NotNull NmsBundle metaBundle() {
+        int ver = NmsVersion.getFormattedNmsInteger();
+        if (ver < f("1.8")) {
+            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
+        }
+        // The SAME ladder the component serializer uses, deliberately.
+        //
+        // The ItemMeta string work is version independent, so this used to collapse everything
+        // below 1.21.4 onto one module. But getDisplayName and getLore CONSTRUCT a
+        // VersionedComponent, and its concrete type decides how the result serializes when it is
+        // later sent: v1_16_R3 and above use BungeeComponentSerializer.get(), which emits hex, and
+        // the modules below it use .legacy(), which does not. LegacyComponentSerializer
+        // .legacySection() does decode the section-x hex form, so a name read off an ItemMeta on a
+        // 1.12 server really can carry a hex colour, and collapsing the ladder handed that server a
+        // hex-capable component. Splitting the same way keeps the type matched to the server.
+        return VersionedComponentSerializer.bundleFor(ver);
     }
 
-    /**
-     * Set the display name of an item stack using a {@link VersionedComponent}.<br>
-     * <br>
-     * On older versions the component is serialized to legacy codes, while on newer versions it uses the native adventure api.
-     * @return the same {@link ItemMeta} instance (for chaining).
-     */
     public static @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent component) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver <= f("1.18.1")) {
-            // uses shaded components
-            return VersionedComponent_1_18_R1.setDisplayName(meta, component);
-        }
-
-        // 1.18.2+ has adventure bundled, so we can use the native apis
-        return VersionedComponent_LATEST.setDisplayName(meta, component);
+        return metaBundle().setDisplayName(meta, component);
     }
 
-    /**
-     * Set the lore of an item stack using a list of {@link VersionedComponent}s.<br>
-     * <br>
-     * On older versions the components are serialized to legacy codes, while on newer versions it uses the native adventure api.
-     * @param meta the item meta to modify
-     * @param lore the lore lines as versioned components, or null to remove lore
-     * @return the same {@link ItemMeta} instance (for chaining).
-     */
     public static @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver <= f("1.18.1")) {
-            // uses shaded components
-            return VersionedComponent_1_18_R1.setLore(meta, lore);
-        }
-
-        // 1.18.2+ has adventure bundled, so we can use the native apis
-        return VersionedComponent_LATEST.setLore(meta, lore);
+        return metaBundle().setLore(meta, lore);
     }
 
-    /**
-     * Get the lore of an item stack as a list of {@link VersionedComponent}s.<br>
-     * <br>
-     * Returns null if the item has no lore.
-     * @param meta the item meta to read from
-     * @return the lore lines as versioned components, or null if no lore
-     */
     public static @Nullable List<VersionedComponent> getLore(@NotNull ItemMeta meta) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver <= f("1.18.1")) {
-            // uses shaded components
-            return VersionedComponent_1_18_R1.getLore(meta);
-        }
-
-        // 1.18.2+ has adventure bundled, so we can use the native apis
-        return VersionedComponent_LATEST.getLore(meta);
+        return metaBundle().getLore(meta);
     }
 
-    /**
-     * Get the display name of an item stack as a {@link VersionedComponent}.<br>
-     * <br>
-     * Returns null if the item has no custom display name.
-     * @param meta the item meta to read from
-     * @return the display name as a versioned component, or null if no custom name
-     */
     public static @Nullable VersionedComponent getDisplayName(@NotNull ItemMeta meta) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver <= f("1.18.1")) {
-            // uses shaded components
-            return VersionedComponent_1_18_R1.getDisplayName(meta);
-        }
-
-        // 1.18.2+ has adventure bundled, so we can use the native apis
-        return VersionedComponent_LATEST.getDisplayName(meta);
+        return metaBundle().getDisplayName(meta);
     }
 
-    /**
-     * Add a single line to the lore of an item stack using a {@link VersionedComponent}.<br>
-     * <br>
-     * If the item has no existing lore, creates a new lore list with this component.
-     * @param meta the item meta to modify
-     * @param component the lore line to add
-     * @return the same {@link ItemMeta} instance (for chaining).
-     */
     public static @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent component) {
         Preconditions.checkNotNull(meta, "meta cannot be null");
         Preconditions.checkNotNull(component, "component cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
+        return metaBundle().addLoreLine(meta, component);
+    }
 
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver <= f("1.18.1")) {
-            // uses shaded components
-            return VersionedComponent_1_18_R1.addLoreLine(meta, component);
-        }
-
-        // 1.18.2+ has adventure bundled, so we can use the native apis
-        return VersionedComponent_LATEST.addLoreLine(meta, component);
+    private static int f(String mcVersion) {
+        return NmsVersionParser.getFormattedNmsInteger(mcVersion);
     }
 }

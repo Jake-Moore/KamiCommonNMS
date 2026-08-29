@@ -88,6 +88,16 @@ dependencies {
 
 apply(from = "$rootDir/gradle/paper-toolchain.gradle.kts")
 
+tasks {
+    publish.get().dependsOn(build)
+    build.get().dependsOn(shadowJar)
+    shadowJar.get().dependsOn(jar)
+    shadowJar {
+        archiveClassifier.set("")
+        // configurations = listOf(project.configurations.shadow.get())
+    }
+}
+
 apply(from = "$rootDir/gradle/verify-java-compat.gradle.kts")
 
 tasks.register("printServerAPI") {

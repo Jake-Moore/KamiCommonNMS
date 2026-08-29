@@ -22,9 +22,20 @@ val verifyJava21Compatibility = tasks.register("verifyJava21Compatibility") {
     dependsOn(tasks.named("shadowJar"), tasks.named("generateMetadataFileForShadowPublication"))
 
     val jarFile = tasks.named<Jar>("shadowJar").flatMap { it.archiveFile }
+    val classifier = tasks.named<Jar>("shadowJar").flatMap { it.archiveClassifier }
     val moduleFile = layout.buildDirectory.file("publications/shadow/module.json")
 
     doLast {
+        // The jar inspected below must be the one consumers receive. If shadowJar grows a
+        // classifier, the shaded jar publishes as -all and the primary artifact becomes the thin
+        // jar, with none of the version modules in it. Everything else here would still pass.
+        if (classifier.get().isNotEmpty()) {
+            throw GradleException(
+                "shadowJar has classifier '${classifier.get()}', so the shaded jar is not the primary " +
+                        "published artifact. Consumers would receive the thin jar."
+            )
+        }
+
         var inspected = 0
         var highest = 0
         var worst = ""

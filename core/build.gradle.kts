@@ -266,3 +266,6 @@ gradle.projectsEvaluated {
         }
     }
 }
+
+apply(from = "$rootDir/gradle/verify-nms-bundles.gradle.kts")
+

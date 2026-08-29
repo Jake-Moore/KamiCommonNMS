@@ -1,6 +1,7 @@
 package com.kamikazejam.kamicommon.nms.library.worldguard;
 
 import com.kamikazejam.kamicommon.nms.NmsAPI;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
@@ -91,9 +92,9 @@ public class WorldGuardHook {
         // Check for supported versions
         String ver = wg.getDescription().getVersion();
         if (ver.startsWith("6")) {
-            return worldguard = new WorldGuard6(wg, NmsAPI.getNmsWorldWrapper());
+            return worldguard = NmsBundles.forModule("worlds6").worldGuard(wg, NmsAPI.getNmsWorldWrapper());
         }else if (ver.startsWith("7")) {
-            return worldguard = new WorldGuard7(wg, NmsAPI.getNmsWorldWrapper());
+            return worldguard = NmsBundles.forModule("worlds7").worldGuard(wg, NmsAPI.getNmsWorldWrapper());
         }else {
             return null;
         }

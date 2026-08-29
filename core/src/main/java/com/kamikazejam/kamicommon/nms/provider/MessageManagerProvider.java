@@ -3,8 +3,7 @@ package com.kamikazejam.kamicommon.nms.provider;
 import com.kamikazejam.kamicommon.nms.NmsAPI;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.AbstractMessageManager;
 import com.kamikazejam.kamicommon.nms.abstraction.itemtext.AbstractItemTextPre_1_17;
-import com.kamikazejam.kamicommon.nms.chat.MessageManager_LATEST;
-import com.kamikazejam.kamicommon.nms.chat.MessageManager_1_8_R1;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -52,10 +51,10 @@ public class MessageManagerProvider extends Provider<AbstractMessageManager> {
         // Use md5 BaseComponent pre 1.17
         if (ver < f("1.17")) {
             AbstractItemTextPre_1_17 itemText = NmsAPI.getItemTextProviderPre_1_17().get();
-            return new MessageManager_1_8_R1(itemText);
+            return NmsBundles.forModule("v1_8_R1").messageManager(itemText);
         }
 
         // Use kyori adventure Component post 1.17
-        return new MessageManager_LATEST();
+        return NmsBundles.forModule("v_latest").messageManager();
     }
 }

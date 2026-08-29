@@ -1,9 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemEditor;
-import com.kamikazejam.kamicommon.nms.item.ItemEditor_1_11_R1;
-import com.kamikazejam.kamicommon.nms.item.ItemEditor_LATEST;
-import com.kamikazejam.kamicommon.nms.item.ItemEditor_1_8_R1;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -50,15 +48,15 @@ public class ItemEditorProvider extends Provider<AbstractItemEditor> {
 
         if (ver < f("1.11")) {
             // Pre 1.11 versions (1.8, 1.9, 1.10)
-            return new ItemEditor_1_8_R1();
+            return NmsBundles.forModule("v1_8_R1").itemEditor();
         }
 
         if (ver < f("1.13")) {
             // Pre 1.13 versions (1.11, 1.12)
-            return new ItemEditor_1_11_R1();
+            return NmsBundles.forModule("v1_11_R1").itemEditor();
         }
 
         // 1.13+ versions
-        return new ItemEditor_LATEST();
+        return NmsBundles.forModule("v_latest").itemEditor();
     }
 }

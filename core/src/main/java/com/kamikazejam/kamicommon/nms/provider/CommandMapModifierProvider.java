@@ -1,8 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.command.CommandMapModifier;
-import com.kamikazejam.kamicommon.nms.command.CommandMapModifier_LATEST;
-import com.kamikazejam.kamicommon.nms.command.CommandMapModifier_1_8_R1;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -48,9 +47,9 @@ public class CommandMapModifierProvider extends Provider<CommandMapModifier> {
         }
 
         if (ver < f("1.17")) {
-            return new CommandMapModifier_1_8_R1();
+            return NmsBundles.forModule("v1_8_R1").commandMapModifier();
         }else {
-            return new CommandMapModifier_LATEST();
+            return NmsBundles.forModule("v_latest").commandMapModifier();
         }
     }
 }

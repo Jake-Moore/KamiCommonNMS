@@ -1,9 +1,8 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.kamikazejam.kamicommon.nms.text.ComponentLoggerAdapter;
-import com.kamikazejam.kamicommon.nms.text.ComponentLoggerAdapter_1_18_R1;
-import com.kamikazejam.kamicommon.nms.text.ComponentLoggerAdapter_LATEST;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,10 +31,10 @@ public class ComponentLoggerAdapterProvider extends Provider<ComponentLoggerAdap
         // Select the correct wrapper which knows how to send this kind of component
         if (ver <= f("1.18.1")) {
             // uses legacy logging method, since server does not have kyori ComponentLogger yet
-            return new ComponentLoggerAdapter_1_18_R1();
+            return NmsBundles.forModule("v1_18_R1").componentLoggerAdapter();
         }
 
         // 1.18.2+ has adventure and MiniMessage bundled, so we can use the native apis
-        return new ComponentLoggerAdapter_LATEST();
+        return NmsBundles.forModule("v_latest").componentLoggerAdapter();
     }
 }

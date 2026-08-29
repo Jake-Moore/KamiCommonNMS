@@ -1,203 +1,79 @@
 package com.kamikazejam.kamicommon.nms.serializer;
 
 import com.kamikazejam.kamicommon.nms.NmsVersion;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundle;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_11_R1;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_15_R1;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_16_R3;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_18_R1;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_LATEST;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import com.kamikazejam.kamicommon.util.Preconditions;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Provider for version-specific adventure component wrappers.
- * <p>
- * This provider selects the appropriate {@link VersionedComponent} implementation
- * based on the current Minecraft version, handling the evolution of
- * the adventure api and its integration natively into paper.
- * </p>
- *
- * @see VersionedComponent
- */
 @SuppressWarnings("unused")
 public class VersionedComponentSerializer {
 
     /**
-     * Convert a string (treated as plain text) into a {@link VersionedComponent} for this version.<br>
-     * <br>
-     * Does not support any color codes or mini message parsings. See other methods for those.
+     * Picks the module whose {@link VersionedComponent} implementation matches this server.
+     * <p>
+     * The thresholds are unchanged; they were simply repeated in all five factories below, which is
+     * five places to keep in step. The modules up to 1.18.1 wrap the <i>shaded</i> adventure, while
+     * {@code v_latest} delegates to the server's own — that difference is the reason 1.18.2 is a
+     * boundary at all, so both paths are kept.
+     * </p>
+     *
+     * @param ver the formatted NMS version integer
+     * @return the module to construct through
      */
+    private static @NotNull NmsBundle componentBundle(int ver) {
+        if (ver < f("1.8")) {
+            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
+        }
+        // uses shaded serializers - 1.8 to 1.11.X
+        if (ver < f("1.12")) { return NmsBundles.forModule("v1_11_R1"); }
+        // uses shaded serializers - 1.12 to 1.15.X
+        if (ver < f("1.16")) { return NmsBundles.forModule("v1_15_R1"); }
+        // uses shaded serializers - 1.16.X (added hex support)
+        if (ver < f("1.17")) { return NmsBundles.forModule("v1_16_R3"); }
+        // uses shaded serializers - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
+        if (ver <= f("1.18.1")) { return NmsBundles.forModule("v1_18_R1"); }
+        // 1.18.2+ has adventure and MiniMessage bundled, so we can use the native apis
+        return NmsBundles.forModule("v_latest");
+    }
+
     public @NotNull VersionedComponent fromInternalComponent(@NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component component) {
         Preconditions.checkNotNull(component, "component cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver < f("1.12")) {
-            // uses shaded PlainTextComponentSerializer - 1.8 to 1.11.X
-            return new VersionedComponent_1_11_R1(component);
-        } else if (ver < f("1.16")) {
-            // uses shaded PlainTextComponentSerializer - 1.12 to 1.15.X
-            return new VersionedComponent_1_15_R1(component);
-        } else if (ver < f("1.17")) {
-            // uses shaded PlainTextComponentSerializer - 1.16.X (added hex support)
-            return new VersionedComponent_1_16_R3(component);
-        } else if (ver <= f("1.18.1")) {
-            // uses shaded PlainTextComponentSerializer - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
-            return new VersionedComponent_1_18_R1(component);
-        }
-
-        // 1.18.2+ has adventure bundled, so we can use the native apis
-        return VersionedComponent_LATEST.fromInternalComponent(component);
+        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFrom(component);
     }
 
-    /**
-     * Convert a string (treated as plain text) into a {@link VersionedComponent} for this version.<br>
-     * <br>
-     * Does not support any color codes or mini message parsings. See other methods for those.
-     */
     public @NotNull VersionedComponent fromPlainText(@NotNull String text) {
         Preconditions.checkNotNull(text, "text cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver < f("1.12")) {
-            // uses shaded PlainTextComponentSerializer - 1.8 to 1.11.X
-            return new VersionedComponent_1_11_R1(PlainTextComponentSerializer.plainText().deserialize(text));
-        } else if (ver < f("1.16")) {
-            // uses shaded PlainTextComponentSerializer - 1.12 to 1.15.X
-            return new VersionedComponent_1_15_R1(PlainTextComponentSerializer.plainText().deserialize(text));
-        } else if (ver < f("1.17")) {
-            // uses shaded PlainTextComponentSerializer - 1.16.X (added hex support)
-            return new VersionedComponent_1_16_R3(PlainTextComponentSerializer.plainText().deserialize(text));
-        } else if (ver <= f("1.18.1")) {
-            // uses shaded PlainTextComponentSerializer - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
-            return new VersionedComponent_1_18_R1(PlainTextComponentSerializer.plainText().deserialize(text));
-        }
-
-        // 1.18.2+ has adventure bundled, so we can use the native apis
-        return VersionedComponent_LATEST.fromPlainText(text);
+        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromPlainText(text);
     }
 
-    /**
-     * Convert a MiniMessage string into a {@link VersionedComponent} for this version.<br>
-     * <br>
-     * Does not convert or support legacy codes (&amp; or &sect;). See {@link #fromLegacyAmpersand(String)} and {@link #fromLegacySection(String)} for those.
-     */
     public @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage) {
         Preconditions.checkNotNull(miniMessage, "miniMessage cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver < f("1.12")) {
-            // uses shaded MiniMessage - 1.8 to 1.11.X
-            return new VersionedComponent_1_11_R1(MiniMessage.miniMessage().deserialize(miniMessage));
-        } else if (ver < f("1.16")) {
-            // uses shaded MiniMessage - 1.12 to 1.15.X
-            return new VersionedComponent_1_15_R1(MiniMessage.miniMessage().deserialize(miniMessage));
-        } else if (ver < f("1.17")) {
-            // uses shaded MiniMessage - 1.16.X (added hex support)
-            return new VersionedComponent_1_16_R3(MiniMessage.miniMessage().deserialize(miniMessage));
-        } else if (ver <= f("1.18.1")) {
-            // uses shaded MiniMessage - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
-            return new VersionedComponent_1_18_R1(MiniMessage.miniMessage().deserialize(miniMessage));
-        }
-
-        // 1.18.2+ has adventure and MiniMessage bundled, so we can use the native MiniMessage
-        return VersionedComponent_LATEST.fromMiniMessage(miniMessage);
+        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromMiniMessage(miniMessage);
     }
 
-    /**
-     * Convert a legacy ampersand (&amp;) string into a {@link VersionedComponent} for this version.<br>
-     * <br>
-     * Will ignore section (&sect;) codes. See {@link #fromLegacySection(String)} for that.
-     */
     public @NotNull VersionedComponent fromLegacyAmpersand(@NotNull String legacy) {
         Preconditions.checkNotNull(legacy, "legacy cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver < f("1.12")) {
-            // uses shaded MiniMessage - 1.8 to 1.11.X
-            return new VersionedComponent_1_11_R1(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
-        } else if (ver < f("1.16")) {
-            // uses shaded MiniMessage - 1.12 to 1.15.X
-            return new VersionedComponent_1_15_R1(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
-        } else if (ver < f("1.17")) {
-            // uses shaded MiniMessage - 1.16.X (added hex support)
-            return new VersionedComponent_1_16_R3(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
-        } else if (ver <= f("1.18.1")) {
-            // uses shaded MiniMessage - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
-            return new VersionedComponent_1_18_R1(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
-        }
-
-        // 1.18.2+ has adventure and MiniMessage bundled, so we can use the native MiniMessage
-        return VersionedComponent_LATEST.fromLegacyAmpersand(legacy);
+        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromLegacyAmpersand(legacy);
     }
 
-    /**
-     * Convert a legacy section (&sect;) string into a {@link VersionedComponent} for this version.<br>
-     * <br>
-     * Will ignore ampersand (&amp;) codes. See {@link #fromLegacyAmpersand(String)} for that.
-     */
     public @NotNull VersionedComponent fromLegacySection(@NotNull String legacy) {
         Preconditions.checkNotNull(legacy, "legacy cannot be null");
-        int ver = NmsVersion.getFormattedNmsInteger();
-        if (ver < f("1.8")) {
-            throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
-        }
-
-        // Select the correct wrapper which knows how to send this kind of component
-        if (ver < f("1.12")) {
-            // uses shaded MiniMessage - 1.8 to 1.11.X
-            return new VersionedComponent_1_11_R1(LegacyComponentSerializer.legacySection().deserialize(legacy));
-        } else if (ver < f("1.16")) {
-            // uses shaded MiniMessage - 1.12 to 1.15.X
-            return new VersionedComponent_1_15_R1(LegacyComponentSerializer.legacySection().deserialize(legacy));
-        } else if (ver < f("1.17")) {
-            // uses shaded MiniMessage - 1.16.X (added hex support)
-            return new VersionedComponent_1_16_R3(LegacyComponentSerializer.legacySection().deserialize(legacy));
-        } else if (ver <= f("1.18.1")) {
-            // uses shaded MiniMessage - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
-            return new VersionedComponent_1_18_R1(LegacyComponentSerializer.legacySection().deserialize(legacy));
-        }
-
-        // 1.18.2+ has adventure and MiniMessage bundled, so we can use the native MiniMessage
-        return VersionedComponent_LATEST.fromLegacySection(legacy);
+        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromLegacySection(legacy);
     }
 
-    /**
-     * Serialize a {@link VersionedComponent} back into a MiniMessage string.
-     */
     public @NotNull String serializeMiniMessage(@NotNull VersionedComponent component) {
         Preconditions.checkNotNull(component, "component cannot be null");
         return component.serializeMiniMessage();
     }
 
-    /**
-     * Deserialize a MiniMessage string into a {@link VersionedComponent}.
-     */
     public @NotNull VersionedComponent deserializeMiniMessage(@NotNull String miniMessage) {
         return fromMiniMessage(miniMessage);
     }
 
-    private int f(String mcVersion) {
+    private static int f(String mcVersion) {
         return NmsVersionParser.getFormattedNmsInteger(mcVersion);
     }
 }

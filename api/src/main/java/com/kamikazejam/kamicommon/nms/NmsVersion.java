@@ -3,6 +3,9 @@ package com.kamikazejam.kamicommon.nms;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Method;
 
 /**
  * Version detection and management utility for the KamiCommon NMS system.
@@ -92,9 +95,39 @@ public class NmsVersion {
     public static String getMCVersion() {
         if (mcVersion != null) {return mcVersion;}
 
+        // Prefer Server#getMinecraftVersion() where the running server has it. It reports the
+        //  bare version ("1.21.10", "26.2") where getBukkitVersion() reports a build coordinate.
+        //  Reflectively, because that method does not exist on the oldest supported API and this
+        //  module compiles against 1.8.8.
+        String direct = getMinecraftVersionReflectively();
+        if (direct != null && !direct.isEmpty()) {
+            mcVersion = direct;
+            return mcVersion;
+        }
+
+        // Fallback. Note this is NOT always "1.20.4"-shaped: Paper 26.x reports
+        //  "26.2.build.115-stable" here, which leaves "26.2.build.115" after the split.
+        //  NmsVersionParser reads the leading numeric components and ignores the rest.
         String bukkitVer = Bukkit.getServer().getBukkitVersion(); // i.e. 1.20.4-R0.1-SNAPSHOT
         mcVersion = bukkitVer.split("-")[0]; // i.e. 1.20.4
         return mcVersion;
+    }
+
+    /**
+     * @return the value of {@code Server#getMinecraftVersion()}, or null if this server predates it.
+     */
+    private static @Nullable String getMinecraftVersionReflectively() {
+        try {
+            Object server = Bukkit.getServer();
+            if (server == null) {return null;}
+            Method method = server.getClass().getMethod("getMinecraftVersion");
+            Object value = method.invoke(server);
+            return (value instanceof String) ? (String) value : null;
+        } catch (Throwable ignored) {
+            // NoSuchMethodException on older servers, and anything else is not worth failing over
+            //  because the getBukkitVersion() fallback below handles every supported version.
+            return null;
+        }
     }
 
     /** Cached formatted version integer to avoid repeated computation. */

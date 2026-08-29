@@ -12,11 +12,11 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Chunk_LATEST implements NMSChunkDef {
-    private final @NotNull ChunkProvider_LATEST provider;
+public class Chunk_1_21_11 implements NMSChunkDef {
+    private final @NotNull ChunkProvider_1_21_11 provider;
     private final @NotNull Chunk bukkitChunk;
     private final @NotNull ChunkAccess chunk;
-    public Chunk_LATEST(@NotNull ChunkProvider_LATEST provider, @NotNull Chunk bukkitChunk) {
+    public Chunk_1_21_11(@NotNull ChunkProvider_1_21_11 provider, @NotNull Chunk bukkitChunk) {
         this.provider = provider;
         this.bukkitChunk = bukkitChunk;
         this.chunk = ((CraftChunk) bukkitChunk).getHandle(ChunkStatus.FULL);
@@ -39,7 +39,7 @@ public class Chunk_LATEST implements NMSChunkDef {
 
     @Override
     public @NotNull NMSChunkSection getSection(int y) {
-        return new ChunkSection_LATEST(this, this.chunk, y);
+        return new ChunkSection_1_21_11(this, this.chunk, y);
     }
 
     @Override
@@ -64,11 +64,11 @@ public class Chunk_LATEST implements NMSChunkDef {
 
     @Override
     public int getX() {
-        return this.chunk.getPos().x();
+        return this.chunk.getPos().x;
     }
 
     @Override
     public int getZ() {
-        return this.chunk.getPos().z();
+        return this.chunk.getPos().z;
     }
 }

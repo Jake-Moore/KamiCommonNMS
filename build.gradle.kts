@@ -1,12 +1,12 @@
 @Suppress("PropertyName")
-val VERSION = "1.2.19" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
+val VERSION = "1.2.20" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
 
 plugins {
     id("com.gradleup.shadow") version "9.2.2" apply false
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.22" apply false
 }
 
-val highestPaperDep = "1.21.11-pre4-R0.1-SNAPSHOT"
+val highestPaperDep = "26.2.build.115-stable"
 
 // Testing server APIs (the earliest supported version, and the latest PaperMC version)
 val oldestServerAPI = "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC"
@@ -37,8 +37,12 @@ ext {
     set("adventureDep", "com.kamikazejam.kamicommon:spigot-nms-text:1.0.5")
 }
 extra["commonDependencies"] = listOf(
-    "de.tr7zw:item-nbt-api:2.15.3",
-    "com.github.cryptomorin:XSeries:v13.5.1",
+    // 2.15.3's MinecraftVersion stops at MC1_21_R6; 2.16.0 adds MC26_1 and MC26_2.
+    "de.tr7zw:item-nbt-api:2.16.0",
+    // 13.5.1 parses Bukkit.getVersion() with the regex "MC: \\d\\.(\\d+)" - a single digit for
+    //  the major - and throws IllegalArgumentException from XMaterial's static initializer on any
+    //  26.x server. 13.7.1 uses "MC: (\\d+)\\.(\\d+)".
+    "com.github.cryptomorin:XSeries:13.7.1",
     "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.5.0"
 )
 

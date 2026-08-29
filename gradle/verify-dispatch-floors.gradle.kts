@@ -1,0 +1,246 @@
+// The fourth check, and the only one that can see this class of mistake.
+//
+// verifyFloors reads bytecode, so it catches a class that exceeds its module's floor and a
+// lower-floor class that names a higher-floor one. It structurally CANNOT catch a dispatch ladder
+// sending an old server to a high-floor module, because the whole point of resolving modules by
+// name is that no static reference exists for it to find. Nothing in TeleportProvider's constant
+// pool mentions v_latest.
+//
+// So this check reads the ladders themselves. For every Minecraft version we claim to support it
+// works out which module each provider would select, and asserts that module's floor is loadable on
+// the JVM that Minecraft version runs on. Raising v_latest to Java 25 while 1.21.11 still fell
+// through to it was caught here, by nothing else, before any server was booted.
+//
+// It never loads a version class and never runs a provider. It parses source and evaluates the
+// comparisons.
+
+// The JVM each Minecraft version actually runs on. The server's own requirement, not ours.
+val serverJvms = listOf(
+    "1.8" to 8, "1.8.3" to 8, "1.8.8" to 8, "1.9.2" to 8, "1.9.4" to 8, "1.10.2" to 8,
+    "1.11.2" to 8, "1.12.2" to 8, "1.13" to 8, "1.13.2" to 8, "1.14.4" to 8, "1.15.2" to 8,
+    "1.16.1" to 8, "1.16.2" to 8, "1.16.3" to 8, "1.16.5" to 8,
+    "1.17.1" to 16,
+    "1.18.1" to 17, "1.18.2" to 17, "1.19.2" to 17, "1.19.3" to 17, "1.19.4" to 17,
+    "1.20.1" to 17, "1.20.2" to 17, "1.20.4" to 17,
+    "1.20.6" to 21, "1.21.4" to 21, "1.21.9" to 21, "1.21.11" to 21,
+    "26.1.2" to 25, "26.2" to 25,
+)
+
+// Three ladders do not branch on the version integer, so this check cannot decide them and they
+// were read by hand instead. Naming them here rather than skipping anything unrecognised is what
+// keeps the check fail-closed: a NEW undecidable ladder fails the build and forces the same reading.
+//
+//   WorldEditHook::worldEdit          selects on the WorldEdit plugin instance, not the version
+//   WorldGuardHook::get               branches on ver.startsWith("6"), a WorldGuard version string
+//   ItemTextProviderPre_1_17::provide throws above 1.16.5 by design, so it has no branch to take
+val handChecked = setOf(
+    "library/worldedit/WorldEditHook.java::worldEdit",
+    "library/worldguard/WorldGuardHook.java::get",
+    "provider/ItemTextProviderPre_1_17.java::provide",
+)
+
+val moduleFloors = java.util.Properties().apply {
+    rootProject.file("gradle/module-floors.properties").inputStream().use { load(it) }
+}.entries.associate { (k, v) -> k.toString() to v.toString().trim().toInt() }
+
+// NmsVersionParser.getFormattedNmsInteger, reproduced rather than called.
+//
+// Calling the real one would be better if the real one were reachable, but it is not. It ships in
+// KamiCommon's standalone-utils, which this project takes as compileOnly and never bundles, so the
+// copy on the compile classpath is whatever version the pin in build.gradle.kts names while the
+// copy that actually runs comes from the consuming KamiCommon jar. Those two have already been five
+// releases apart, far enough that the pinned one throws on the version strings Paper 26.x reports.
+// A check that silently used the wrong one would evaluate every comparison against wrong numbers
+// and still report success, so the agreement is asserted below instead of assumed.
+fun encode(mcVersion: String): Int {
+    val m = Regex("""^(\d+)(?:\.(\d+))?(?:\.(\d+))?""").find(mcVersion.trim())
+        ?: throw GradleException("cannot read a version out of '$mcVersion'")
+    val major = m.groupValues[1].toInt()
+    val minor = m.groupValues[2].ifEmpty { "0" }.toInt()
+    val patch = m.groupValues[3].ifEmpty { "0" }.toInt()
+    // Legacy 1.x is packed textually, which is why 1.21.10 is 12110 rather than 1220.
+    if (major == 1) return (if (minor <= 9) "10$minor$patch" else "1$minor$patch").toInt()
+    // Calendar era, two digits each, so 26.2 reads as 26|02|00.
+    return major * 10_000 + minor * 100 + patch
+}
+
+/** Any dispatch call, and the subset whose module is a string literal this check can read. */
+val anyCall = Regex("""forModule\(""")
+val literalCalls = Regex("forModule\\(\"")
+
+/** `if (cond) {` opening a branch, or a `forModule("x")` call. Ordered, so the pairs stay aligned. */
+val token = Regex("""if \(([^\n]*?)\)\s*\{|forModule\("([^"]+)"\)""")
+
+/** A method declaration at class-body indentation. Its body is taken by matching braces. */
+val methodHeader = Regex("""\n {4}(?:private|protected|public)[^\n{]*\b(\w+)\([^)]*\)\s*\{""")
+
+/** `ver <= f("1.21.11")`, `nmsVersion == f("1.8.8")`, `ver >= 1162`. Anything else is undecidable. */
+val comparison = Regex("""^\s*(?:ver|nmsVersion)\s*(<=|>=|==|<|>)\s*(?:f\("([^"]+)"\)|(\d+))\s*$""")
+
+val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
+    group = "verification"
+    description = "Checks that no dispatch ladder sends a server to a module its JVM cannot load."
+
+    val sourceRoot = file("src/main/java")
+    // Every provider reaches the encoder through a private f(), and each f() delegates to
+    // NmsVersionParser. If any stops delegating, encode() above is no longer what the ladder uses.
+    val encoderDelegates = rootProject.file("core/src/main/java")
+
+    doLast {
+        // Two ways the reproduced encoder could stop matching the real one, both checked.
+        //
+        // First, the values. These four span both eras and both legacy packing widths.
+        val expected = mapOf(
+            "1.8.8" to 1088, "1.16.5" to 1165, "1.21.10" to 12110, "1.21.11" to 12111,
+            "26.1.2" to 260102, "26.2" to 260200,
+        )
+        for ((v, want) in expected) {
+            val got = encode(v)
+            if (got != want) {
+                throw GradleException(
+                    "the version encoder in this check returned $got for $v, expected $want. Every " +
+                            "comparison below would be evaluated against the wrong numbers."
+                )
+            }
+        }
+        // Second, the delegation. A provider's f() that stopped calling NmsVersionParser would make
+        // the ladders mean something this check cannot see.
+        val delegating = encoderDelegates.walkTopDown().filter { it.extension == "java" }
+            .count { it.readText().contains("NmsVersionParser.getFormattedNmsInteger") }
+        if (delegating < 3) {
+            throw GradleException(
+                "only $delegating classes under core/ delegate to NmsVersionParser. The providers " +
+                        "encode versions some other way now, so this check is modelling the wrong thing."
+            )
+        }
+
+        val violations = ArrayList<String>()
+        val undecidable = LinkedHashSet<String>()
+        var sites = 0
+        var decided = 0
+        var callsSeen = 0
+        var callsParsed = 0
+
+        sourceRoot.walkTopDown().filter { it.extension == "java" }.sortedBy { it.path }.forEach { file ->
+            val text = file.readText()
+            // Gate on forModule in ANY form, not just forModule("literal"). WorldEditHook dispatches
+            // through a helper taking the module as a parameter, so a literal-only gate skipped that
+            // whole file rather than reporting that it could not read it.
+            if (!text.contains("forModule")) return@forEach
+            callsSeen += literalCalls.findAll(text).count()
+            val where = file.path.substringAfter("/nms/")
+
+            for (header in methodHeader.findAll(text)) {
+                var depth = 1
+                var i = header.range.last + 1
+                while (i < text.length && depth > 0) {
+                    if (text[i] == '{') depth++
+                    if (text[i] == '}') depth--
+                    i++
+                }
+                val body = text.substring(header.range.last + 1, i)
+                if (!body.contains("forModule")) continue
+                sites++
+                val site = "$where::${header.groupValues[1]}"
+
+                // A forModule call whose argument is not a string literal cannot be resolved here.
+                // Treat the whole method as undecidable rather than reading only the literals and
+                // reporting a clean result for a ladder that was partly invisible.
+                if (anyCall.findAll(body).count() != literalCalls.findAll(body).count()) {
+                    undecidable.add(site)
+                    continue
+                }
+
+                // Each `if` guards the next forModule. An `if` with no forModule before the next
+                // `if` was guarding something else, a throw or an early return, so it is dropped.
+                val ladder = ArrayList<Pair<String?, String>>()
+                var pending: String? = null
+                for (t in token.findAll(body)) {
+                    val cond = t.groupValues[1]
+                    if (t.groupValues[2].isEmpty()) pending = cond
+                    else { ladder.add(pending to t.groupValues[2]); pending = null }
+                }
+                callsParsed += ladder.size
+
+                for ((mcVersion, jvm) in serverJvms) {
+                    val ver = encode(mcVersion)
+                    var chosen: String? = null
+                    var stuck = false
+                    for ((cond, module) in ladder) {
+                        if (cond == null) { chosen = module; break }
+                        val m = comparison.matchEntire(cond)
+                        if (m == null) { stuck = true; break }
+                        val rhs = m.groupValues[2].takeIf { it.isNotEmpty() }?.let { encode(it) }
+                            ?: m.groupValues[3].toInt()
+                        val hit = when (m.groupValues[1]) {
+                            "<=" -> ver <= rhs
+                            ">=" -> ver >= rhs
+                            "==" -> ver == rhs
+                            "<" -> ver < rhs
+                            else -> ver > rhs
+                        }
+                        if (hit) { chosen = module; break }
+                    }
+                    if (stuck || chosen == null) { undecidable.add(site); continue }
+                    decided++
+                    val floor = moduleFloors[chosen] ?: throw GradleException(
+                        "$site dispatches to module '$chosen', which has no entry in " +
+                                "gradle/module-floors.properties, so its floor cannot be checked."
+                    )
+                    if (floor > jvm) {
+                        violations.add("$site sends Minecraft $mcVersion (Java $jvm) to $chosen (Java $floor)")
+                    }
+                }
+            }
+        }
+
+        // If the method or token regexes stop matching, ladders vanish and this check passes on an
+        // empty set. Every forModule call in a file must land in exactly one parsed ladder.
+        if (callsSeen != callsParsed) {
+            throw GradleException(
+                "found $callsSeen forModule(...) calls in the source but parsed only $callsParsed " +
+                        "into ladders. The source no longer matches the shape this check reads, so " +
+                        "whatever it missed is unchecked."
+            )
+        }
+        if (sites < 10 || decided < 300) {
+            throw GradleException(
+                "only $sites ladder sites and $decided decisions, far below what this project has. " +
+                        "A check evaluating almost nothing reports success no matter what is wrong."
+            )
+        }
+
+        val unexpected = undecidable - handChecked
+        if (unexpected.isNotEmpty()) {
+            throw GradleException(
+                "these ladders cannot be decided from the version integer, so nothing verifies which " +
+                        "module they select:\n  " + unexpected.joinToString("\n  ") +
+                        "\nRead each one, confirm the module it picks is loadable on that server's " +
+                        "JVM, then add it to handChecked in gradle/verify-dispatch-floors.gradle.kts."
+            )
+        }
+        val stale = handChecked - undecidable
+        if (stale.isNotEmpty()) {
+            throw GradleException(
+                "these are listed as hand-checked but this check can now decide them, so the " +
+                        "exemption is hiding a real result:\n  " + stale.joinToString("\n  ") +
+                        "\nRemove them from handChecked."
+            )
+        }
+        if (violations.isNotEmpty()) {
+            throw GradleException(
+                "a dispatch ladder selects a module built for a newer JVM than the server runs on. " +
+                        "That server gets UnsupportedClassVersionError the moment it touches the " +
+                        "provider:\n  " + violations.distinct().take(20).joinToString("\n  ") +
+                        "\nFork the implementation into a module at the server's own floor and add a " +
+                        "branch above the fallthrough."
+            )
+        }
+        logger.lifecycle(
+            "verifyDispatchFloors: $sites ladders, $decided decisions across ${serverJvms.size} " +
+                    "server versions, no module selected above its server's JVM"
+        )
+    }
+}
+tasks.named("build") { dependsOn(verifyDispatchFloors) }
+tasks.named("publish") { dependsOn(verifyDispatchFloors) }

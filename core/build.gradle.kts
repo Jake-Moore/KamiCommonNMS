@@ -74,6 +74,7 @@ dependencies {
     implementation(project(":versions:v1_20_CB"))
     implementation(project(":versions:v1_21_4"))
     implementation(project(":versions:v1_21_9"))
+    implementation(project(":versions:v1_21_11"))
     implementation(project(":versions:v_latest"))
 
     implementation(project(":versions:worlds6"))
@@ -85,10 +86,7 @@ dependencies {
     compileOnly(project.property("serverAPI") as String)
 }
 
-// Requires J21 since some submodules (which are shaded) are Java 21
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
+apply(from = "$rootDir/gradle/paper-toolchain.gradle.kts")
 
 tasks {
     publish.get().dependsOn(build)
@@ -99,6 +97,8 @@ tasks {
         // configurations = listOf(project.configurations.shadow.get())
     }
 }
+
+apply(from = "$rootDir/gradle/verify-java-compat.gradle.kts")
 
 tasks.register("printServerAPI") {
     doFirst {

@@ -1,3 +1,8 @@
+plugins {
+    // Resolves toolchains on machines without every required JDK installed.
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 rootProject.name = "KamiCommonNMS"
 
 include(":api")
@@ -29,6 +34,7 @@ include("versions:v1_20_R3")
 include("versions:v1_20_CB")
 include("versions:v1_21_4")
 include("versions:v1_21_9")
+include("versions:v1_21_11")
 include("versions:v_latest")
 include("versions:worlds6")
 include("versions:worlds7")

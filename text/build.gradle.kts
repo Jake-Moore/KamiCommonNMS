@@ -26,6 +26,11 @@ dependencies {
     implementation("net.kyori:adventure-text-serializer-bungeecord:$platform")
 }
 
+java {
+    // Pinned, or this module inherits whichever JDK runs the build and republishes at that version.
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 tasks {
     publish.get().dependsOn(build)
     build.get().dependsOn(shadowJar)

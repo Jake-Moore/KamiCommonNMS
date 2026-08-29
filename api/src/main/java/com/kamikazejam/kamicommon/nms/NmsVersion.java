@@ -3,6 +3,9 @@ package com.kamikazejam.kamicommon.nms;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Method;
 
 /**
  * Version detection and management utility for the KamiCommon NMS system.
@@ -92,9 +95,32 @@ public class NmsVersion {
     public static String getMCVersion() {
         if (mcVersion != null) {return mcVersion;}
 
+        // Prefer Server#getMinecraftVersion(); reflective because the 1.8.8 API lacks it
+        String direct = getMinecraftVersionReflectively();
+        if (direct != null && !direct.isEmpty()) {
+            mcVersion = direct;
+            return mcVersion;
+        }
+
+        // Not always "1.20.4"-shaped: Paper 26.x reports "26.2.build.120-stable" here
         String bukkitVer = Bukkit.getServer().getBukkitVersion(); // i.e. 1.20.4-R0.1-SNAPSHOT
         mcVersion = bukkitVer.split("-")[0]; // i.e. 1.20.4
         return mcVersion;
+    }
+
+    /**
+     * @return the value of {@code Server#getMinecraftVersion()}, or null if this server predates it.
+     */
+    private static @Nullable String getMinecraftVersionReflectively() {
+        try {
+            Object server = Bukkit.getServer();
+            if (server == null) {return null;}
+            Method method = server.getClass().getMethod("getMinecraftVersion");
+            Object value = method.invoke(server);
+            return (value instanceof String) ? (String) value : null;
+        } catch (Throwable ignored) {
+            return null; // older servers lack the method; getBukkitVersion() covers them
+        }
     }
 
     /** Cached formatted version integer to avoid repeated computation. */

@@ -29,7 +29,4 @@ dependencies {
     compileOnly(project.property("adventureDep") as String)
 }
 
-// Requires J21 since target jar is Java 21
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
+apply(from = "$rootDir/gradle/paper-toolchain.gradle.kts")

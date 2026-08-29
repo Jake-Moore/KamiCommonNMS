@@ -25,27 +25,47 @@ import java.lang.reflect.Method;
  * </ul>
  * </p>
  * <p>
- * <strong>Version Format Evolution:</strong><br>
- * This system adapts to Minecraft's changing version identification methods:
- * <ul>
- * <li><strong>Legacy (1.8-1.12):</strong> Uses traditional "vX_XX_RX" package-based detection</li>
- * <li><strong>Modern (1.13+):</strong> Direct Minecraft version parsing from Bukkit version</li>
- * <li><strong>Post-Relocation (1.17+):</strong> CB package relocation no longer reliable</li>
- * <li><strong>Mojang-Mapped (1.20.5+):</strong> New naming conventions require version-based selection</li>
- * </ul>
+ * <strong>How the version is obtained:</strong><br>
+ * {@code Server#getMinecraftVersion()} where it exists, reflectively because the 1.8.8 API predates
+ * it, falling back to the leading component of {@code Server#getBukkitVersion()}. Package based
+ * detection ("vX_XX_RX" from the CraftBukkit package) is <b>not</b> used and has not been reliable
+ * since Paper stopped relocating that package in 1.20.5.
  * </p>
  * <p>
  * <strong>Formatted Integer System:</strong><br>
- * The formatted integer system enables efficient version comparisons across providers:
+ * Versions are packed into an integer that sorts in release order, so a provider can write
+ * {@code if (ver <= f("1.16.5"))} instead of comparing strings. <b>There are two eras</b>, because
+ * Minecraft left {@code 1.x} versioning behind after 1.21.11 and moved to calendar versions:
  * <pre>
- * Version    | Integer | Usage
- * 1.8.9      | 1089    | Legacy comparison base
- * 1.13.2     | 1132    | Flattening update detection
- * 1.16.5     | 1165    | Hex color support detection
- * 1.17.1     | 1171    | NMS restructure detection
- * 1.20.4     | 1204    | Modern API transition
- * 1.21.0     | 1210    | Mojang mapping detection
+ * Version                | Integer | Note
+ * 1.8                    |    1080 | absent patch reads as 0
+ * 1.8.8                  |    1088 |
+ * 1.16.5                 |    1165 | hex colour support arrives
+ * 1.17.1                 |    1171 |
+ * 1.20.4                 |    1204 |
+ * 1.21                   |    1210 |
+ * 1.21.9                 |    1219 |
+ * 1.21.10                |   12110 | FIVE digits, see below
+ * 1.21.11                |   12111 | the last 1.x release
+ * 26.1.1                 |  260101 | calendar era begins
+ * 26.2                   |  260200 | reads as 26|02|00
+ * 26.2.build.120-stable  |  260200 | trailing junk is ignored
+ * 26.10.1                |  261001 |
  * </pre>
+ * </p>
+ * <p>
+ * <strong>The legacy packing is textual, not arithmetic.</strong> {@code 1.21.10} is
+ * {@code "1" + "21" + "10"}, which is 12110 and not 1220. That is why the result is not a fixed
+ * width and must never be assumed to be four digits: it is four for most 1.x releases, five once the
+ * patch reaches two digits, and six for every calendar version. Compare it, do not slice it.
+ * </p>
+ * <p>
+ * <strong>The two eras cannot collide.</strong> Legacy packing tops out at
+ * {@code "1" + "99" + "99"}, which is 19999, and every calendar value is at least 260000. So
+ * {@code ver < 260000} is the same question as "is this a 1.x server", and
+ * {@code if (ver < f("26")))} is the correct way to write a fallthrough that must not catch 26.x.
+ * Prefer that over pinning the last release you happened to know about: a guard written as
+ * {@code ver <= f("1.21.11")} silently excludes a future 1.21.12.
  * </p>
  * <p>
  * <strong>Critical Dependencies:</strong><br>
@@ -72,24 +92,33 @@ public class NmsVersion {
      * initialization and repeated version checks.
      * </p>
      * <p>
-     * <strong>Version Evolution Context:</strong><br>
-     * Modern Minecraft servers (1.13+) use semantic versioning in the Bukkit version
-     * string, making direct version extraction more reliable than legacy package-based
-     * detection methods. This approach ensures compatibility with future server
-     * implementations and specialized forks.
+     * <strong>Two sources, in order:</strong>
+     * <ol>
+     * <li>{@code Server#getMinecraftVersion()}, called reflectively because the 1.8.8 API does not
+     *     declare it. This is the authoritative answer where it exists.</li>
+     * <li>Otherwise the leading component of {@code Server#getBukkitVersion()}, split on {@code "-"}.</li>
+     * </ol>
+     * </p>
+     * <p>
+     * <strong>The fallback is not always semver shaped.</strong> Paper 26.x reports its Bukkit
+     * version as {@code "26.2.build.120-stable"}, so after the split the caller can be handed
+     * {@code "26.2.build.120"}. {@link com.kamikazejam.kamicommon.util.nms.NmsVersionParser} reads
+     * the leading numeric components and ignores the rest, which is why that tolerance exists rather
+     * than being cosmetic.
      * </p>
      * <p>
      * <strong>Examples:</strong>
      * <pre>
-     * Bukkit Version String        | Extracted MC Version
-     * "1.8.8-R0.1-SNAPSHOT"       | "1.8.8"
-     * "1.16.5-R0.1-SNAPSHOT"      | "1.16.5"
-     * "1.20.4-R0.1-SNAPSHOT"      | "1.20.4"
-     * "1.21-R0.1-SNAPSHOT"        | "1.21"
+     * Reported by server              | Extracted MC Version
+     * "1.8.8-R0.1-SNAPSHOT"           | "1.8.8"
+     * "1.16.5-R0.1-SNAPSHOT"          | "1.16.5"
+     * "1.20.4-R0.1-SNAPSHOT"          | "1.20.4"
+     * "1.21-R0.1-SNAPSHOT"            | "1.21"
+     * "26.2.build.120-stable"         | "26.2.build.120"
      * </pre>
      * </p>
      *
-     * @return the Minecraft version string (e.g., "1.8.8", "1.16.5", "1.20.4")
+     * @return the Minecraft version string (e.g., "1.8.8", "1.16.5", "1.20.4", "26.2.build.120")
      */
     @SneakyThrows
     public static String getMCVersion() {
@@ -127,32 +156,34 @@ public class NmsVersion {
     private static int formattedNms = -1;
 
     /**
-     * Converts the Minecraft version to a standardized 4-digit integer for efficient comparison.
+     * Converts the Minecraft version to an integer that sorts in release order.
      * <p>
-     * This method transforms semantic version strings into comparable integers using a
-     * standardized format: major[1]minor[2]patch[1]. This enables efficient version
-     * range checking across all providers and supports the complex version logic
-     * required for 13+ years of Minecraft compatibility.
+     * <b>The width is not fixed.</b> Earlier versions of this documentation described a "4-digit
+     * integer" with a single patch digit, which was wrong for {@code 1.21.10} and for every calendar
+     * version. See the class javadoc for the full table. In short: four digits for most {@code 1.x}
+     * releases, five once the patch reaches two digits, six for {@code 26.x} and later. Treat the
+     * result as an opaque ordered value. Compare it, do not slice digits out of it or assume a range.
      * </p>
      * <p>
-     * <strong>Format Specification:</strong><br>
-     * The integer format allocates digits as follows:
+     * <strong>Two eras:</strong>
      * <ul>
-     * <li><strong>Major:</strong> 1 digit (covers versions 1.x)</li>
-     * <li><strong>Minor:</strong> 2 digits (handles 1.8 through 1.21+)</li>
-     * <li><strong>Patch:</strong> 1 digit (accommodates point releases)</li>
+     * <li><strong>Legacy ({@code 1.x}):</strong> textual packing, so {@code 1.21.10} is
+     *     {@code "1" + "21" + "10"} = 12110. Reproduced digit for digit from the original scheme, so
+     *     every {@code f("1.x.y")} threshold that ever existed keeps the value it always had.</li>
+     * <li><strong>Calendar ({@code >= 2.x}):</strong> {@code major*10_000 + minor*100 + patch}, so
+     *     {@code 26.2} is 260200 and reads as {@code 26|02|00}.</li>
      * </ul>
+     * The legacy branch cannot exceed 19999 and the calendar branch starts at 260000, so the two
+     * never overlap and no offset is needed.
      * </p>
      * <p>
-     * <strong>Version Comparison Examples:</strong>
+     * <strong>Writing version guards:</strong>
      * <pre>
-     * Version | Integer | Provider Selection Use Case
-     * 1.8.9   | 1089    | if (ver >= 1089) { ... }
-     * 1.13.0  | 1130    | if (ver >= 1130) { ... }
-     * 1.16.2  | 1162    | if (ver >= 1162) { ... }
-     * 1.17.0  | 1170    | if (ver >= 1170) { ... }
-     * 1.20.5  | 1205    | if (ver >= 1205) { ... }
+     * if (ver &gt;= f("1.16.2")) { ... }   // a feature that arrived in a known release
+     * if (ver &lt; f("26"))      { ... }   // everything before the calendar era
      * </pre>
+     * Prefer {@code ver &lt; f("26")} to naming the newest release you know of. A fallthrough written
+     * as {@code ver &lt;= f("1.21.11")} quietly stops covering a future {@code 1.21.12}.
      * </p>
      * <p>
      * <strong>Performance Note:</strong><br>
@@ -161,7 +192,7 @@ public class NmsVersion {
      * comparisons, making caching essential for optimal performance.
      * </p>
      *
-     * @return the formatted NMS version as a 4-digit integer
+     * @return the formatted NMS version as an order-preserving integer, of variable width
      * @see #getMCVersion()
      * @see com.kamikazejam.kamicommon.util.nms.NmsVersionParser#getFormattedNmsInteger(String)
      */

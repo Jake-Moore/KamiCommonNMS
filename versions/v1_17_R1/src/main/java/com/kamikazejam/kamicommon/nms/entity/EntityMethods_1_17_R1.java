@@ -23,7 +23,9 @@ public class EntityMethods_1_17_R1 extends EntityMethodsPost_1_14 {
 
     @Override
     public void setMobAI(@NotNull Entity entity, boolean value) {
-        if (((CraftLivingEntity) entity).getHandle() instanceof Mob mob) {
+        Object mobSource = ((CraftLivingEntity) entity).getHandle();
+        if (mobSource instanceof Mob) {
+            Mob mob = (Mob) mobSource;
             mob.aware = value;
         }
         ((CraftLivingEntity) entity).setAI(value);

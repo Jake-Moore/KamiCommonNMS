@@ -1,8 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.mainhand.AbstractMainHand;
-import com.kamikazejam.kamicommon.nms.mainhand.MainHand_1_8_R1;
-import com.kamikazejam.kamicommon.nms.mainhand.MainHand_LATEST;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -43,8 +42,10 @@ public class MainHandProvider extends Provider<AbstractMainHand> {
     @Override
     protected @NotNull AbstractMainHand provide(int ver) {
         if (ver <= 1090) {
-            return new MainHand_1_8_R1();
+            return NmsBundles.forModule("v1_8_R1").mainHand();
         }
-        return new MainHand_LATEST();
+        // Off-hand arrived in 1.9 and getItemInMainHand is Bukkit API, so v1_9_R1 at Java 8
+        // covers everything above. v_latest would require Java 21 on a 1.9 server.
+        return NmsBundles.forModule("v1_9_R1").mainHand();
     }
 }

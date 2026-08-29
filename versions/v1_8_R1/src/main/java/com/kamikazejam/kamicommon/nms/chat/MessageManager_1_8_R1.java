@@ -35,7 +35,8 @@ public class MessageManager_1_8_R1 extends AbstractMessageManager {
     @Override
     protected void processAndSendInternal(@NotNull CommandSender sender, @NotNull KMessage kMessage) {
         for (String line : kMessage.getLines()) {
-            if (sender instanceof Player player) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
                 // Use BaseComponent -> will support all actions
                 BaseComponent[] components = processPlaceholders(line, kMessage.isTranslate(), kMessage.getActions());
                 player.spigot().sendMessage(components);
@@ -113,19 +114,24 @@ public class MessageManager_1_8_R1 extends AbstractMessageManager {
         for (BaseComponent clickComponent : legacyTexts) {
 
             @Nullable Click click = action.getClick();
-            if (click instanceof ClickCmd clickCmd) {
+            if (click instanceof ClickCmd) {
+                ClickCmd clickCmd = (ClickCmd) click;
                 clickComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, clickCmd.getCommand()));
-            }else if (click instanceof ClickSuggest clickSuggest) {
+            }else if (click instanceof ClickSuggest) {
+                ClickSuggest clickSuggest = (ClickSuggest) click;
                 clickComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, clickSuggest.getSuggestion()));
-            }else if (click instanceof ClickUrl clickUrl) {
+            }else if (click instanceof ClickUrl) {
+                ClickUrl clickUrl = (ClickUrl) click;
                 clickComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, clickUrl.getUrl()));
             }
 
             @Nullable Hover hover = action.getHover();
-            if (hover instanceof HoverText hoverText) {
+            if (hover instanceof HoverText) {
+                HoverText hoverText = (HoverText) hover;
                 // For every version [1.8 - 1.16.5] this HoverEvent constructor is fine
                 clickComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(hoverText.getText())));
-            }else if (hover instanceof HoverItem hoverItem) {
+            }else if (hover instanceof HoverItem) {
+                HoverItem hoverItem = (HoverItem) hover;
                 clickComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, itemText.getComponents(hoverItem.getItemStack())));
             }
         }

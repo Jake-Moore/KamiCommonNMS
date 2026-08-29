@@ -97,23 +97,26 @@ public abstract class EntityMethodsPre_1_13 extends AbstractEntityMethods {
     private EntityType translateNMSTypes(@Nullable String nmsType) {
         if (nmsType == null) { return null; }
 
-        EntityType type = switch (nmsType.toLowerCase()) {
-            case "pigzombie" -> EntityType.PIG_ZOMBIE;
-            case "complexpart" -> EntityType.COMPLEX_PART;
-            case "cavespider" -> EntityType.CAVE_SPIDER;
-            case "irongolem", "villagergolem" -> EntityType.IRON_GOLEM;
-            case "magmacube", "lavaslime" -> EntityType.MAGMA_CUBE;
-            case "mushroomcow" -> EntityType.MUSHROOM_COW;
-            case "ozelot" -> EntityType.OCELOT;
-            case "entityhorse" -> EntityType.HORSE;
-            default -> {
+        EntityType type;
+        switch (nmsType.toLowerCase()) {
+            case "pigzombie":     type = EntityType.PIG_ZOMBIE;   break;
+            case "complexpart":   type = EntityType.COMPLEX_PART; break;
+            case "cavespider":    type = EntityType.CAVE_SPIDER;  break;
+            case "irongolem":
+            case "villagergolem": type = EntityType.IRON_GOLEM;   break;
+            case "magmacube":
+            case "lavaslime":     type = EntityType.MAGMA_CUBE;   break;
+            case "mushroomcow":   type = EntityType.MUSHROOM_COW; break;
+            case "ozelot":        type = EntityType.OCELOT;       break;
+            case "entityhorse":   type = EntityType.HORSE;        break;
+            default:
                 try {
-                    yield EntityType.valueOf(nmsType.toUpperCase());
+                    type = EntityType.valueOf(nmsType.toUpperCase());
                 } catch (final IllegalArgumentException exc) {
-                    yield null;
+                    type = null;
                 }
-            }
-        };
+                break;
+        }
         if (type != null) { return type; }
 
         // Try XEntityType

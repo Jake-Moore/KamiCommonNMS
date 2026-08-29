@@ -15,4 +15,5 @@ tasks { // 3. configure tasks (like reObf automatically)
     assemble {
         dependsOn(reobfJar)
     }
+
 }

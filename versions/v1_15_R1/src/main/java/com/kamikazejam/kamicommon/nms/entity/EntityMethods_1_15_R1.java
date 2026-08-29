@@ -22,7 +22,9 @@ public class EntityMethods_1_15_R1 extends EntityMethodsPost_1_14 {
 
     @Override
     public void setMobAI(@NotNull Entity entity, boolean value) {
-        if (((CraftLivingEntity) entity).getHandle() instanceof EntityInsentient insentient) {
+        Object insentientSource = ((CraftLivingEntity) entity).getHandle();
+        if (insentientSource instanceof EntityInsentient) {
+            EntityInsentient insentient = (EntityInsentient) insentientSource;
             insentient.aware = value;
         }
         ((CraftLivingEntity) entity).setAI(value);

@@ -47,7 +47,6 @@ extra["commonDependencies"] = listOf(
     //  the major - and throws IllegalArgumentException from XMaterial's static initializer on any
     //  26.x server. 13.7.1 uses "MC: (\\d+)\\.(\\d+)".
     "com.github.cryptomorin:XSeries:13.7.1",
-    "com.github.fierioziy.particlenativeapi:ParticleNativeAPI-core:4.5.0"
 )
 
 allprojects {

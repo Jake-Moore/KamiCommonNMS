@@ -36,6 +36,31 @@ server fail with `UnsupportedClassVersionError` the moment it touches that provi
 So: **place a class in the earliest module whose server version it works on.** That is the lowest Java
 floor it can have, and every later version inherits it for free.
 
+### The floor table
+
+Each module targets the JVM its own Minecraft version required. The build checks this against the
+emitted class files, so a module cannot drift from what it declares.
+
+| modules | Java | why |
+|---|---|---|
+| `api`, `core` | 8 | a 1.8.8 server loads both in full |
+| `v1_8_R1` through `v1_16_R3`, `worlds6` | 8 | those versions run on Java 8 |
+| `v1_17_R1` | 16 | what 1.17 required |
+| `v1_18_R1` through `v1_20_R3` | 17 | what 1.18 through 1.20.4 required |
+| `worlds7` | 17 | `worldguard-bukkit:7.0.9` is entirely class-file major 61 |
+| `v1_20_CB`, `v1_21_4`, `v1_21_9`, `v1_21_11`, `v_latest` | 21 | 1.20.5 onward |
+
+`v_latest` compiles against Paper 26.x but still emits 21, because nothing needs it higher.
+
+Three build tasks keep this honest. `verifyFloors` checks every class in the shaded jar against its
+module's floor, checks that no lower-floor class names a higher-floor one, and checks the published
+metadata against the bytecode. `verifyNmsBundles` checks that every module has an adapter, that
+nothing names one statically, and that every capability a ladder asks for is actually implemented
+rather than inherited from the throwing default. `verifyTextFloor` does the same for `:text`.
+
+To see what a running server selected, use `/kc nmsproviders`. It resolves every provider from the
+console and prints the implementation each one got.
+
 ### Two rules that follow
 
 **1. The ladder in `:core` is the source of truth, not the module name.** A module name now only tells

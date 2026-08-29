@@ -48,15 +48,28 @@ emitted class files, so a module cannot drift from what it declares.
 | `v1_17_R1` | 16 | what 1.17 required |
 | `v1_18_R1` through `v1_20_R3` | 17 | what 1.18 through 1.20.4 required |
 | `worlds7` | 17 | `worldguard-bukkit:7.0.9` is entirely class-file major 61 |
-| `v1_20_CB`, `v1_21_4`, `v1_21_9`, `v1_21_11`, `v_latest` | 21 | 1.20.5 onward |
+| `v1_20_CB`, `v1_21_4`, `v1_21_9`, `v1_21_11` | 21 | 1.20.5 onward |
+| `v_latest` | 25 | what 26.x requires |
 
-`v_latest` compiles against Paper 26.x but still emits 21, because nothing needs it higher.
+The table lives in `gradle/module-floors.properties`, read by the build and by both floor checks. A
+module missing from it fails the build rather than inheriting whatever the build was running.
 
-Three build tasks keep this honest. `verifyFloors` checks every class in the shaded jar against its
-module's floor, checks that no lower-floor class names a higher-floor one, and checks the published
-metadata against the bytecode. `verifyNmsBundles` checks that every module has an adapter, that
-nothing names one statically, and that every capability a ladder asks for is actually implemented
-rather than inherited from the throwing default. `verifyTextFloor` does the same for `:text`.
+`v_latest` can target 25 only because every capability a 1.21.11 server reaches has a twin in
+`v1_21_11`. Those twins are duplicated on purpose: `v_latest` holds one implementation of every
+provider, so bumping `highestPaperDep` compile-checks all of them against bleeding-edge Paper.
+
+Four build tasks keep this honest.
+
+- `verifyFloors` checks every class in the shaded jar against its module's floor, checks that no
+  lower-floor class names a higher-floor one, and checks the published metadata against the bytecode.
+- `verifyNmsBundles` checks that every module has an adapter, that nothing names one statically, and
+  that every capability a ladder asks for is actually implemented rather than inherited from the
+  throwing default.
+- `verifyDispatchFloors` reads the ladders themselves and checks that no branch sends a server to a
+  module its JVM cannot load. **Nothing else can see this.** `verifyFloors` reads bytecode, and
+  resolving modules by name means there is no static reference for it to find, so a ladder routing
+  1.21.11 into a Java 25 module leaves every other check green.
+- `verifyTextFloor` does for `:text` what `verifyFloors` does for the shaded jar.
 
 To see what a running server selected, use `/kc nmsproviders`. It resolves every provider from the
 console and prints the implementation each one got.

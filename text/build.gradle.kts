@@ -27,9 +27,7 @@ dependencies {
 }
 
 java {
-    // Pinned explicitly. Without this the module inherits whichever JDK runs the build, so moving
-    //  CI to JDK 25 (needed to compile against paper-api 26.2) would silently republish this
-    //  artifact declaring org.gradle.jvm.version=25 and lock out every Java 21 consumer.
+    // Pinned, or this module inherits whichever JDK runs the build and republishes at that version.
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 

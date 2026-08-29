@@ -95,19 +95,14 @@ public class NmsVersion {
     public static String getMCVersion() {
         if (mcVersion != null) {return mcVersion;}
 
-        // Prefer Server#getMinecraftVersion() where the running server has it. It reports the
-        //  bare version ("1.21.10", "26.2") where getBukkitVersion() reports a build coordinate.
-        //  Reflectively, because that method does not exist on the oldest supported API and this
-        //  module compiles against 1.8.8.
+        // Prefer Server#getMinecraftVersion(); reflective because the 1.8.8 API lacks it
         String direct = getMinecraftVersionReflectively();
         if (direct != null && !direct.isEmpty()) {
             mcVersion = direct;
             return mcVersion;
         }
 
-        // Fallback. Note this is NOT always "1.20.4"-shaped: Paper 26.x reports
-        //  "26.2.build.115-stable" here, which leaves "26.2.build.115" after the split.
-        //  NmsVersionParser reads the leading numeric components and ignores the rest.
+        // Not always "1.20.4"-shaped: Paper 26.x reports "26.2.build.120-stable" here
         String bukkitVer = Bukkit.getServer().getBukkitVersion(); // i.e. 1.20.4-R0.1-SNAPSHOT
         mcVersion = bukkitVer.split("-")[0]; // i.e. 1.20.4
         return mcVersion;
@@ -124,9 +119,7 @@ public class NmsVersion {
             Object value = method.invoke(server);
             return (value instanceof String) ? (String) value : null;
         } catch (Throwable ignored) {
-            // NoSuchMethodException on older servers, and anything else is not worth failing over
-            //  because the getBukkitVersion() fallback below handles every supported version.
-            return null;
+            return null; // older servers lack the method; getBukkitVersion() covers them
         }
     }
 

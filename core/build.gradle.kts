@@ -1,7 +1,5 @@
 @file:Suppress("UNCHECKED_CAST")
 
-import java.util.zip.ZipFile
-
 val reobfVersions = listOf(
     "v1_17_R1",
     "v1_18_R1",
@@ -88,114 +86,9 @@ dependencies {
     compileOnly(project.property("serverAPI") as String)
 }
 
-// Under MC_SERVER_NEWEST_API=true, `serverAPI` is paper-api 26.2, whose Gradle
-// metadata declares org.gradle.jvm.version=25. Ask the resolver for a 25-compatible
-// library, run javac on JDK 25 so it can read class-file major 69, but keep EMITTING
-// Java 21 bytecode - the providers here must load on pre-26 JVMs, and the JVM loads
-// referenced classes during verification rather than lazily.
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
-    // Declare the Java 21 target explicitly. options.release below controls what javac EMITS,
-    //  but it does not feed org.gradle.jvm.version on the outgoing variants - those default to
-    //  the toolchain, which would publish metadata claiming Java 25 over major-65 bytecode and
-    //  make every Java 21 consumer unable to resolve this module.
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-configurations.named("compileClasspath").configure {
-    attributes {
-        attribute(org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
-    }
-}
-tasks.withType<JavaCompile>().configureEach { options.release.set(21) }
+apply(from = "$rootDir/gradle/paper-toolchain.gradle.kts")
 
-// The shadow component derives org.gradle.jvm.version from the toolchain, and neither
-//  options.release nor targetCompatibility reaches it. Pin it, so the metadata matches the
-//  bytecode (major 65) no matter which JDK ran the build. Without this the published module
-//  claims Java 25 and every Java 21 consumer fails to resolve it.
-afterEvaluate {
-    configurations.named("shadowRuntimeElements").configure {
-        attributes {
-            attribute(org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-        }
-    }
-}
-
-tasks {
-    publish.get().dependsOn(build)
-    build.get().dependsOn(shadowJar)
-    shadowJar.get().dependsOn(jar)
-    shadowJar {
-        archiveClassifier.set("")
-        // configurations = listOf(project.configurations.shadow.get())
-    }
-}
-
-// -------------------------------------------------- //
-//        Java 21 compatibility, enforced not assumed   //
-// -------------------------------------------------- //
-// KamiCommon runs on servers from 1.8.x upward, so nothing it ships may require a JVM newer
-//  than 21 - not even the classes compiled against Paper 26.2. This is easy to break silently:
-//  the JVM loads referenced classes during verification rather than lazily, so ONE major-69
-//  class makes every provider that merely names it unloadable, and a wrong jvm.version in the
-//  metadata locks out consumers while the bytecode looks fine.
-val verifyJava21Compatibility = tasks.register("verifyJava21Compatibility") {
-    group = "verification"
-    description = "Fails if the shaded jar, or its published metadata, would lock out Java 21 servers."
-    dependsOn(tasks.shadowJar, tasks.named("generateMetadataFileForShadowPublication"))
-
-    val jarFile = tasks.shadowJar.flatMap { it.archiveFile }
-    val moduleFile = layout.buildDirectory.file("publications/shadow/module.json")
-
-    doLast {
-        // 1. No class in the artifact may exceed major 65 (Java 21).
-        var inspected = 0
-        var highest = 0
-        var worst = ""
-        ZipFile(jarFile.get().asFile).use { zip ->
-            zip.entries().asSequence().filter { it.name.endsWith(".class") }.forEach { entry ->
-                zip.getInputStream(entry).use { stream ->
-                    val header = stream.readNBytes(8)
-                    if (header.size == 8 && header[0] == 0xCA.toByte() && header[1] == 0xFE.toByte()) {
-                        val major = ((header[6].toInt() and 0xFF) shl 8) or (header[7].toInt() and 0xFF)
-                        inspected++
-                        if (major > highest) { highest = major; worst = entry.name }
-                    }
-                }
-            }
-        }
-        // Guard the guard: a walker that matches nothing would pass forever.
-        if (inspected < 1000) {
-            throw GradleException(
-                "verifyJava21Compatibility only inspected $inspected classes in ${jarFile.get().asFile.name}. " +
-                        "That is far below the expected count, so this check is not actually looking at the artifact."
-            )
-        }
-        if (highest > 65) {
-            throw GradleException(
-                "$worst is class-file major $highest (Java ${highest - 44}). Nothing in this artifact may " +
-                        "exceed major 65 (Java 21) - the JVM resolves referenced classes during verification, " +
-                        "so this would break every server below 26.x, not just those that use the class."
-            )
-        }
-
-        // 2. The published metadata must declare Java 21, or consumers cannot resolve us.
-        val module = moduleFile.get().asFile
-        if (!module.exists()) { throw GradleException("expected Gradle module metadata at $module") }
-        val declared = Regex("\"org\\.gradle\\.jvm\\.version\"\\s*:\\s*(\\d+)").find(module.readText())
-            ?: throw GradleException("no org.gradle.jvm.version found in $module")
-        if (declared.groupValues[1] != "21") {
-            throw GradleException(
-                "published metadata declares org.gradle.jvm.version=${declared.groupValues[1]}, expected 21. " +
-                        "The bytecode may be fine, but every Java 21 consumer will fail to resolve this module."
-            )
-        }
-
-        logger.lifecycle("verifyJava21Compatibility: $inspected classes, highest major $highest, metadata declares 21")
-    }
-}
-tasks.named("build") { dependsOn(verifyJava21Compatibility) }
-tasks.named("publish") { dependsOn(verifyJava21Compatibility) }
+apply(from = "$rootDir/gradle/verify-java-compat.gradle.kts")
 
 tasks.register("printServerAPI") {
     doFirst {

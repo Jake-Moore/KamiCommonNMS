@@ -1,6 +1,5 @@
 plugins {
-    // KamiCommon already has this; KamiCommonNMS did not, so a machine (or CI runner)
-    // without every required JDK pre-installed cannot resolve the toolchains.
+    // Resolves toolchains on machines without every required JDK installed.
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 

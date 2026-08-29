@@ -26,6 +26,13 @@ dependencies {
     implementation("net.kyori:adventure-text-serializer-bungeecord:$platform")
 }
 
+java {
+    // Pinned explicitly. Without this the module inherits whichever JDK runs the build, so moving
+    //  CI to JDK 25 (needed to compile against paper-api 26.2) would silently republish this
+    //  artifact declaring org.gradle.jvm.version=25 and lock out every Java 21 consumer.
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 tasks {
     publish.get().dependsOn(build)
     build.get().dependsOn(shadowJar)

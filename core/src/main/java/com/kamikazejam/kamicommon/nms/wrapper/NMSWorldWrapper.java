@@ -118,8 +118,7 @@ public class NMSWorldWrapper extends NMSWrapper<NMSWorld, World> {
             // For up to 1.21.4 (breaks in 1.21.5)
             return new NMSWorld_1_21_4(world, NmsAPI.getBlockUtilProvider());
         }else if (ver <= f("1.21.11")) {
-            // For 1.21.5 through 1.21.11 (breaks in 26.1, where ChunkPos became a
-            //  record and its x/z fields became accessors)
+            // For 1.21.5 through 1.21.11 (breaks in 26.1)
             return new NMSWorld_1_21_11(world, NmsAPI.getBlockUtilProvider());
         }
         // Includes chunk code for 26.1+

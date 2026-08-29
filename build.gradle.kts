@@ -3,10 +3,8 @@ val VERSION = "1.2.20" // -SNAPSHOT marks WIP versions (snapshots are not CI pub
 
 plugins {
     id("com.gradleup.shadow") version "9.2.2" apply false
-    // NOT beta.23: its own task classes are compiled for Java 21 (class-file 65), and
-    //  paperweight runs its workers in each module's toolchain JVM - so the Java 17 modules
-    //  (v1_17_R1 and friends) die with "GenerateMappingsParams has been compiled by a more
-    //  recent version of the Java Runtime". beta.22 is Java 17 and is the newest that works.
+    // Newest that works: beta.23 is Java 21, and paperweight runs its workers in each
+    //  module's toolchain JVM, so the Java 17 modules cannot host it.
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.22" apply false
 }
 
@@ -43,9 +41,7 @@ ext {
 extra["commonDependencies"] = listOf(
     // 2.15.3's MinecraftVersion stops at MC1_21_R6; 2.16.0 adds MC26_1 and MC26_2.
     "de.tr7zw:item-nbt-api:2.16.0",
-    // 13.5.1 parses Bukkit.getVersion() with the regex "MC: \\d\\.(\\d+)" - a single digit for
-    //  the major - and throws IllegalArgumentException from XMaterial's static initializer on any
-    //  26.x server. 13.7.1 uses "MC: (\\d+)\\.(\\d+)".
+    // 13.5.1 reads only a single-digit major and throws from XMaterial's <clinit> on 26.x.
     "com.github.cryptomorin:XSeries:13.7.1",
 )
 

@@ -1,8 +1,10 @@
 package com.kamikazejam.kamicommon.nms.library.worldedit;
 
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -88,9 +90,9 @@ public class WorldEditHook {
 
         String ver = plugin.getDescription().getVersion();
         if (ver.startsWith("6")) {
-            return worldEditVer = new WorldEdit6();
+            return worldEditVer = worldEdit("worlds6");
         } else if (ver.startsWith("7")) {
-            return worldEditVer = new WorldEdit7();
+            return worldEditVer = worldEdit("worlds7");
         }
 
         // Try to fetch FAWE (for later versions WorldEdit is not required to run FAWE)
@@ -100,13 +102,28 @@ public class WorldEditHook {
             try {
                 // If this class is found, it's v7 WorldEdit within FAWE
                 Class<?> v7Specific = Class.forName("com.sk89q.worldedit.math.BlockVector3");
-                return worldEditVer = new WorldEdit7();
+                return worldEditVer = worldEdit("worlds7");
             }catch (Throwable ignored) {
                 // If we have an error, try falling back to WE 6
-                return worldEditVer = new WorldEdit6();
+                return worldEditVer = worldEdit("worlds6");
             }
         }
 
         return null;
+    }
+
+    /**
+     * {@link com.kamikazejam.kamicommon.nms.bundle.NmsBundle#worldEdit()} is declared
+     * {@code WorldEditApi<?>} because {@code :api} does not compile against WorldEdit and so cannot
+     * name {@link Clipboard}. Both implementations do declare {@code WorldEditApi<Clipboard>}, and
+     * the parameter is erased at runtime, so this narrowing is safe. Kept in one place rather than
+     * pushed into the two module adapters.
+     *
+     * @param module the version module to load, {@code worlds6} or {@code worlds7}
+     * @return that module's WorldEdit implementation
+     */
+    @SuppressWarnings("unchecked")
+    private static @NotNull WorldEditApi<Clipboard> worldEdit(@NotNull String module) {
+        return (WorldEditApi<Clipboard>) NmsBundles.forModule(module).worldEdit();
     }
 }

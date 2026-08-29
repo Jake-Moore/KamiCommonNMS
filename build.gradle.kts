@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-val VERSION = "1.2.21" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
+val VERSION = "1.2.22" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
 
 plugins {
     id("com.gradleup.shadow") version "9.2.2" apply false
@@ -36,7 +36,7 @@ ext {
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.42")
     set("jetbrainsDep", "org.jetbrains:annotations:26.0.2")
-    set("adventureDep", "com.kamikazejam.kamicommon:spigot-nms-text:1.0.5")
+    set("adventureDep", ":text")
 }
 extra["commonDependencies"] = listOf(
     // 2.15.3's MinecraftVersion stops at MC1_21_R6; 2.16.0 adds MC26_1 and MC26_2.

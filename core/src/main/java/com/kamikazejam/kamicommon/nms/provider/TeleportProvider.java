@@ -1,33 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.teleport.AbstractTeleporter;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_10_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_11_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_12_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_13_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_13_R2;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_14_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_15_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_16_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_16_R2;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_16_R3;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_17_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_18_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_18_R2;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_19_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_19_R2;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_19_R3;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_CB;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_R2;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_20_R3;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_21_9;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_8_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_8_R2;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_8_R3;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_9_R1;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_9_R2;
-import com.kamikazejam.kamicommon.nms.teleport.Teleporter_LATEST;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -75,61 +49,61 @@ public class TeleportProvider extends Provider<AbstractTeleporter> {
         }
 
         if (ver == f("1.8")) {
-            return new Teleporter1_8_R1();
+            return NmsBundles.forModule("v1_8_R1").teleporter();
         }else if (ver <= f("1.8.3")) {
-            return new Teleporter1_8_R2();
+            return NmsBundles.forModule("v1_8_R2").teleporter();
         }else if (ver <= f("1.8.8")) {
-            return new Teleporter1_8_R3();
+            return NmsBundles.forModule("v1_8_R3").teleporter();
         }else if (ver <= f("1.9.2")) {
-            return new Teleporter1_9_R1();
+            return NmsBundles.forModule("v1_9_R1").teleporter();
         }else if (ver <= f("1.9.4")) {
-            return new Teleporter1_9_R2();
+            return NmsBundles.forModule("v1_9_R2").teleporter();
         }else if (ver <= f("1.10.2")) {
-            return new Teleporter1_10_R1();
+            return NmsBundles.forModule("v1_10_R1").teleporter();
         }else if (ver <= f("1.11.2")) {
-            return new Teleporter1_11_R1();
+            return NmsBundles.forModule("v1_11_R1").teleporter();
         }else if (ver <= f("1.12.2")) {
-            return new Teleporter1_12_R1();
+            return NmsBundles.forModule("v1_12_R1").teleporter();
         }else if (ver <= f("1.13")) {
-            return new Teleporter1_13_R1();
+            return NmsBundles.forModule("v1_13_R1").teleporter();
         }else if (ver <= f("1.13.2")) {
-            return new Teleporter1_13_R2();
+            return NmsBundles.forModule("v1_13_R2").teleporter();
         }else if (ver <= f("1.14.4")) {
-            return new Teleporter1_14_R1();
+            return NmsBundles.forModule("v1_14_R1").teleporter();
         }else if (ver <= f("1.15.2")) {
-            return new Teleporter1_15_R1();
+            return NmsBundles.forModule("v1_15_R1").teleporter();
         }else if (ver <= f("1.16.1")) {
-            return new Teleporter1_16_R1();
+            return NmsBundles.forModule("v1_16_R1").teleporter();
         }else if (ver <= f("1.16.3")) {
-            return new Teleporter1_16_R2();
+            return NmsBundles.forModule("v1_16_R2").teleporter();
         }else if (ver <= f("1.16.5")) {
-            return new Teleporter1_16_R3();
+            return NmsBundles.forModule("v1_16_R3").teleporter();
         }else if (ver <= f("1.17.1")) {
-            return new Teleporter1_17_R1();
+            return NmsBundles.forModule("v1_17_R1").teleporter();
         }else if (ver <= f("1.18.1")) {
-            return new Teleporter1_18_R1();
+            return NmsBundles.forModule("v1_18_R1").teleporter();
         }else if (ver <= f("1.18.2")) {
-            return new Teleporter1_18_R2();
+            return NmsBundles.forModule("v1_18_R2").teleporter();
         }else if (ver <= f("1.19.2")) {
-            return new Teleporter1_19_R1();
+            return NmsBundles.forModule("v1_19_R1").teleporter();
         }else if (ver <= f("1.19.3")) {
-            return new Teleporter1_19_R2();
+            return NmsBundles.forModule("v1_19_R2").teleporter();
         }else if (ver <= f("1.19.4")) {
-            return new Teleporter1_19_R3();
+            return NmsBundles.forModule("v1_19_R3").teleporter();
         }else if (ver <= f("1.20.1")) {
-            return new Teleporter1_20_R1();
+            return NmsBundles.forModule("v1_20_R1").teleporter();
         }else if (ver <= f("1.20.2")) {
-            return new Teleporter1_20_R2();
+            return NmsBundles.forModule("v1_20_R2").teleporter();
         }else if (ver <= f("1.20.4")) {
-            return new Teleporter1_20_R3();
+            return NmsBundles.forModule("v1_20_R3").teleporter();
         }else if (ver <= f("1.20.6")) {
             // Confirmed for 1.20.5 and 1.20.6
-            return new Teleporter1_20_CB();
+            return NmsBundles.forModule("v1_20_CB").teleporter();
         }else if (ver <= f("1.21.9")) {
             // Confirmed for 1.21 to 1.21.9
-            return new Teleporter1_21_9();
+            return NmsBundles.forModule("v1_21_9").teleporter();
         }
         // Confirmed for 1.21.10
-        return new Teleporter_LATEST();
+        return NmsBundles.forModule("v_latest").teleporter();
     }
 }

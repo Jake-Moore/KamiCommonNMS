@@ -3,6 +3,7 @@ package com.kamikazejam.kamicommon.nms.abstraction.chat;
 import com.kamikazejam.kamicommon.actions.Action;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.impl.KMessageBlock;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.impl.KMessageSingle;
+import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,7 +74,7 @@ public abstract class AbstractMessageManager {
      * @param messages the {@link KMessage} instances to process and send
      */
     public final void processAndSend(@NotNull CommandSender sender, @NotNull KMessage... messages) {
-        this.processAndSend(sender, List.of(messages));
+        this.processAndSend(sender, Arrays.asList(messages));
     }
 
     /**

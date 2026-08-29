@@ -14,6 +14,49 @@
 ## JavaDoc
 - https://docs.jake-moore.dev/KamiCommonNMS/
 
+## Module layout: which module does a class belong in?
+
+**This convention changed. It used to be the opposite, and the module names read the other way round.**
+
+It used to be that a class lived in the module named for the last version it worked on.
+`Teleporter1_8_R3` meant "correct through 1.8.8". `VersionedComponent_1_18_R1` meant "works from 1.8
+all the way up to 1.18.1". If the ladder never asked for a module below yours, that implied yours
+worked all the way down. The module name was an upper bound.
+
+A class now lives in the module named for the first version it works on. The module name is a lower
+bound, and the ladder in `:core` says where it stops.
+
+The reason is the Java floor. Each `versions/*` module now targets the JVM its own Minecraft version
+required. Java 8 through 1.16.5, 16 for 1.17, 17 through 1.20.4, 21 from 1.20.5, and `v_latest`
+tracks 26.x. Bytecode is forward compatible and never backward: a Java 8 class runs on Java 25, but a
+Java 21 class cannot load on Java 8. So a class serving 1.13 upward **must** be compiled at Java 8,
+which means it must live in a Java 8 module. Putting it in `v_latest`, as several classes were, makes a 1.13
+server fail with `UnsupportedClassVersionError` the moment it touches that provider.
+
+So: **place a class in the earliest module whose server version it works on.** That is the lowest Java
+floor it can have, and every later version inherits it for free.
+
+### Two rules that follow
+
+**1. The ladder in `:core` is the source of truth, not the module name.** A module name now only tells
+you where a class *starts*. Where it stops is decided by the `if (ver <= f("..."))` chain in the
+provider. Every branch in those ladders carries a comment saying which module it selects and why.
+Keep that up, because the layout no longer explains itself.
+
+**2. Moving a class up the ladder means re-checking the branch below it.** If you discover an
+implementation needs a newer server than its branch claims and you raise its lower bound, the versions
+it vacates fall to the branch beneath, and that branch has never been compiled against them. Verify
+it can be, for every version it just absorbed. This is not hypothetical: raising the native
+`VersionedComponent` from 1.18.2 to 1.21.4 handed 1.18.2–1.21.3 to the shaded implementation, which
+had never been built against anything above 1.18.1.
+
+### Duplication is sometimes correct
+
+Two modules may hold byte-identical code. `ComponentLoggerAdapter_1_16_R3` and the pre-1.18.2 logging
+it replaced are one example. That is deliberate. The code is the same because the behaviour is the same;
+what differs is the JVM the module targets. Reaching across to share one copy would drag the higher
+floor onto the lower server. Fork it, name it for the version it starts at, and say so in a comment.
+
 ## Disclaimers
 - 1.17+ only officially supports **Paper** as the server software.
 - This library requires **Java 21** to be used, as such any version of server jar must be runnable on Java 21 as well.

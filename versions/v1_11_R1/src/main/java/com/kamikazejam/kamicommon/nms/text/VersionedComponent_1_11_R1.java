@@ -26,7 +26,8 @@ public class VersionedComponent_1_11_R1 implements VersionedComponent {
 
     @Override
     public void sendTo(@NotNull CommandSender sender) {
-        if (sender instanceof Player player) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
             // Use direct spigot method
             player.spigot().sendMessage(BungeeComponentSerializer.legacy().serialize(this.component));
         } else {
@@ -78,5 +79,22 @@ public class VersionedComponent_1_11_R1 implements VersionedComponent {
     @Override
     public @NotNull VersionedComponent append(@NotNull VersionedComponent other) {
         return new VersionedComponent_1_11_R1(this.component.append(other.asInternalComponent()));
+    }
+
+    /**
+     * The legacy section-coded text, so that concatenating a component into a string produces the
+     * message rather than an object identity.
+     * <p>
+     * Object.toString() cannot be given a default in {@link VersionedComponent}, so every
+     * implementation carries this. Without it, anything doing {@code "prefix " + component} logged
+     * {@code ...VersionedComponent_1_11_R1@3466377f}, which is what the console showed on every
+     * server below 1.18.2.
+     * </p>
+     *
+     * @return this component as legacy section-coded text
+     */
+    @Override
+    public String toString() {
+        return this.serializeLegacySection();
     }
 }

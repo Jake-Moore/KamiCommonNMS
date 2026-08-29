@@ -23,7 +23,18 @@ public class VersionedComponentSerializer {
      * @param ver the formatted NMS version integer
      * @return the module to construct through
      */
-    private static @NotNull NmsBundle componentBundle(int ver) {
+    /**
+     * The one ladder that decides which module builds a {@link VersionedComponent} for this server.
+     * <p>
+     * Public because {@code VersionedComponentUtil} must use the same one. Its ItemMeta read methods
+     * construct components too, and the concrete type decides whether the result can carry a hex
+     * colour when it is later sent. Two ladders meant two answers for the same server.
+     * </p>
+     *
+     * @param ver the formatted NMS integer for the running server
+     * @return the module to construct through
+     */
+    public static @NotNull NmsBundle bundleFor(int ver) {
         if (ver < f("1.8")) {
             throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
         }
@@ -45,27 +56,27 @@ public class VersionedComponentSerializer {
 
     public @NotNull VersionedComponent fromInternalComponent(@NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component component) {
         Preconditions.checkNotNull(component, "component cannot be null");
-        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFrom(component);
+        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFrom(component);
     }
 
     public @NotNull VersionedComponent fromPlainText(@NotNull String text) {
         Preconditions.checkNotNull(text, "text cannot be null");
-        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromPlainText(text);
+        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFromPlainText(text);
     }
 
     public @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage) {
         Preconditions.checkNotNull(miniMessage, "miniMessage cannot be null");
-        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromMiniMessage(miniMessage);
+        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFromMiniMessage(miniMessage);
     }
 
     public @NotNull VersionedComponent fromLegacyAmpersand(@NotNull String legacy) {
         Preconditions.checkNotNull(legacy, "legacy cannot be null");
-        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromLegacyAmpersand(legacy);
+        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFromLegacyAmpersand(legacy);
     }
 
     public @NotNull VersionedComponent fromLegacySection(@NotNull String legacy) {
         Preconditions.checkNotNull(legacy, "legacy cannot be null");
-        return componentBundle(NmsVersion.getFormattedNmsInteger()).componentFromLegacySection(legacy);
+        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFromLegacySection(legacy);
     }
 
     public @NotNull String serializeMiniMessage(@NotNull VersionedComponent component) {

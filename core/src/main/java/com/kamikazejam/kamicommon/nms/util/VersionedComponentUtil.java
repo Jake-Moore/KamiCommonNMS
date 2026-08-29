@@ -35,13 +35,17 @@ public class VersionedComponentUtil {
         if (ver < f("1.8")) {
             throw new IllegalArgumentException("Version not supported (< 1.8): " + ver);
         }
-        // These are plain legacy-section operations on the Bukkit ItemMeta API, identical for
-        // every version below 1.18.2, so there is one copy and it sits at Java 8, the lowest
-        // floor any server in that range needs.
-        if (ver < f("1.21.4")) { return NmsBundles.forModule("v1_16_R3"); }
-        // 1.21.4+ can use the native Adventure apis. That is v1_21_4, not v_latest: 1.21.4 runs
-        // Java 21 and v_latest targets 25, so routing a 1.21.x server there would fail to load.
-        return NmsBundles.forModule("v1_21_4");
+        // The SAME ladder the component serializer uses, deliberately.
+        //
+        // The ItemMeta string work is version independent, so this used to collapse everything
+        // below 1.21.4 onto one module. But getDisplayName and getLore CONSTRUCT a
+        // VersionedComponent, and its concrete type decides how the result serializes when it is
+        // later sent: v1_16_R3 and above use BungeeComponentSerializer.get(), which emits hex, and
+        // the modules below it use .legacy(), which does not. LegacyComponentSerializer
+        // .legacySection() does decode the section-x hex form, so a name read off an ItemMeta on a
+        // 1.12 server really can carry a hex colour, and collapsing the ladder handed that server a
+        // hex-capable component. Splitting the same way keeps the type matched to the server.
+        return VersionedComponentSerializer.bundleFor(ver);
     }
 
     public static @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent component) {

@@ -146,54 +146,51 @@ val verifyNmsBundles = tasks.register("verifyNmsBundles") {
         // helper, which an IDE does in one keystroke, silently dropped every capability it mediated
         // while the build stayed green.
         val bundleSimpleName = bundleInterface.substringAfterLast('/')
+        // Helper names are DERIVED, not listed. A hardcoded list of two names meant renaming a
+        // helper, which an IDE does in one keystroke, silently dropped every capability it mediated.
         val helperDecl = Regex("""\b$bundleSimpleName\s+(\w+)\s*\(""")
-        var helpersFound = 0
-        var viaHelperCaps = 0
-        coreSources.walkTopDown().filter { it.extension == "java" }.forEach { file ->
+        val coreFiles = coreSources.walkTopDown().filter { it.extension == "java" }.toList()
+
+        // Two passes, across the WHOLE source set rather than per file. The ladder that picks a
+        // module for component work now lives in one place and is called from another file, so a
+        // per-file pass saw the modules without the capability calls and checked nothing.
+        val helperNames = LinkedHashSet<String>()
+        val helperModules = LinkedHashSet<String>()
+        for (file in coreFiles) {
+            val text = file.readText()
+            helperDecl.findAll(text).forEach { helperNames.add(it.groupValues[1]) }
+            bundleOnly.findAll(text).forEach { helperModules.add(it.groupValues[1]) }
+        }
+        if (helperNames.isEmpty() || helperModules.isEmpty()) {
+            throw GradleException(
+                "found ${helperNames.size} methods returning $bundleSimpleName and ${helperModules.size} " +
+                        "modules returned from them. This project routes component and ItemMeta work " +
+                        "through such a helper, so zero of either means nothing here is being read."
+            )
+        }
+        // One level of nesting has to be allowed: `[^)]*` stopped at the inner `)` and matched
+        // nothing for bundleFor(NmsVersion.getFormattedNmsInteger()).componentFrom(...).
+        val names = helperNames.joinToString("|") { Regex.escape(it) }
+        val viaHelper = Regex("""\b(?:$names)\((?:[^()]|\([^()]*\))*\)\s*\.\s*(\w+)\s*\(""")
+        val helperCaps = LinkedHashSet<String>()
+        for (file in coreFiles) {
             val text = file.readText()
             direct.findAll(text).forEach { asked.getOrPut(it.groupValues[1]) { HashSet() }.add(it.groupValues[2]) }
-            // Where a helper picks the module and the capability is called on its result, every
-            // module the helper can return must implement every capability called on it.
-            val helperModules = bundleOnly.findAll(text).map { it.groupValues[1] }.toList()
-            if (helperModules.isNotEmpty()) {
-                val helpers = helperDecl.findAll(text).map { it.groupValues[1] }.toSet()
-                if (helpers.isEmpty()) {
-                    throw GradleException(
-                        "${file.name} resolves modules through a helper but no method returning " +
-                                "$bundleSimpleName was found in it, so nothing here can tell which " +
-                                "capabilities those modules are asked for."
-                    )
-                }
-                helpersFound += helpers.size
-                // The argument may itself contain a call, so one level of nesting has to be allowed.
-                // `[^)]*` stopped at the inner `)` and matched nothing for
-                // componentBundle(NmsVersion.getFormattedNmsInteger()).componentFrom(...).
-                val names = helpers.joinToString("|") { Regex.escape(it) }
-                val viaHelper = Regex("""\b(?:$names)\((?:[^()]|\([^()]*\))*\)\s*\.\s*(\w+)\s*\(""")
-                val caps = viaHelper.findAll(text).map { it.groupValues[1] }.toSet()
-                if (caps.isEmpty()) {
-                    throw GradleException(
-                        "${file.name} declares the module-picking helper(s) ${helpers.joinToString()} " +
-                                "and returns ${helperModules.size} modules from them, but no capability " +
-                                "call on a helper result was matched. Those modules would be checked " +
-                                "for nothing at all."
-                    )
-                }
-                viaHelperCaps += caps.size
-                helperModules.forEach { m -> asked.getOrPut(m) { HashSet() }.addAll(caps) }
-            }
+            viaHelper.findAll(text).forEach { helperCaps.add(it.groupValues[1]) }
         }
+        if (helperCaps.size < 6) {
+            throw GradleException(
+                "only ${helperCaps.size} capabilities are called on a helper result. The component and " +
+                        "ItemMeta capabilities together are more than that, so they are not being read."
+            )
+        }
+        // Every module the helper can return must implement every capability called on its result.
+        helperModules.forEach { m -> asked.getOrPut(m) { HashSet() }.addAll(helperCaps) }
+
         if (asked.size < 15) {
             throw GradleException(
                 "only found capability calls for ${asked.size} modules in ${coreSources.name}; expected 15+, " +
                         "so this task is not reading the dispatch sites."
-            )
-        }
-        if (helpersFound < 2 || viaHelperCaps < 6) {
-            throw GradleException(
-                "found $helpersFound module-picking helpers contributing $viaHelperCaps capability calls. " +
-                        "This project has two helpers mediating the component and ItemMeta capabilities, " +
-                        "so a smaller number means they are no longer being read."
             )
         }
         // A module name a ladder asks for that has no adapter in the jar was previously skipped with

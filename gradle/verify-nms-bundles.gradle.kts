@@ -142,7 +142,13 @@ val verifyNmsBundles = tasks.register("verifyNmsBundles") {
         val asked = HashMap<String, MutableSet<String>>()
         val direct = Regex("""forModule\("([^"]+)"\)\s*\.\s*(\w+)\s*\(""")
         val bundleOnly = Regex("""forModule\("([^"]+)"\)\s*;""")
-        val viaHelper = Regex("""\b(?:componentBundle|metaBundle)\([^)]*\)\s*\.\s*(\w+)\s*\(""")
+        // Helper names are DERIVED, not listed. A hardcoded list of two names meant renaming a
+        // helper, which an IDE does in one keystroke, silently dropped every capability it mediated
+        // while the build stayed green.
+        val bundleSimpleName = bundleInterface.substringAfterLast('/')
+        val helperDecl = Regex("""\b$bundleSimpleName\s+(\w+)\s*\(""")
+        var helpersFound = 0
+        var viaHelperCaps = 0
         coreSources.walkTopDown().filter { it.extension == "java" }.forEach { file ->
             val text = file.readText()
             direct.findAll(text).forEach { asked.getOrPut(it.groupValues[1]) { HashSet() }.add(it.groupValues[2]) }
@@ -150,7 +156,30 @@ val verifyNmsBundles = tasks.register("verifyNmsBundles") {
             // module the helper can return must implement every capability called on it.
             val helperModules = bundleOnly.findAll(text).map { it.groupValues[1] }.toList()
             if (helperModules.isNotEmpty()) {
+                val helpers = helperDecl.findAll(text).map { it.groupValues[1] }.toSet()
+                if (helpers.isEmpty()) {
+                    throw GradleException(
+                        "${file.name} resolves modules through a helper but no method returning " +
+                                "$bundleSimpleName was found in it, so nothing here can tell which " +
+                                "capabilities those modules are asked for."
+                    )
+                }
+                helpersFound += helpers.size
+                // The argument may itself contain a call, so one level of nesting has to be allowed.
+                // `[^)]*` stopped at the inner `)` and matched nothing for
+                // componentBundle(NmsVersion.getFormattedNmsInteger()).componentFrom(...).
+                val names = helpers.joinToString("|") { Regex.escape(it) }
+                val viaHelper = Regex("""\b(?:$names)\((?:[^()]|\([^()]*\))*\)\s*\.\s*(\w+)\s*\(""")
                 val caps = viaHelper.findAll(text).map { it.groupValues[1] }.toSet()
+                if (caps.isEmpty()) {
+                    throw GradleException(
+                        "${file.name} declares the module-picking helper(s) ${helpers.joinToString()} " +
+                                "and returns ${helperModules.size} modules from them, but no capability " +
+                                "call on a helper result was matched. Those modules would be checked " +
+                                "for nothing at all."
+                    )
+                }
+                viaHelperCaps += caps.size
                 helperModules.forEach { m -> asked.getOrPut(m) { HashSet() }.addAll(caps) }
             }
         }
@@ -160,11 +189,33 @@ val verifyNmsBundles = tasks.register("verifyNmsBundles") {
                         "so this task is not reading the dispatch sites."
             )
         }
+        if (helpersFound < 2 || viaHelperCaps < 6) {
+            throw GradleException(
+                "found $helpersFound module-picking helpers contributing $viaHelperCaps capability calls. " +
+                        "This project has two helpers mediating the component and ItemMeta capabilities, " +
+                        "so a smaller number means they are no longer being read."
+            )
+        }
+        // A module name a ladder asks for that has no adapter in the jar was previously skipped with
+        // `?: continue`, so `forModule("worlds77")` passed every check and threw ClassNotFoundException
+        // at runtime. The declared-module list only runs the other way, every module has an adapter,
+        // and it cannot see a name nothing declares.
+        val unknownModules = asked.keys.filterNot { it in declared }.sorted()
+        if (unknownModules.isNotEmpty()) {
+            throw GradleException(
+                "a dispatch site asks for a module that does not exist, so NmsBundles.forModule throws " +
+                        "the moment that branch is taken:\n  " + unknownModules.joinToString("\n  ") +
+                        "\nCheck the spelling against settings.gradle.kts."
+            )
+        }
         val unimplemented = ArrayList<String>()
         ZipFile(jarFile.get().asFile).use { zip ->
             for ((module, caps) in asked) {
                 val entry = zip.getEntry("com/kamikazejam/kamicommon/nms/bundle/$module/NmsBundleImpl.class")
-                    ?: continue
+                    ?: throw GradleException(
+                        "module '$module' is declared and asked for, but has no NmsBundleImpl in the " +
+                                "shaded jar, so it was never shaded in."
+                    )
                 val have = declaredMethods(zip.getInputStream(entry).readBytes())
                 caps.filterNot { it in have }.forEach { unimplemented.add("$module has no $it()") }
             }

@@ -23,7 +23,12 @@ val serverJvms = listOf(
     "1.18.1" to 17, "1.18.2" to 17, "1.19.2" to 17, "1.19.3" to 17, "1.19.4" to 17,
     "1.20.1" to 17, "1.20.2" to 17, "1.20.4" to 17,
     "1.20.6" to 21, "1.21.4" to 21, "1.21.9" to 21, "1.21.11" to 21,
-    "26.1.2" to 25, "26.2" to 25,
+    // Versions that do not exist yet, and are the point. The table originally jumped straight from
+    // 1.21.11 to 26.1.2, so six ladders gated on `ver <= f("1.21.11")` routed a hypothetical 1.21.12
+    // into the Java 25 module and nothing here modelled it. An era boundary has to be tested from
+    // both sides, not just at the last release anyone has seen.
+    "1.21.12" to 21, "1.21.99" to 21,
+    "26.1.2" to 25, "26.2" to 25, "26.9.9" to 25,
 )
 
 // Three ladders do not branch on the version integer, so this check cannot decide them and they
@@ -74,7 +79,7 @@ val token = Regex("""if \(([^\n]*?)\)\s*\{|forModule\("([^"]+)"\)""")
 /** A method declaration at class-body indentation. Its body is taken by matching braces. */
 val methodHeader = Regex("""\n {4}(?:private|protected|public)[^\n{]*\b(\w+)\([^)]*\)\s*\{""")
 
-/** `ver <= f("1.21.11")`, `nmsVersion == f("1.8.8")`, `ver >= 1162`. Anything else is undecidable. */
+/** `ver < f("26")`, `nmsVersion == f("1.8.8")`, `ver >= 1162`. Anything else is undecidable. */
 val comparison = Regex("""^\s*(?:ver|nmsVersion)\s*(<=|>=|==|<|>)\s*(?:f\("([^"]+)"\)|(\d+))\s*$""")
 
 val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
@@ -82,9 +87,10 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
     description = "Checks that no dispatch ladder sends a server to a module its JVM cannot load."
 
     val sourceRoot = file("src/main/java")
-    // Every provider reaches the encoder through a private f(), and each f() delegates to
-    // NmsVersionParser. If any stops delegating, encode() above is no longer what the ladder uses.
-    val encoderDelegates = rootProject.file("core/src/main/java")
+    // Every ladder reaches the encoder through an f() that delegates to NmsVersionParser. If any
+    // stops delegating, encode() above is no longer what the ladder uses. Most ladders inherit
+    // Provider.f, which lives in :api, so scanning only :core missed the one that matters.
+    val encoderRoots = listOf(rootProject.file("api/src/main/java"), rootProject.file("core/src/main/java"))
 
     doLast {
         // Two ways the reproduced encoder could stop matching the real one, both checked.
@@ -103,14 +109,53 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
                 )
             }
         }
-        // Second, the delegation. A provider's f() that stopped calling NmsVersionParser would make
-        // the ladders mean something this check cannot see.
-        val delegating = encoderDelegates.walkTopDown().filter { it.extension == "java" }
-            .count { it.readText().contains("NmsVersionParser.getFormattedNmsInteger") }
-        if (delegating < 3) {
+        // Second, the delegation. An f() that stopped calling NmsVersionParser would make the
+        // ladders mean something this check cannot see, and a count with no headroom cannot say so:
+        // the previous form scanned :core only, found exactly 3 and required 3, which meant the
+        // encoder Provider.f actually uses could be replaced wholesale without moving the number.
+        //
+        // So name the declaring types instead of counting files. These are every f() a ladder can
+        // reach; if one appears that is not listed, the last clause reports it.
+        val mustDelegate = setOf(
+            "api/src/main/java/com/kamikazejam/kamicommon/nms/provider/Provider.java",
+            "api/src/main/java/com/kamikazejam/kamicommon/nms/wrappers/NMSWrapper.java",
+            "core/src/main/java/com/kamikazejam/kamicommon/nms/provider/event/PreSpawnSpawnerAdapter.java",
+            "core/src/main/java/com/kamikazejam/kamicommon/nms/serializer/VersionedComponentSerializer.java",
+            "core/src/main/java/com/kamikazejam/kamicommon/nms/util/VersionedComponentUtil.java",
+        )
+        val declaresF = Regex("""\b(?:int|Integer)\s+f\s*\(""")
+        val delegates = Regex("""NmsVersionParser\.getFormattedNmsInteger""")
+        val found = LinkedHashSet<String>()
+        val notDelegating = ArrayList<String>()
+        for (root in encoderRoots) {
+            root.walkTopDown().filter { it.extension == "java" }.forEach { f ->
+                val body = f.readText()
+                if (!declaresF.containsMatchIn(body)) return@forEach
+                val rel = f.path.substringAfter("${rootProject.projectDir}/")
+                found.add(rel)
+                if (!delegates.containsMatchIn(body)) notDelegating.add(rel)
+            }
+        }
+        if (notDelegating.isNotEmpty()) {
             throw GradleException(
-                "only $delegating classes under core/ delegate to NmsVersionParser. The providers " +
-                        "encode versions some other way now, so this check is modelling the wrong thing."
+                "these declare an f(...) that no longer delegates to NmsVersionParser, so the ladders " +
+                        "encode versions some way this check does not model:\n  " +
+                        notDelegating.joinToString("\n  ")
+            )
+        }
+        val missing = mustDelegate - found
+        if (missing.isNotEmpty()) {
+            throw GradleException(
+                "expected an f(...) declaration in these and found none, so either they moved or the " +
+                        "detection broke:\n  " + missing.joinToString("\n  ")
+            )
+        }
+        val extra = found - mustDelegate
+        if (extra.isNotEmpty()) {
+            throw GradleException(
+                "a new f(...) appeared that this check has never seen:\n  " + extra.joinToString("\n  ") +
+                        "\nConfirm it delegates to NmsVersionParser, then add it to mustDelegate in " +
+                        "gradle/verify-dispatch-floors.gradle.kts."
             )
         }
 

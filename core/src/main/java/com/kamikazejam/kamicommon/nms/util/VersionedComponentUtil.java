@@ -39,8 +39,8 @@ public class VersionedComponentUtil {
         // every version below 1.18.2, so there is one copy and it sits at Java 8, the lowest
         // floor any server in that range needs.
         if (ver < f("1.21.4")) { return NmsBundles.forModule("v1_16_R3"); }
-        // 1.18.2+ has adventure bundled, so we can use the native apis. That is v1_18_R2, not
-        // v_latest: 1.18.2 runs Java 17 and v_latest targets 21 for Paper 26.x.
+        // 1.21.4+ can use the native Adventure apis. That is v1_21_4, not v_latest: 1.21.4 runs
+        // Java 21 and v_latest targets 25, so routing a 1.21.x server there would fail to load.
         return NmsBundles.forModule("v1_21_4");
     }
 

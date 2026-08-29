@@ -55,8 +55,17 @@ The table lives in `gradle/module-floors.properties`, read by the build and by b
 module missing from it fails the build rather than inheriting whatever the build was running.
 
 `v_latest` can target 25 only because every capability a 1.21.11 server reaches has a twin in
-`v1_21_11`. Those twins are duplicated on purpose: `v_latest` holds one implementation of every
-provider, so bumping `highestPaperDep` compile-checks all of them against bleeding-edge Paper.
+`v1_21_11`. Those twins are duplicated on purpose rather than moved: `v_latest` is the module that
+gets recompiled against a new Paper dev bundle when `highestPaperDep` moves, so anything living only
+in an older module is not compile-checked against bleeding-edge Paper.
+
+**That coverage is currently partial, and it is a known gap.** `v_latest` implements 6 of the 27
+capabilities on `NmsBundle`: `blockUtil`, `entityMethods`, `nmsItemMethods`, `nmsWorld`,
+`packetHandler` and `teleporter`. The rest are served on 26.x by modules built against much older
+dev bundles, because the class that works from 1.13 onward belongs in the 1.13 module under the
+convention above. So if Paper 26.x removed, say, `Bukkit.getCommandMap()`, the build would not see
+it and a 26.x server would fail at runtime. Bumping `highestPaperDep` proves those six and nothing
+else.
 
 Four build tasks keep this honest.
 
@@ -97,8 +106,11 @@ floor onto the lower server. Fork it, name it for the version it starts at, and 
 
 ## Disclaimers
 - 1.17+ only officially supports **Paper** as the server software.
-- This library requires **Java 21** to be used, as such any version of server jar must be runnable on Java 21 as well.
-  - It is highly likely older versions need to be specially compiled for Java 21.
+- This library runs on whatever Java the server itself requires, down to **Java 8**. See the floor
+  table above. Each module targets its own Minecraft version's requirement, so a 1.8.8 server on
+  Java 8 loads the library in full.
+  - One exception: WorldEdit and WorldGuard 7.x support is compiled at Java 17, so those hooks need
+    a Java 17 server even though the rest of the library does not.
 
 ## Transitive Dependencies
 This nms project includes a few libraries it needs to compile and enforce cross-version support. They are:

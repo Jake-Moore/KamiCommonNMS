@@ -163,12 +163,18 @@ val verifyFloors = tasks.register("verifyFloors") {
 
         val module = moduleFile.get().asFile
         if (!module.exists()) { throw GradleException("expected Gradle module metadata at $module") }
-        val declared = Regex("\"org\\.gradle\\.jvm\\.version\"\\s*:\\s*(\\d+)").find(module.readText())
-            ?: throw GradleException("no org.gradle.jvm.version found in $module")
-        if (declared.groupValues[1] != BASE_FLOOR.toString()) {
+        // EVERY declaration, not the first. `find` read whichever variant appeared earliest in the
+        // file, so a second variant with a wrong floor would pass while being the one a Gradle
+        // consumer actually selects.
+        val declaredAll = Regex("\"org\\.gradle\\.jvm\\.version\"\\s*:\\s*(\\d+)")
+            .findAll(module.readText()).map { it.groupValues[1] }.toList()
+        if (declaredAll.isEmpty()) { throw GradleException("no org.gradle.jvm.version found in $module") }
+        val wrong = declaredAll.filter { it != BASE_FLOOR.toString() }
+        if (wrong.isNotEmpty()) {
             throw GradleException(
-                "published metadata declares org.gradle.jvm.version=${declared.groupValues[1]}, expected " +
-                        "$BASE_FLOOR. The bytecode may be fine, but consumers below that cannot resolve this module."
+                "published metadata declares org.gradle.jvm.version=${wrong.joinToString()} across " +
+                        "${declaredAll.size} variant(s), expected $BASE_FLOOR everywhere. The bytecode " +
+                        "may be fine, but consumers below that cannot resolve this module."
             )
         }
         logger.lifecycle("verifyFloors: $inspected classes across ${moduleFloors.size} module floors, " +

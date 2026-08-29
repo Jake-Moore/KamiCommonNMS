@@ -17,17 +17,16 @@ import java.util.zip.ZipFile
 
 val BASE_FLOOR = 8
 
-// Must agree with the floor table in versions/build.gradle.kts.
-val moduleFloors = mapOf(
-    "v1_8_R1" to 8, "v1_8_R2" to 8, "v1_8_R3" to 8, "v1_9_R1" to 8, "v1_9_R2" to 8,
-    "v1_10_R1" to 8, "v1_11_R1" to 8, "v1_12_R1" to 8, "v1_13_R1" to 8, "v1_13_R2" to 8,
-    "v1_14_R1" to 8, "v1_15_R1" to 8, "v1_16_R1" to 8, "v1_16_R2" to 8, "v1_16_R3" to 8,
-    "worlds6" to 8,
-    "v1_17_R1" to 16,
-    "v1_18_R1" to 17, "v1_18_R2" to 17, "v1_19_R1" to 17, "v1_19_R2" to 17, "v1_19_R3" to 17,
-    "v1_20_R1" to 17, "v1_20_R2" to 17, "v1_20_R3" to 17, "worlds7" to 17,
-    "v1_20_CB" to 21, "v1_21_4" to 21, "v1_21_9" to 21, "v1_21_11" to 21, "v_latest" to 21,
-)
+// The single copy, shared with versions/build.gradle.kts and verify-dispatch-floors.gradle.kts.
+val moduleFloors = java.util.Properties().apply {
+    rootProject.file("gradle/module-floors.properties").inputStream().use { load(it) }
+}.entries.associate { (k, v) -> k.toString() to v.toString().trim().toInt() }
+if (moduleFloors.size < 30) {
+    throw GradleException(
+        "gradle/module-floors.properties yielded only ${moduleFloors.size} entries, so this check " +
+                "would give almost every class the base floor and pass regardless of its bytecode."
+    )
+}
 
 fun majorFor(floor: Int) = floor + 44
 

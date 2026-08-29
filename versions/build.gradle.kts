@@ -9,33 +9,27 @@ subprojects {
     // the verifier resolves it during :core's own verification and every older server stops loading
     // the provider that did it. verifyNmsBundles is what stops that.
     //
-    // The TOOLCHAIN stays 21 for every module except v_latest. paperweight runs its workers in the
-    // module's toolchain JVM and that pairing is already proven at 2.0.0-beta.22; the floor work has
-    // no reason to disturb it. Only the emitted target moves.
-    val floors = mapOf(
-        // Minecraft 1.8 - 1.16.5 ran on Java 8, and WorldEdit/WorldGuard 6 are Java 7 bytecode.
-        "v1_8_R1" to 8, "v1_8_R2" to 8, "v1_8_R3" to 8,
-        "v1_9_R1" to 8, "v1_9_R2" to 8, "v1_10_R1" to 8, "v1_11_R1" to 8, "v1_12_R1" to 8,
-        "v1_13_R1" to 8, "v1_13_R2" to 8, "v1_14_R1" to 8, "v1_15_R1" to 8,
-        "v1_16_R1" to 8, "v1_16_R2" to 8, "v1_16_R3" to 8,
-        "worlds6" to 8,
-        // 1.17 is the one release that required exactly 16.
-        "v1_17_R1" to 16,
-        // 1.18 - 1.20.4 required 17. worlds7 joins them because worldguard-bukkit 7.0.9 is
-        // entirely class-file major 61, so a lower target here would be a promise we cannot keep.
-        "v1_18_R1" to 17, "v1_18_R2" to 17,
-        "v1_19_R1" to 17, "v1_19_R2" to 17, "v1_19_R3" to 17,
-        "v1_20_R1" to 17, "v1_20_R2" to 17, "v1_20_R3" to 17,
-        "worlds7" to 17,
-        // 1.20.5 onward required 21. v_latest is compiled against Paper 26.x but still emits 21,
-        // because nothing needs it higher and a major-69 class in the jar would only be protected
-        // by the reflection never being bypassed.
-        "v1_20_CB" to 21, "v1_21_4" to 21, "v1_21_9" to 21, "v1_21_11" to 21,
-        "v_latest" to 21,
-    )
+    // The TOOLCHAIN stays 21 for every module except v_latest, and is deliberately NOT the floor.
+    // paperweight runs its workers in the module's toolchain JVM, so a module compiling to Java 17
+    // still runs javac and paperweight on 21. That is what lets paperweight-userdev sit at
+    // 2.0.0-beta.23, whose own task classes are Java 21: no module hosts them on anything lower.
+    // Only the emitted target moves with the floor.
+
+    // The floor table lives in gradle/module-floors.properties so that this file, verifyFloors and
+    // verifyDispatchFloors all read one copy. See that file for why each module sits where it does.
+    val floors = java.util.Properties().apply {
+        rootProject.file("gradle/module-floors.properties").inputStream().use { load(it) }
+    }.entries.associate { (k, v) -> k.toString() to v.toString().trim().toInt() }
+    if (floors.size < 30) {
+        throw GradleException(
+            "gradle/module-floors.properties yielded only ${floors.size} entries. It should carry " +
+                    "every module under versions/, and a table that parsed to almost nothing would " +
+                    "hand most modules the no-entry error below rather than their real floor."
+        )
+    }
     val floor = floors[project.name]
         ?: throw GradleException(
-            "versions/${project.name} has no entry in the floor table in versions/build.gradle.kts. " +
+            "versions/${project.name} has no entry in gradle/module-floors.properties. " +
                     "Add one: a module with no declared floor would silently inherit whatever the " +
                     "build happened to be running, which is how every module ended up at Java 21."
         )

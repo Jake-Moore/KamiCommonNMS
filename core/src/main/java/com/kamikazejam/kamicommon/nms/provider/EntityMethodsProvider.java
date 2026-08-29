@@ -99,7 +99,13 @@ public class EntityMethodsProvider extends Provider<AbstractEntityMethods> {
         }else if (ver <= f("1.20.4")) {
             return NmsBundles.forModule("v1_20_R3").entityMethods();
         }
-        // With the mojang-mapped paper nms now, we might be good to use this version indefinitely
-        return NmsBundles.forModule("v_latest").entityMethods(); // Confirmed for 1.20.5, 1.20.6, 1.21
+        // Everything from here to 1.21.11 runs on Java 21, so it comes from v1_21_11. The
+        // v_latest twin below is the same source compiled against Paper 26.x, which targets
+        // Java 25 because 26.x requires it. Routing a 1.21 server there would fail to load.
+        if (ver <= f("1.21.11")) {
+            return NmsBundles.forModule("v1_21_11").entityMethods();
+        }
+        // 26.x only, and compiled against it.
+        return NmsBundles.forModule("v_latest").entityMethods();
     }
 }

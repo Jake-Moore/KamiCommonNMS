@@ -4,6 +4,8 @@ plugins {
 }
 
 dependencies {
+    // ModernVersionedComponent lives in v1_18_R2, the earliest version that has native Adventure.
+    compileOnly(project(":versions:v1_18_R2"))
     // Unique dependencies for this module
     // Confirmed working for 1.21.4, see 1_21_CB for 1.21.5+
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT") // 2. add the dev bundle (contains all apis)

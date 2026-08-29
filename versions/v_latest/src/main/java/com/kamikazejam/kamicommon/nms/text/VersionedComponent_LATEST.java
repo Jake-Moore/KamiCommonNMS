@@ -2,6 +2,7 @@ package com.kamikazejam.kamicommon.nms.text;
 
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import com.kamikazejam.kamicommon.util.Preconditions;
+import java.util.Collections;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -21,11 +22,22 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Confirmed For: 1_18_R2 to 1.21.8, 1.21.9
- * <br>
- * 1_18_R2 was the first version of paper to ship with kyori adventure **MiniMessage** support.
+ * The 26.x twin of {@code VersionedComponent_1_21_4} in {@code versions/v1_21_4}, and the only reason
+ * it exists is to be compiled.
+ * <p>
+ * Nothing dispatches here. This is the highest value canary of the set, because it is the only
+ * implementation that uses the server's OWN Adventure rather than the shaded copy, plus
+ * {@code ItemMeta.customName()}, which is exactly the surface Paper moves. Compiling it against
+ * {@code highestPaperDep} means bumping that version proves those calls still exist.
+ * </p><p>
+ * Two deliberate differences from the twin, neither of which touches a method body. It implements
+ * {@code VersionedComponent} rather than {@code ModernVersionedComponent}, because that interface
+ * lives in {@code versions/v1_18_R2} and a second copy of it in this package would collide with the
+ * first in the shaded jar; and {@code asNativeComponent()} therefore carries no {@code @Override}.
+ * Everything that actually calls a Paper API is identical, which is the part being checked.
+ * </p>
  */
-public class VersionedComponent_LATEST implements ModernVersionedComponent {
+public class VersionedComponent_LATEST implements VersionedComponent {
     private final @NotNull Component component;
     private VersionedComponent_LATEST(@NotNull Component component) {
         this.component = component;
@@ -106,7 +118,8 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
         return JSONComponentSerializer.json().deserialize(json);
     }
 
-    @Override
+    // Declared by ModernVersionedComponent, which this canary cannot implement. See the class
+    // javadoc: the method body is what is being compile-checked, not the interface wiring.
     public @NotNull Component asNativeComponent() {
         return this.component;
     }
@@ -185,7 +198,7 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
         return new VersionedComponent_LATEST(name);
     }
     public static @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent line) {
-        List<Component> lore = (meta.hasLore() && meta.lore() != null) ? meta.lore() : List.of();
+        List<Component> lore = (meta.hasLore() && meta.lore() != null) ? meta.lore() : Collections.emptyList();
         List<Component> newLore = new ArrayList<>(Objects.requireNonNull(lore));
         if (line instanceof VersionedComponent_LATEST vcLatest) {
             newLore.add(vcLatest.component);
@@ -196,5 +209,22 @@ public class VersionedComponent_LATEST implements ModernVersionedComponent {
         }
         meta.lore(newLore);
         return meta;
+    }
+
+    /**
+     * The legacy section-coded text, so that concatenating a component into a string produces the
+     * message rather than an object identity.
+     * <p>
+     * Object.toString() cannot be given a default in {@link VersionedComponent}, so every
+     * implementation carries this. Without it, anything doing {@code "prefix " + component} logged
+     * {@code ...VersionedComponent_1_11_R1@3466377f}, which is what the console showed on every
+     * server below 1.18.2.
+     * </p>
+     *
+     * @return this component as legacy section-coded text
+     */
+    @Override
+    public String toString() {
+        return this.serializeLegacySection();
     }
 }

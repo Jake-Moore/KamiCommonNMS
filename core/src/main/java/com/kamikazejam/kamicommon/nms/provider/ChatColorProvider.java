@@ -1,8 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.IChatColorNMS;
-import com.kamikazejam.kamicommon.nms.chatcolor.ChatColor_LATEST;
-import com.kamikazejam.kamicommon.nms.chatcolor.ChatColor1_8_R3;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -43,9 +42,11 @@ public class ChatColorProvider extends Provider<IChatColorNMS> {
     protected @NotNull IChatColorNMS provide(int ver) {
         // If we are 1.16.2+ we can use the getColor() method introduced when hex codes were added
         if (ver >= 1162) {
-            return new ChatColor_LATEST();
+            // 1.16.2 added getColor(); that is a Bukkit API, not NMS, so the implementation sits
+            // in v1_16_R2 at Java 8. In v_latest it would need Java 21 on a Java 8 server.
+            return NmsBundles.forModule("v1_16_R2").chatColor();
         }
         // Otherwise we have to approximate
-        return new ChatColor1_8_R3();
+        return NmsBundles.forModule("v1_8_R3").chatColor();
     }
 }

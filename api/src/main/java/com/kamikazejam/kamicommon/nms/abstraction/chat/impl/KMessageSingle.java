@@ -2,6 +2,7 @@ package com.kamikazejam.kamicommon.nms.abstraction.chat.impl;
 
 import com.kamikazejam.kamicommon.actions.Action;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.KMessage;
+import java.util.Collections;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -119,7 +120,7 @@ public class KMessageSingle extends KMessage {
      */
     @Override
     public @NotNull List<String> getLines() {
-        return new ArrayList<>(List.of(line));
+        return new ArrayList<>(Collections.singletonList(line));
     }
 
     /**

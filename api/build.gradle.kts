@@ -26,7 +26,10 @@ dependencies {
     compileOnly(project.property("serverAPI") as String)
 
     // Add nms-text for text components
-    compileOnly(project.property("adventureDep") as String)
+    compileOnly(project(project.property("adventureDep") as String))
 }
 
-apply(from = "$rootDir/gradle/paper-toolchain.gradle.kts")
+// A 1.8.8 server loads every class in this module, so it is the floor everything else
+// is measured against. See gradle/module-floor.gradle.kts for what each setting does.
+extra["moduleFloor"] = 8
+apply(from = "$rootDir/gradle/module-floor.gradle.kts")

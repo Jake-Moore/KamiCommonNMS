@@ -1,9 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider.event;
 
 import com.kamikazejam.kamicommon.nms.NmsVersion;
-import com.kamikazejam.kamicommon.nms.event.PreSpawnSpawnerAdapter_1_12_R1;
-import com.kamikazejam.kamicommon.nms.event.PreSpawnSpawnerAdapter_LATEST;
-import com.kamikazejam.kamicommon.nms.event.PreSpawnSpawnerAdapter_1_8_R3;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -72,16 +70,18 @@ public class PreSpawnSpawnerAdapter {
 
         // 1.8.8      -> Assume TacoSpigot fork and use SpawnerPreSpawnEvent
         if (nmsVersion == f("1.8.8")) {
-            return new PreSpawnSpawnerAdapter_1_8_R3();
+            return NmsBundles.forModule("v1_8_R3").preSpawnSpawnerAdapter();
         }
 
         // < 1.13     -> Assume Paper fork and use SpawnerSpawnEvent
         if (nmsVersion <= f("1.12.2")) {
-            return new PreSpawnSpawnerAdapter_1_12_R1();
+            return NmsBundles.forModule("v1_12_R1").preSpawnSpawnerAdapter();
         }
 
         // 1.13+      -> Assume PaperSpigot and use PreSpawnerSpawnEvent
-        return new PreSpawnSpawnerAdapter_LATEST();
+        // PreSpawnerSpawnEvent has been Bukkit/Paper API since 1.13, so one implementation covers
+        // everything above and it lives in v1_13_R1 at Java 8, not v_latest at Java 21.
+        return NmsBundles.forModule("v1_13_R1").preSpawnSpawnerAdapter();
     }
 
     /**

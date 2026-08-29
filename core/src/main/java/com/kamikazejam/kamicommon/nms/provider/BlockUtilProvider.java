@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
 import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
-import com.kamikazejam.kamicommon.nms.block.*;
+import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -49,58 +49,64 @@ public class BlockUtilProvider extends Provider<AbstractBlockUtil> {
         }
 
         if (ver == f("1.8")) {
-            return new BlockUtil1_8_R1();
+            return NmsBundles.forModule("v1_8_R1").blockUtil();
         }else if (ver <= f("1.8.3")) {
-            return new BlockUtil1_8_R2();
+            return NmsBundles.forModule("v1_8_R2").blockUtil();
         }else if (ver <= f("1.8.8")) {
-            return new BlockUtil1_8_R3();
+            return NmsBundles.forModule("v1_8_R3").blockUtil();
         }else if (ver <= f("1.9.2")) {
-            return new BlockUtil1_9_R1();
+            return NmsBundles.forModule("v1_9_R1").blockUtil();
         }else if (ver <= f("1.9.4")) {
-            return new BlockUtil1_9_R2();
+            return NmsBundles.forModule("v1_9_R2").blockUtil();
         }else if (ver <= f("1.10.2")) {
-            return new BlockUtil1_10_R1();
+            return NmsBundles.forModule("v1_10_R1").blockUtil();
         }else if (ver <= f("1.11.2")) {
-            return new BlockUtil1_11_R1();
+            return NmsBundles.forModule("v1_11_R1").blockUtil();
         }else if (ver <= f("1.12.2")) {
-            return new BlockUtil1_12_R1();
+            return NmsBundles.forModule("v1_12_R1").blockUtil();
         }else if (ver <= f("1.13")) {
-            return new BlockUtil1_13_R1();
+            return NmsBundles.forModule("v1_13_R1").blockUtil();
         }else if (ver <= f("1.13.2")) {
-            return new BlockUtil1_13_R2();
+            return NmsBundles.forModule("v1_13_R2").blockUtil();
         }else if (ver <= f("1.14.4")) {
-            return new BlockUtil1_14_R1();
+            return NmsBundles.forModule("v1_14_R1").blockUtil();
         }else if (ver <= f("1.15.2")) {
-            return new BlockUtil1_15_R1();
+            return NmsBundles.forModule("v1_15_R1").blockUtil();
         }else if (ver <= f("1.16.1")) {
-            return new BlockUtil1_16_R1();
+            return NmsBundles.forModule("v1_16_R1").blockUtil();
         }else if (ver <= f("1.16.3")) {
-            return new BlockUtil1_16_R2();
+            return NmsBundles.forModule("v1_16_R2").blockUtil();
         }else if (ver <= f("1.16.5")) {
-            return new BlockUtil1_16_R3();
+            return NmsBundles.forModule("v1_16_R3").blockUtil();
         }else if (ver <= f("1.17.1")) {
-            return new BlockUtil1_17_R1();
+            return NmsBundles.forModule("v1_17_R1").blockUtil();
         }else if (ver <= f("1.18.1")) {
-            return new BlockUtil1_18_R1();
+            return NmsBundles.forModule("v1_18_R1").blockUtil();
         }else if (ver <= f("1.18.2")) {
-            return new BlockUtil1_18_R2();
+            return NmsBundles.forModule("v1_18_R2").blockUtil();
         }else if (ver <= f("1.19.2")) {
-            return new BlockUtil1_19_R1();
+            return NmsBundles.forModule("v1_19_R1").blockUtil();
         }else if (ver <= f("1.19.3")) {
-            return new BlockUtil1_19_R2();
+            return NmsBundles.forModule("v1_19_R2").blockUtil();
         }else if (ver <= f("1.19.4")) {
-            return new BlockUtil1_19_R3();
+            return NmsBundles.forModule("v1_19_R3").blockUtil();
         }else if (ver <= f("1.20.1")) {
-            return new BlockUtil1_20_R1();
+            return NmsBundles.forModule("v1_20_R1").blockUtil();
         }else if (ver <= f("1.20.2")) {
-            return new BlockUtil1_20_R2();
+            return NmsBundles.forModule("v1_20_R2").blockUtil();
         }else if (ver <= f("1.20.4")) {
-            return new BlockUtil1_20_R3();
+            return NmsBundles.forModule("v1_20_R3").blockUtil();
         }else if (ver <= f("1.21.4")) {
             // breaks in 1.21.5 with new block state bitmask flag argument
-            return new BlockUtil1_21_4();
+            return NmsBundles.forModule("v1_21_4").blockUtil();
         }
-        // With the mojang-mapped paper nms now, we might be good to use this version indefinitely
-        return new BlockUtil_LATEST();
+        // Everything below 26.x runs on Java 21 or lower, so it comes from v1_21_11. The
+        // v_latest twin below is the same source compiled against Paper 26.x, which targets
+        // Java 25 because 26.x requires it. Routing a 1.21 server there would fail to load.
+        if (ver < f("26")) {
+            return NmsBundles.forModule("v1_21_11").blockUtil();
+        }
+        // 26.x only, and compiled against it.
+        return NmsBundles.forModule("v_latest").blockUtil();
     }
 }

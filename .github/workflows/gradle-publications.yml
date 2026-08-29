@@ -33,6 +33,15 @@ jobs:
           settings-path: ${{ github.workspace }}
 
       # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+      - name: Cache paperweight setup
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gradle/caches/paperweight
+            versions/*/.gradle/caches/paperweight
+          key: paperweight-${{ runner.os }}-${{ hashFiles('build.gradle.kts', 'versions/*/build.gradle.kts') }}
+          restore-keys: paperweight-${{ runner.os }}-
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
         with:
@@ -90,6 +99,15 @@ jobs:
         settings-path: ${{ github.workspace }}
 
       # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+    - name: Cache paperweight setup
+      uses: actions/cache@v4
+      with:
+        path: |
+          .gradle/caches/paperweight
+          versions/*/.gradle/caches/paperweight
+        key: paperweight-${{ runner.os }}-${{ hashFiles('build.gradle.kts', 'versions/*/build.gradle.kts') }}
+        restore-keys: paperweight-${{ runner.os }}-
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
       with:
@@ -149,6 +167,15 @@ jobs:
           distribution: 'temurin'
 
       # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+      - name: Cache paperweight setup
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gradle/caches/paperweight
+            versions/*/.gradle/caches/paperweight
+          key: paperweight-${{ runner.os }}-${{ hashFiles('build.gradle.kts', 'versions/*/build.gradle.kts') }}
+          restore-keys: paperweight-${{ runner.os }}-
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
         with:

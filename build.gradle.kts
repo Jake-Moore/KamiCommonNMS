@@ -3,10 +3,10 @@ val VERSION = "1.2.20" // -SNAPSHOT marks WIP versions (snapshots are not CI pub
 
 plugins {
     id("com.gradleup.shadow") version "9.2.2" apply false
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.22" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
 }
 
-val highestPaperDep = "26.2.build.115-stable"
+val highestPaperDep = "26.2.build.120-stable"
 
 // Testing server APIs (the earliest supported version, and the latest PaperMC version)
 val oldestServerAPI = "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC"

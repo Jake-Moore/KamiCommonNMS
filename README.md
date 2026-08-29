@@ -23,7 +23,14 @@
 This nms project includes a few libraries it needs to compile and enforce cross-version support. They are:
 - [com.github.cryptomorin:XSeries](https://github.com/CryptoMorin/XSeries)
 - [de.tr7zw:item-nbt-api](https://github.com/tr7zw/Item-NBT-API)
-- [com.github.fierioziy.particlenativeapi:ParticleNativeAPI](https://github.com/Fierioziy/ParticleNativeAPI)
+
+> **Removed in 1.2.20:** `ParticleNativeAPI` is no longer a dependency. Nothing in this library used
+> it, and its version table stops at 1.21.11, so it cannot work on 26.x. If you relied on receiving
+> it transitively, declare it yourself.
+>
+> **Also in 1.2.20:** XSeries moved from `v13.5.1` to `13.7.1`, which removes `XMaterial.supports(int)`
+> in favour of `supports(int, int)`. 13.5.1 throws from `XMaterial`'s static initializer on any 26.x
+> server, so the bump is required rather than optional.
 
 These libraries are not shaded. They are defined as **transitive dependencies** for upstream projects to use as they see fit.
 - If you already have these on the classpath, you can exclude them in the dependency

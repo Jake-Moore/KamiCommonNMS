@@ -20,4 +20,4 @@ dependencies {
 //  we forfeit spigot compatibility, but it will natively work on paper
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
-// Toolchain 25 and target 21 now come from the floor table in versions/build.gradle.kts.
+// Toolchain and target both come from the floor table, gradle/module-floors.properties.

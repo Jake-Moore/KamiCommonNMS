@@ -57,8 +57,8 @@ public final class NmsBundles {
             // The one failure this whole indirection exists to make legible. Without it the server
             // gets an Error out of the class loader naming a relocated class nobody recognises.
             throw new IllegalStateException(
-                    "KamiCommon's support for Minecraft " + module + " needs a newer Java version"
-                            + " than this server is running (" + System.getProperty("java.version") + ")."
+                    "KamiCommon's '" + module + "' support module needs a newer Java version than"
+                            + " this server is running (" + System.getProperty("java.version") + ")."
                             + " This is a server configuration problem, not a KamiCommon bug.", e);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(

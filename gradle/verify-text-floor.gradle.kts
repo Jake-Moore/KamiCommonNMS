@@ -10,9 +10,21 @@ val verifyTextFloor = tasks.register("verifyTextFloor") {
     dependsOn(tasks.named("shadowJar"), tasks.named("generateMetadataFileForShadowPublication"))
 
     val jarFile = tasks.named<Jar>("shadowJar").flatMap { it.archiveFile }
+    val classifier = tasks.named<Jar>("shadowJar").flatMap { it.archiveClassifier }
     val moduleFile = layout.buildDirectory.file("publications/shadow/module.json")
 
     doLast {
+        // The same guard verifyFloors carries, for the same reason. Shadow 9 defaults this module's
+        // classifier to "all", so losing the explicit archiveClassifier.set("") publishes
+        // spigot-nms-text-1.0.6-all.jar with nothing at the plain coordinate. :core keeps working
+        // because it depends on the task rather than the coordinate, so it is invisible locally
+        // while every Maven consumer gets a 404.
+        if (classifier.get().isNotEmpty()) {
+            throw GradleException(
+                "shadowJar has classifier '${classifier.get()}', so the shaded jar is not the primary " +
+                        "published artifact and nothing exists at the plain coordinate."
+            )
+        }
         var inspected = 0
         var highest = 0
         var worst = ""
@@ -49,12 +61,16 @@ val verifyTextFloor = tasks.register("verifyTextFloor") {
         }
         val module = moduleFile.get().asFile
         if (!module.exists()) { throw GradleException("expected Gradle module metadata at $module") }
-        val declared = Regex("\"org\\.gradle\\.jvm\\.version\"\\s*:\\s*(\\d+)").find(module.readText())
-            ?: throw GradleException("no org.gradle.jvm.version found in $module")
-        if (declared.groupValues[1] != "8") {
+        // EVERY declaration, not the first, for the reason spelled out in verify-floors.gradle.kts.
+        val declaredAll = Regex("\"org\\.gradle\\.jvm\\.version\"\\s*:\\s*(\\d+)")
+            .findAll(module.readText()).map { it.groupValues[1] }.toList()
+        if (declaredAll.isEmpty()) { throw GradleException("no org.gradle.jvm.version found in $module") }
+        val wrong = declaredAll.filter { it != "8" }
+        if (wrong.isNotEmpty()) {
             throw GradleException(
-                "published metadata declares org.gradle.jvm.version=${declared.groupValues[1]}, expected 8. " +
-                        "The bytecode may be fine, but every consumer below that will fail to resolve this module."
+                "published metadata declares org.gradle.jvm.version=${wrong.joinToString()} across " +
+                        "${declaredAll.size} variant(s), expected 8 everywhere. The bytecode may be " +
+                        "fine, but every consumer below that will fail to resolve this module."
             )
         }
         logger.lifecycle("verifyTextFloor: $inspected classes, highest major $highest, metadata declares 8")

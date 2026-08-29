@@ -38,8 +38,8 @@ public class VersionedComponentSerializer {
         // Everything below 1.21.4 uses the shaded Adventure: the native implementation needs
         // ItemMeta.customName(), which Paper only added in 1.21.4.
         if (ver < f("1.21.4")) { return NmsBundles.forModule("v1_17_R1"); }
-        // 1.18.2+ has adventure and MiniMessage bundled, so we can use the native apis. That is
-        // v1_18_R2, not v_latest: 1.18.2 runs Java 17 and v_latest targets 21 for Paper 26.x.
+        // 1.21.4+ can use the native Adventure apis, because that is where ItemMeta.customName()
+        // arrived. That is v1_21_4, not v_latest: 1.21.4 runs Java 21 and v_latest targets 25.
         return NmsBundles.forModule("v1_21_4");
     }
 

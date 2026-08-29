@@ -118,7 +118,7 @@ public class NMSWorldWrapper extends NMSWrapper<NMSWorld, World> {
         }else if (ver <= f("1.21.4")) {
             // For up to 1.21.4 (breaks in 1.21.5)
             return NmsBundles.forModule("v1_21_4").nmsWorld(world, NmsAPI.getBlockUtilProvider());
-        }else if (ver <= f("1.21.11")) {
+        }else if (ver < f("26")) {
             // For 1.21.5 through 1.21.11 (breaks in 26.1)
             return NmsBundles.forModule("v1_21_11").nmsWorld(world, NmsAPI.getBlockUtilProvider());
         }

@@ -54,6 +54,13 @@
       "enabled": false
     },
     {
+      "description": "NEVER propose standalone-utils updates. This is not an outdated dependency, it is a compileOnly compile reference that KamiCommon's own release cadence would otherwise drive. Every KamiCommon alpha produced a standalone-utils PR here, and merging it changed no bytecode while making main differ from the published artifact, which reads like NMS has an update worth pulling back into KamiCommon and starts a deploy cycle over nothing. NMS names nothing from standalone-utils at runtime and never bundles it, so being behind costs nothing. Jake bumps `standaloneUtils` in build.gradle.kts by hand when he needs a newer compile feature or class, which is the only time it should move.",
+      "matchPackageNames": [
+        "com.kamikazejam.kamicommon:standalone-utils"
+      ],
+      "enabled": false
+    },
+    {
       "description": "These CAN move, but each one changes something a build check reasons about, so they get their own branch and a human. worldguard-bukkit and fawe are what justify the Java 17 floor on worlds7, since worldguard-bukkit 7.0.9 is entirely class-file major 61. paper-api drives highestPaperDep, which is what makes v_latest a compile check against bleeding-edge Paper and what triggers paperweight re-derivation. Grouped separately rather than merely automerge:false, because a non-automergeable member inside all-minor-patch blocks the entire batch.",
       "matchPackageNames": [
         "com.sk89q.worldguard:worldguard-bukkit",

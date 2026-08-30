@@ -3,6 +3,7 @@ package com.kamikazejam.kamicommon.nms.serializer;
 import com.kamikazejam.kamicommon.nms.NmsVersion;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundle;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
+import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.util.Preconditions;
 import com.kamikazejam.kamicommon.util.nms.NmsVersionParser;
@@ -67,6 +68,23 @@ public class VersionedComponentSerializer {
     public @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage) {
         Preconditions.checkNotNull(miniMessage, "miniMessage cannot be null");
         return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFromMiniMessage(miniMessage);
+    }
+
+    /**
+     * MiniMessage with tag replacements.
+     * <p>
+     * Replaces the pattern of building an Adventure {@code TagResolver} at the call site and passing
+     * the result through {@link #fromInternalComponent}, which required naming the shaded Adventure
+     * copy from outside the {@code versions/*} modules.
+     * </p>
+     */
+    public @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+        Preconditions.checkNotNull(miniMessage, "miniMessage cannot be null");
+        Preconditions.checkNotNull(placeholders, "placeholders cannot be null");
+        for (TextPlaceholder placeholder : placeholders) {
+            Preconditions.checkNotNull(placeholder, "placeholders cannot contain null");
+        }
+        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFromMiniMessage(miniMessage, placeholders);
     }
 
     public @NotNull VersionedComponent fromLegacyAmpersand(@NotNull String legacy) {

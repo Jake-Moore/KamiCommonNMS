@@ -4,6 +4,13 @@ import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.
 import com.kamikazejam.kamicommon.util.Preconditions;
 import java.util.Collections;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import com.kamikazejam.kamicommon.nms.text.ClickAction;
+import com.kamikazejam.kamicommon.nms.text.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -136,6 +143,60 @@ public class VersionedComponent_LATEST implements VersionedComponent {
         return new VersionedComponent_LATEST(this.component.append(otherComp));
     }
 
+    @Override
+    public @NotNull VersionedComponent click(@NotNull ClickAction action, @NotNull String value) {
+        return new VersionedComponent_LATEST(this.component.clickEvent(toClickEvent(action, value)));
+    }
+
+    @Override
+    public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
+        return new VersionedComponent_LATEST(this.component.hoverEvent(HoverEvent.showText(nativeOf(tooltip))));
+    }
+
+    @Override
+    public @NotNull VersionedComponent decorate(@NotNull TextDecoration decoration, boolean value) {
+        return new VersionedComponent_LATEST(this.component.decoration(toDecoration(decoration), value));
+    }
+
+    /**
+     * The native component behind another {@link VersionedComponent}.
+     * <p>
+     * Deliberately round-trips through MiniMessage rather than {@code asInternalComponent()} for a
+     * foreign implementation. That method returns the <i>shaded</i> Adventure copy, and using it here
+     * would put a shaded reference back on the path modern servers load, which is the coupling this
+     * API exists to remove. Same reasoning as {@code append}.
+     * </p>
+     */
+    private static @NotNull Component nativeOf(@NotNull VersionedComponent other) {
+        if (other instanceof VersionedComponent_LATEST same) {
+            return same.component;
+        }
+        return MiniMessage.miniMessage().deserialize(other.serializeMiniMessage());
+    }
+
+    private static @NotNull ClickEvent toClickEvent(@NotNull ClickAction action, @NotNull String value) {
+        switch (action) {
+            case RUN_COMMAND: return ClickEvent.runCommand(value);
+            case SUGGEST_COMMAND: return ClickEvent.suggestCommand(value);
+            case OPEN_URL: return ClickEvent.openUrl(value);
+            case COPY_TO_CLIPBOARD: return ClickEvent.copyToClipboard(value);
+        }
+        // Unreachable today. Kept so that adding a constant to ClickAction fails here rather than
+        // silently dropping the behaviour on this version.
+        throw new UnsupportedOperationException("Unhandled ClickAction: " + action);
+    }
+
+    private static @NotNull net.kyori.adventure.text.format.TextDecoration toDecoration(@NotNull TextDecoration decoration) {
+        switch (decoration) {
+            case BOLD: return net.kyori.adventure.text.format.TextDecoration.BOLD;
+            case ITALIC: return net.kyori.adventure.text.format.TextDecoration.ITALIC;
+            case UNDERLINED: return net.kyori.adventure.text.format.TextDecoration.UNDERLINED;
+            case STRIKETHROUGH: return net.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
+            case OBFUSCATED: return net.kyori.adventure.text.format.TextDecoration.OBFUSCATED;
+        }
+        throw new UnsupportedOperationException("Unhandled TextDecoration: " + decoration);
+    }
+
     // ------------------------------------------------------------ //
     //                        STATIC METHODS                        //
     // ------------------------------------------------------------ //
@@ -227,4 +288,41 @@ public class VersionedComponent_LATEST implements VersionedComponent {
     public String toString() {
         return this.serializeLegacySection();
     }
+
+    /**
+     * MiniMessage with tag replacements, converting each {@link TextPlaceholder} into the resolver
+     * type this module's Adventure copy uses.
+     * <p>
+     * The conversion lives here rather than at the call site precisely so that no caller has to name
+     * a {@code TagResolver}. That is the leak this API closes.
+     * </p>
+     */
+    @Internal
+    public static @NotNull VersionedComponent_LATEST fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+        return new VersionedComponent_LATEST(MiniMessage.miniMessage().deserialize(miniMessage, toResolver(placeholders)));
+    }
+
+    private static @NotNull TagResolver toResolver(@NotNull TextPlaceholder[] placeholders) {
+        TagResolver[] resolvers = new TagResolver[placeholders.length];
+        for (int i = 0; i < placeholders.length; i++) {
+            TextPlaceholder placeholder = placeholders[i];
+            switch (placeholder.getKind()) {
+                case LITERAL:
+                    resolvers[i] = Placeholder.unparsed(placeholder.getKey(), placeholder.getStringValue());
+                    break;
+                case MINI_MESSAGE:
+                    resolvers[i] = Placeholder.parsed(placeholder.getKey(), placeholder.getStringValue());
+                    break;
+                case COMPONENT:
+                    resolvers[i] = Placeholder.component(placeholder.getKey(), nativeOf(placeholder.getComponentValue()));
+                    break;
+                default:
+                    // Adding a Kind without handling it here would otherwise drop the replacement
+                    // and render the raw tag to players.
+                    throw new UnsupportedOperationException("Unhandled TextPlaceholder.Kind: " + placeholder.getKind());
+            }
+        }
+        return TagResolver.resolver(resolvers);
+    }
+
 }

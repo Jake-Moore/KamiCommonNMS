@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -118,6 +119,32 @@ public interface VersionedComponent {
     default @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
         throw new UnsupportedOperationException(
                 "hover(VersionedComponent) is not implemented by " + this.getClass().getName());
+    }
+
+    /**
+     * Returns a copy of this component whose hover shows the given item, with its name, lore and
+     * enchantments as a player would see them in an inventory.
+     * <p>
+     * Servers from 1.17 through 1.18.1 throw. The item NBT this library reads below 1.18.2 comes
+     * from {@code AbstractItemTextPre_1_17}, which stops at 1.16.5, and those two versions have
+     * neither that nor native Adventure.
+     * </p>
+     * <p>
+     * On 1.8 through 1.12 the hover carries the item's {@code tag} compound, so the name, lore and
+     * enchantments survive while the top-level {@code Damage} field does not. An item whose variant
+     * or durability lives in {@code Damage}, such as coloured wool or a worn tool, therefore hovers
+     * as the undamaged base item. This is the shape of Adventure's item hover, which holds an id, a
+     * count and a tag and has nowhere to put {@code Damage}. From 1.13 onward the variant is part of
+     * the id and durability moved into {@code tag}, so nothing is lost.
+     * </p>
+     *
+     * @param item the item shown on hover
+     * @throws IllegalArgumentException      if the item is air, which has no item to show
+     * @throws UnsupportedOperationException on 1.17 through 1.18.1
+     */
+    default @NotNull VersionedComponent hoverItem(@NotNull ItemStack item) {
+        throw new UnsupportedOperationException(
+                "hoverItem(ItemStack) is not implemented by " + this.getClass().getName());
     }
 
     /**

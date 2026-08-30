@@ -132,7 +132,10 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
     group = "verification"
     description = "Checks that no dispatch ladder sends a server to a module its JVM cannot load."
 
-    val sourceRoot = file("src/main/java")
+    // Both modules, because a dispatch ladder can live in either. ItemTextProviderPre_1_17 moved to
+    // :api so that text-impl can reach it from inside the nested jar, and a scan of :core alone
+    // stopped seeing the only fifteen-branch ladder in the project while still reporting success.
+    val sourceRoots = listOf(file("src/main/java"), rootProject.file("api/src/main/java"))
     // Every ladder reaches the encoder through an f() that delegates to NmsVersionParser. If any
     // stops delegating, encode() above is no longer what the ladder uses. Most ladders inherit
     // Provider.f, which lives in :api, so scanning only :core missed the one that matters.
@@ -213,7 +216,8 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
         var callsSeen = 0
         var callsParsed = 0
 
-        sourceRoot.walkTopDown().filter { it.extension == "java" }.sortedBy { it.path }.forEach { file ->
+        sourceRoots.flatMap { it.walkTopDown().filter { f -> f.extension == "java" } }
+            .sortedBy { it.path }.forEach { file ->
             val text = stripComments(file.readText())
             // Gate on forModule in ANY form, not just forModule("literal"). WorldEditHook dispatches
             // through a helper taking the module as a parameter, so a literal-only gate skipped that

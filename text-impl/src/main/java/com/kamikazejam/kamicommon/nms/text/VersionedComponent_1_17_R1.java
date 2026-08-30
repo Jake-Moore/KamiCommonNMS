@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
@@ -111,6 +112,24 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent, ShadedBac
     @Override
     public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
         return new VersionedComponent_1_17_R1(this.component.hoverEvent(HoverEvent.showText(ShadedBacked.of(tooltip))));
+    }
+
+    /**
+     * Always throws. 1.17 and 1.18.1 have no item NBT source in this library and no native
+     * Adventure, so there is nothing to build an item hover from.
+     * <p>
+     * {@code AbstractItemTextPre_1_17} stops at 1.16.5, as its name says, and native Adventure
+     * arrives in 1.18.2. Throwing here is the same choice {@link ClickAction#COPY_TO_CLIPBOARD}
+     * makes below 1.16: a hover that quietly shows the wrong thing is worse than one that fails
+     * while it is being written.
+     * </p>
+     */
+    @Override
+    public @NotNull VersionedComponent hoverItem(@NotNull ItemStack item) {
+        throw new UnsupportedOperationException(
+                "hoverItem(ItemStack) needs Minecraft 1.18.2 or newer, or 1.16.5 or older; this server"
+                        + " runs " + Bukkit.getVersion() + " and dispatches to "
+                        + VersionedComponent_1_17_R1.class.getSimpleName());
     }
 
     @Override

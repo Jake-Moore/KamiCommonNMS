@@ -12,12 +12,15 @@ import com.kamikazejam.kamicommon.nms.text.ClickAction;
 import com.kamikazejam.kamicommon.nms.text.TextDecoration;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,26 @@ import org.jetbrains.annotations.Nullable;
  */
 @ApiStatus.Internal
 public class VersionedComponent_1_15_R1 implements VersionedComponent, ShadedBacked {
+    // BungeeComponentSerializer.legacy() with one addition, an explicit legacy hover serializer.
+    //
+    // legacy() is GsonComponentSerializer.builder().downsampleColors().emitLegacyHoverEvent(), and
+    // emitLegacyHoverEvent on its own cannot write an item hover. Adventure has no default
+    // LegacyHoverEventSerializer, so a show_item is emitted as an id and a count with no tag and no
+    // pre-1.16 "value" field at all. The bungee-chat bundled with these versions reads only "value"
+    // and throws NullPointerException when it is absent, so sending an item hover failed outright.
+    // NBTLegacyHoverEventSerializer is what reassembles {id:...,Count:Nb,tag:{...}} into that field.
+    //
+    // Output for every other component is unchanged. Measured against the bungee-chat shipped in
+    // Paper 1.8.8 and 1.12.2 for plain, coloured, hex-downsampled, click, show_text and nested
+    // components: byte-identical to legacy() in all of them.
+    private static final BungeeComponentSerializer SERIALIZER = BungeeComponentSerializer.of(
+            GsonComponentSerializer.builder()
+                    .downsampleColors()
+                    .emitLegacyHoverEvent()
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .build(),
+            LegacyComponentSerializer.legacySection());
+
     private final @NotNull Component component;
     public VersionedComponent_1_15_R1(@NotNull Component component) {
         this.component = component;
@@ -41,7 +64,7 @@ public class VersionedComponent_1_15_R1 implements VersionedComponent, ShadedBac
     @Override
     public void sendTo(@NotNull CommandSender sender) {
         // Use direct spigot method
-        sender.spigot().sendMessage(BungeeComponentSerializer.legacy().serialize(this.component));
+        sender.spigot().sendMessage(SERIALIZER.serialize(this.component));
     }
 
     @Override
@@ -101,6 +124,11 @@ public class VersionedComponent_1_15_R1 implements VersionedComponent, ShadedBac
     @Override
     public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
         return new VersionedComponent_1_15_R1(this.component.hoverEvent(HoverEvent.showText(ShadedBacked.of(tooltip))));
+    }
+
+    @Override
+    public @NotNull VersionedComponent hoverItem(@NotNull ItemStack item) {
+        return new VersionedComponent_1_15_R1(this.component.hoverEvent(ShadedItemHover.of(item)));
     }
 
     @Override

@@ -59,4 +59,25 @@ public interface AbstractItemTextPre_1_17 {
      * @return the NBT string representation of the item's tooltip
      */
     String getNbtStringTooltip(ItemStack item);
+
+    /**
+     * The item's namespaced id, as the server's own item registry writes it.
+     *
+     * @param item the {@link ItemStack} to read
+     * @return the namespaced id, for example {@code minecraft:wool}, or an empty string for air
+     */
+    String getItemId(ItemStack item);
+
+    /**
+     * The item's {@code tag} compound as an SNBT string, or {@code null} when it has none.
+     * <p>
+     * This is the inner compound holding the display name, lore and enchantments. It is not the
+     * whole item NBT that {@link #getNbtStringTooltip(ItemStack)} returns, which also carries
+     * {@code id}, {@code Count} and, below 1.13, {@code Damage}.
+     * </p>
+     *
+     * @param item the {@link ItemStack} to read
+     * @return the {@code tag} compound as SNBT, or {@code null} when the item carries no tag
+     */
+    String getNbtTag(ItemStack item);
 }

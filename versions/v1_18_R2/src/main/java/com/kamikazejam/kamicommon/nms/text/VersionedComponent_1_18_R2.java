@@ -15,9 +15,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.ApiStatus.Internal;
@@ -151,6 +153,16 @@ public class VersionedComponent_1_18_R2 implements ModernVersionedComponent {
     @Override
     public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
         return new VersionedComponent_1_18_R2(this.component.hoverEvent(HoverEvent.showText(nativeOf(tooltip))));
+    }
+
+    @Override
+    public @NotNull VersionedComponent hoverItem(@NotNull ItemStack item) {
+        if (item.getType() == Material.AIR) {
+            throw new IllegalArgumentException("hoverItem(ItemStack) was given air, which has no item to show");
+        }
+        // Paper builds the hover from the item itself, so no NBT is read or reassembled here and
+        // nothing about the item is lost. This is the same call MessageManager already makes.
+        return new VersionedComponent_1_18_R2(this.component.hoverEvent(item.asHoverEvent()));
     }
 
     @Override

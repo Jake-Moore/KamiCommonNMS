@@ -12,6 +12,9 @@ import com.kamikazejam.kamicommon.nms.text.ClickAction;
 import com.kamikazejam.kamicommon.nms.text.TextDecoration;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONOptions;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.ApiStatus.Internal;
@@ -35,6 +39,33 @@ import org.jetbrains.annotations.Nullable;
  */
 @ApiStatus.Internal
 public class VersionedComponent_1_16_R3 implements VersionedComponent, ShadedBacked {
+
+    /**
+     * The world data version of 1.16.5, naming the client generation this tier serves.
+     *
+     * <p>Any 1.16 value selects the same option set; 1.16.5 is used because it is the newest server
+     * this tier dispatches for.
+     */
+    private static final int DATA_VERSION_1_16_5 = 2586;
+
+    // BungeeComponentSerializer.get() pinned to the client generation this tier serves.
+    //
+    // get() serializes with GsonComponentSerializer.gson(), whose defaults follow current Minecraft.
+    // Adventure 4.26 emits the flattened 1.21.5 "hover_event" and "click_event" keys and drops the
+    // item tag from a show_item, because from 1.20.5 an item's data lives in components rather than
+    // in a tag. The bungee-chat shipped with 1.16 reads "hoverEvent" and "clickEvent" and knows
+    // nothing of either, so it discarded both events silently and an item hover arrived as an id.
+    //
+    // Pinning the option state to this tier's data version emits the key names, the show_item
+    // "contents" shape and the tag that a 1.16 client reads. Hex colours are unaffected, which is
+    // the reason this tier exists: EMIT_RGB is already true from 1.16 onward.
+    private static final BungeeComponentSerializer SERIALIZER = BungeeComponentSerializer.of(
+            GsonComponentSerializer.builder()
+                    .options(JSONOptions.byDataVersion().at(DATA_VERSION_1_16_5))
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .build(),
+            LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build());
+
     private final @NotNull Component component;
     public VersionedComponent_1_16_R3(@NotNull Component component) {
         this.component = component;
@@ -43,7 +74,7 @@ public class VersionedComponent_1_16_R3 implements VersionedComponent, ShadedBac
     @Override
     public void sendTo(@NotNull CommandSender sender) {
         // Use direct spigot method
-        sender.spigot().sendMessage(BungeeComponentSerializer.get().serialize(this.component));
+        sender.spigot().sendMessage(SERIALIZER.serialize(this.component));
     }
 
     @Override
@@ -103,6 +134,11 @@ public class VersionedComponent_1_16_R3 implements VersionedComponent, ShadedBac
     @Override
     public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
         return new VersionedComponent_1_16_R3(this.component.hoverEvent(HoverEvent.showText(ShadedBacked.of(tooltip))));
+    }
+
+    @Override
+    public @NotNull VersionedComponent hoverItem(@NotNull ItemStack item) {
+        return new VersionedComponent_1_16_R3(this.component.hoverEvent(ShadedItemHover.of(item)));
     }
 
     @Override

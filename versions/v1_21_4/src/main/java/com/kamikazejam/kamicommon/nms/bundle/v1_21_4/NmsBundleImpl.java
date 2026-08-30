@@ -7,7 +7,6 @@ import com.kamikazejam.kamicommon.nms.provider.Provider;
 import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_21_4;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld_1_21_4;
 import java.util.List;
@@ -45,10 +44,6 @@ public class NmsBundleImpl implements NmsBundle {
     // ItemMeta.customName() (Paper 1.21.4), so 1.21.4 is the earliest that carries both.
     // It used to be dispatched from 1.18.2, which meant every server from 1.18.2 to 1.21.3
     // would have hit NoSuchMethodError on any display-name operation.
-    @Override
-    public @NotNull VersionedComponent componentFrom(@NotNull Component component) {
-        return VersionedComponent_1_21_4.fromInternalComponent(component);
-    }
 
     @Override
     public @NotNull VersionedComponent componentFromPlainText(@NotNull String text) {

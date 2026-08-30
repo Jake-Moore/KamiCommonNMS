@@ -227,7 +227,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
      * </p>
      */
     @Internal
-    public static @NotNull VersionedComponent_1_17_R1 fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+    public static @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
         return new VersionedComponent_1_17_R1(MiniMessage.miniMessage().deserialize(miniMessage, toResolver(placeholders)));
     }
 
@@ -252,6 +252,33 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
             }
         }
         return TagResolver.resolver(resolvers);
+    }
+
+
+    // These return the INTERFACE, not this class, and that is load-bearing rather than style.
+    // NmsBundleImpl calls them; if they returned the concrete type the verifier would need a subtype
+    // check against VersionedComponent when the adapter is loaded, which resolves this class and
+    // through it the shaded Adventure. Loading ANY capability from this module would then drag the
+    // shaded copy onto servers that have Adventure natively. Measured on Paper 26.2, where
+    // commandMapModifier dispatches here.
+    @Internal
+    public static @NotNull VersionedComponent fromPlainText(@NotNull String text) {
+        return new VersionedComponent_1_17_R1(PlainTextComponentSerializer.plainText().deserialize(text));
+    }
+
+    @Internal
+    public static @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage) {
+        return new VersionedComponent_1_17_R1(MiniMessage.miniMessage().deserialize(miniMessage));
+    }
+
+    @Internal
+    public static @NotNull VersionedComponent fromLegacyAmpersand(@NotNull String legacy) {
+        return new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
+    }
+
+    @Internal
+    public static @NotNull VersionedComponent fromLegacySection(@NotNull String legacy) {
+        return new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacySection().deserialize(legacy));
     }
 
 }

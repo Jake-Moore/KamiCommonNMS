@@ -17,10 +17,6 @@ import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_17_R1;
 import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_17_R1;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.NMSPacketHandler;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.NMSPacketHandler_1_17_R1;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
@@ -88,19 +84,15 @@ public class NmsBundleImpl implements NmsBundle {
     // 1.17 and 1.18.1 have Adventure on the server but not MiniMessage, so components are still
     // built from the shaded copy. This lives here rather than in v1_18_R1 because 1.17 runs on
     // Java 16 and that module targets 17.
-    @Override
-    public @NotNull VersionedComponent componentFrom(@NotNull Component component) {
-        return new VersionedComponent_1_17_R1(component);
-    }
 
     @Override
     public @NotNull VersionedComponent componentFromPlainText(@NotNull String text) {
-        return new VersionedComponent_1_17_R1(PlainTextComponentSerializer.plainText().deserialize(text));
+        return VersionedComponent_1_17_R1.fromPlainText(text);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) {
-        return new VersionedComponent_1_17_R1(MiniMessage.miniMessage().deserialize(miniMessage));
+        return VersionedComponent_1_17_R1.fromMiniMessage(miniMessage);
     }
 
     @Override
@@ -110,12 +102,12 @@ public class NmsBundleImpl implements NmsBundle {
 
     @Override
     public @NotNull VersionedComponent componentFromLegacyAmpersand(@NotNull String legacy) {
-        return new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
+        return VersionedComponent_1_17_R1.fromLegacyAmpersand(legacy);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromLegacySection(@NotNull String legacy) {
-        return new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacySection().deserialize(legacy));
+        return VersionedComponent_1_17_R1.fromLegacySection(legacy);
     }
 
     @Override

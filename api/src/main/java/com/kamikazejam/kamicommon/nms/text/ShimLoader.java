@@ -101,7 +101,7 @@ public final class ShimLoader {
             if (in == null) {
                 throw new IllegalStateException(
                         NESTED + " is missing from this jar. It carries the relocated Adventure that "
-                                + "servers below 1.21.4 need. A build that strips it produces a "
+                                + "servers below 1.18.2 need. A build that strips it produces a "
                                 + "library that cannot render text on those versions.");
             }
             try {

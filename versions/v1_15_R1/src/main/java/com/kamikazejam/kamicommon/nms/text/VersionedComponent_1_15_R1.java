@@ -1,6 +1,13 @@
 package com.kamikazejam.kamicommon.nms.text;
 
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.event.ClickEvent;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.event.HoverEvent;
+import com.kamikazejam.kamicommon.nms.text.ClickAction;
+import com.kamikazejam.kamicommon.nms.text.TextDecoration;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -10,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
@@ -75,6 +83,46 @@ public class VersionedComponent_1_15_R1 implements VersionedComponent {
     @Override
     public @NotNull VersionedComponent append(@NotNull VersionedComponent other) {
         return new VersionedComponent_1_15_R1(this.component.append(other.asInternalComponent()));
+    }
+
+    @Override
+    public @NotNull VersionedComponent click(@NotNull ClickAction action, @NotNull String value) {
+        return new VersionedComponent_1_15_R1(this.component.clickEvent(toClickEvent(action, value)));
+    }
+
+    @Override
+    public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
+        return new VersionedComponent_1_15_R1(this.component.hoverEvent(HoverEvent.showText(tooltip.asInternalComponent())));
+    }
+
+    @Override
+    public @NotNull VersionedComponent decorate(@NotNull TextDecoration decoration, boolean value) {
+        return new VersionedComponent_1_15_R1(this.component.decoration(toDecoration(decoration), value));
+    }
+
+    private static @NotNull ClickEvent toClickEvent(@NotNull ClickAction action, @NotNull String value) {
+        switch (action) {
+            case RUN_COMMAND: return ClickEvent.runCommand(value);
+            case SUGGEST_COMMAND: return ClickEvent.suggestCommand(value);
+            case OPEN_URL: return ClickEvent.openUrl(value);
+            case COPY_TO_CLIPBOARD: throw new UnsupportedOperationException(
+                    "COPY_TO_CLIPBOARD needs Minecraft 1.15 or newer; this server dispatches to "
+                            + VersionedComponent_1_15_R1.class.getSimpleName());
+        }
+        // Unreachable today. Kept so that adding a constant to ClickAction fails here rather than
+        // silently dropping the behaviour on this version.
+        throw new UnsupportedOperationException("Unhandled ClickAction: " + action);
+    }
+
+    private static @NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.format.TextDecoration toDecoration(@NotNull TextDecoration decoration) {
+        switch (decoration) {
+            case BOLD: return com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.format.TextDecoration.BOLD;
+            case ITALIC: return com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.format.TextDecoration.ITALIC;
+            case UNDERLINED: return com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.format.TextDecoration.UNDERLINED;
+            case STRIKETHROUGH: return com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
+            case OBFUSCATED: return com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.format.TextDecoration.OBFUSCATED;
+        }
+        throw new UnsupportedOperationException("Unhandled TextDecoration: " + decoration);
     }
 
     /**
@@ -159,6 +207,43 @@ public class VersionedComponent_1_15_R1 implements VersionedComponent {
         newLore.add(LegacyComponentSerializer.legacySection().serialize(line.asInternalComponent()));
         meta.setLore(newLore);
         return meta;
+    }
+
+
+    /**
+     * MiniMessage with tag replacements, converting each {@link TextPlaceholder} into the resolver
+     * type this module's Adventure copy uses.
+     * <p>
+     * The conversion lives here rather than at the call site precisely so that no caller has to name
+     * a {@code TagResolver}. That is the leak this API closes.
+     * </p>
+     */
+    @Internal
+    public static @NotNull VersionedComponent_1_15_R1 fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+        return new VersionedComponent_1_15_R1(MiniMessage.miniMessage().deserialize(miniMessage, toResolver(placeholders)));
+    }
+
+    private static @NotNull TagResolver toResolver(@NotNull TextPlaceholder[] placeholders) {
+        TagResolver[] resolvers = new TagResolver[placeholders.length];
+        for (int i = 0; i < placeholders.length; i++) {
+            TextPlaceholder placeholder = placeholders[i];
+            switch (placeholder.getKind()) {
+                case LITERAL:
+                    resolvers[i] = Placeholder.unparsed(placeholder.getKey(), placeholder.getStringValue());
+                    break;
+                case MINI_MESSAGE:
+                    resolvers[i] = Placeholder.parsed(placeholder.getKey(), placeholder.getStringValue());
+                    break;
+                case COMPONENT:
+                    resolvers[i] = Placeholder.component(placeholder.getKey(), placeholder.getComponentValue().asInternalComponent());
+                    break;
+                default:
+                    // Adding a Kind without handling it here would otherwise drop the replacement
+                    // and render the raw tag to players.
+                    throw new UnsupportedOperationException("Unhandled TextPlaceholder.Kind: " + placeholder.getKind());
+            }
+        }
+        return TagResolver.resolver(resolvers);
     }
 
 }

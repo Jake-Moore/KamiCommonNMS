@@ -15,6 +15,7 @@ import com.kamikazejam.kamicommon.nms.library.worldedit.WorldEditApi;
 import com.kamikazejam.kamicommon.nms.library.worldguard.WorldGuardApi;
 import com.kamikazejam.kamicommon.nms.provider.Provider;
 import com.kamikazejam.kamicommon.nms.text.ComponentLoggerAdapter;
+import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import com.kamikazejam.kamicommon.nms.wrappers.NMSWrapper;
@@ -133,6 +134,16 @@ public interface NmsBundle {
     default @NotNull VersionedComponent componentFromPlainText(@NotNull String text) { throw missing("componentFromPlainText"); }
 
     default @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) { throw missing("componentFromMiniMessage"); }
+
+    /**
+     * MiniMessage with tag replacements, without the caller naming an Adventure {@code TagResolver}.
+     * <p>
+     * Each {@link TextPlaceholder} is converted to whichever resolver this module's Adventure copy
+     * uses. That conversion is the whole reason this overload exists: it keeps the resolver type
+     * inside the {@code versions/*} module, where the shaded Adventure belongs.
+     * </p>
+     */
+    default @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) { throw missing("componentFromMiniMessage(String, TextPlaceholder...)"); }
 
     default @NotNull VersionedComponent componentFromLegacyAmpersand(@NotNull String legacy) { throw missing("componentFromLegacyAmpersand"); }
 

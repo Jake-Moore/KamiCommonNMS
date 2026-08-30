@@ -53,14 +53,15 @@
       "automerge": false
     },
     {
-      "description": "Anything that RUNS the build gets its own branch and a human. Anything the build merely compiles against can batch and auto-merge. Every stuck batch on these repos has been the same shape: a build-system component bundled with libraries, where one incompatible member blocks all the rest. gradle-wrapper did it by erroring inside Renovate's container, which killed the grouped batch on KamiCommon for nine months. com.gradleup.shadow 9.6.1 then did it by needing a newer Gradle than the wrapper provides, failing with AdhocComponentWithVariants.addVariantsFromConfiguration on BOTH repos at once. The first instance was fixed specifically rather than as a class, so the second arrived unguarded. Measured locally: Gradle 9.7.1 with shadow 9.6.1 builds clean, so the wrapper is the unblocker. Expect a shadow PR to sit red until the wrapper moves. That is the signal, not a fault, and it no longer holds a dozen unrelated library updates hostage. Matched by matchDepNames, NOT matchPackageNames: for a Gradle plugin, Renovate's packageName is the marker artifact com.gradleup.shadow:com.gradleup.shadow.gradle.plugin, while depName is the plugin id the dashboard shows. The first version of this rule used matchPackageNames with the plugin id and silently matched nothing, so shadow stayed in the auto-merge batch. Every rule that did work here matches a library coordinate, where depName and packageName are the same string.",
+      "description": "Anything that RUNS the build gets its own branch and a human. Anything the build merely compiles against can batch and auto-merge. Every stuck batch here has been the same shape: a build-system component bundled with libraries, where one incompatible member blocks all the rest. gradle-wrapper did it by erroring inside Renovate's container, which killed the grouped batch for nine months. com.gradleup.shadow 9.6.1 then did it by needing a newer Gradle than the wrapper provides, failing with AdhocComponentWithVariants.addVariantsFromConfiguration. Matched on depType rather than by name. Renovate's Gradle manager assigns depType 'plugin' to anything in a plugins block, which is documented, whereas two earlier attempts to name the plugin failed: matchPackageNames misses because a plugin's packageName is the marker artifact com.gradleup.shadow:com.gradleup.shadow.gradle.plugin, and matchDepNames with the plugin id also matched nothing across a full branch wipe and rescan. Matching the type is also the more durable rule: a plugin added later is covered without anyone remembering to list it.",
       "groupName": "build system",
       "groupSlug": "build-system",
       "automerge": false,
-      "matchDepNames": [
-        "com.gradleup.shadow",
-        "org.gradle.toolchains.foojay-resolver-convention",
-        "io.papermc.paperweight.userdev"
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchDepTypes": [
+        "plugin"
       ]
     },
     {

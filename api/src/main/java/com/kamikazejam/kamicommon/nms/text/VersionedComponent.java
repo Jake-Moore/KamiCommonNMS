@@ -1,6 +1,5 @@
 package com.kamikazejam.kamicommon.nms.text;
 
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryType;
@@ -72,11 +71,19 @@ public interface VersionedComponent {
     @NotNull Inventory createInventory(@NotNull InventoryHolder owner, @NotNull InventoryType type);
 
     /**
-     * Fetches (or Creates) an instance of the internal adventure {@link Component}<br>
-     * <br>
-     * Advanced users may use this in order to interact with advanced Adventure component APIs that are shaded.<br>
+     * Serializes to the JSON representation Minecraft itself uses for components.
+     *
+     * <p>This replaced {@code asInternalComponent()}, removed 2026-08-30. That method handed back the
+     * relocated Adventure component, and once the relocated package is hidden from consumers it was
+     * unusable by construction: a caller cannot name the type, cannot declare a variable for it, and
+     * cannot cast it to anything. Assuming it is the server's own Adventure is wrong even on modern
+     * versions, because it is the shaded copy.
+     *
+     * <p>JSON and MiniMessage carry the same information in a form callers can actually hold. On
+     * 1.21.4 and up, {@code ModernVersionedComponent#asNativeComponent()} returns the server's real
+     * Adventure component, which is nameable and is the right escape hatch there.
      */
-    @NotNull Component asInternalComponent();
+    @NotNull String serializeJson();
 
     /**
      * Appends another VersionedComponent to this one, returning a new instance.<br>
@@ -87,7 +94,7 @@ public interface VersionedComponent {
     /**
      * Returns a copy of this component with a click behaviour attached.
      * <p>
-     * Use this rather than reaching through {@link #asInternalComponent()} to call Adventure's
+     * Use this rather than reaching for Adventure directly to call its
      * {@code clickEvent}. Anything outside the {@code versions/*} modules that names the shaded
      * Adventure copy pins it onto every server, including the modern ones that have Adventure
      * natively and do not need it.

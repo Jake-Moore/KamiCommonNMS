@@ -42,11 +42,24 @@ allprojects {
     }
 }
 
+// Resolves :text's relocated jar as a FILE, for embedding rather than shading.
+val textShim: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
 dependencies {
     // Shade :api code into the core
     implementation(project(":api"))
-    // Shade our adventure relocated api into core
-    implementation(project(project.property("adventureDep") as String))
+    // :text-impl, NOT :text. :text is the relocated Adventure alone; :text-impl merges it with the
+    // classes that use it. Embedding :text shipped a nested jar with 839 Adventure classes and zero
+    // implementations, so TextBundles.forModule would have thrown ClassNotFoundException on every
+    // server below 1.21.4. All six build checks passed on that jar.
+    textShim(project(":text-impl"))
+    // :text is compiled against but not shaded in as loose classes. It is embedded as a NESTED JAR
+    // instead; see the shadowJar block.
+    compileOnly(project(project.property("adventureDep") as String))
+
 
     // Common Dependencies (compileOnly to avoid shading)
     (rootProject.extra["commonDependencies"] as List<String>).forEach(dependencies::shadow)
@@ -77,6 +90,35 @@ tasks {
     shadowJar {
         archiveClassifier.set("")
         // configurations = listOf(project.configurations.shadow.get())
+
+        // :text is not shaded in as loose classes. It is the relocated Adventure, and it exists only
+        // for servers with no native Adventure, meaning everything below 1.21.4.
+        //
+        // Shading it flat put the bytes in the jar as ordinary class entries, and javac has no notion
+        // of an internal package, so every consumer could import
+        // com.kamikazejam.kamicommon.nms.text.kyori.* and some would. Dependency scoping cannot fix
+        // that: measured 2026-08-30, a spigot-jar consumer compiled against the shaded Adventure
+        // successfully even with the dependency declared runtime-only, because scope metadata cannot
+        // hide bytes that are physically present.
+        //
+        // It ships as a JAR INSIDE THIS JAR instead, at internal-libs/adventure.jar, and is loaded at
+        // runtime through a child classloader. Java's classpath has no nested-jar support, so those
+        // classes are not classpath entries at all. That survives being shaded by a consumer, which
+        // is the property scoping could not provide: shadow copies the nested jar through
+        // byte-identically, measured at two levels of shading.
+        dependencies {
+            exclude(project(":text"))
+        }
+        // The nested jar. Resolved through a configuration rather than a cross-project task lookup,
+        // which fails at configuration time. :text already makes its shadow jar the default outgoing
+        // artifact, so project(":text") resolves to the relocated jar.
+        //
+        // from(...) { into(...) } copies it as a FILE. It is never unpacked, which is the entire
+        // point: nested jar entries are not classpath entries, so javac cannot see them.
+        from(textShim) {
+            into("internal-libs")
+            rename { "adventure.jar" }
+        }
     }
 }
 
@@ -213,6 +255,7 @@ gradle.projectsEvaluated {
                                 scopeNode?.setValue("compile")
                             }
                         }
+
                     }
                 }
             }

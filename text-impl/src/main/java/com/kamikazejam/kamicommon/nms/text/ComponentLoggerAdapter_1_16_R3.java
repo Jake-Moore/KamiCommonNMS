@@ -35,7 +35,7 @@ public class ComponentLoggerAdapter_1_16_R3 implements ComponentLoggerAdapter {
         // com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_11_R1@3466377f, instead of the
         // text. That has always been true of this code path; it went unnoticed because until the
         // Java floor dropped, no server old enough to reach it could load KamiCommon at all.
-        String text = LegacyComponentSerializer.legacySection().serialize(message.asInternalComponent());
+        String text = LegacyComponentSerializer.legacySection().serialize(ShadedBacked.of(message));
 
         if (level == Level.FINE) {
             Bukkit.getConsoleSender().sendMessage(LegacyColors.t("&7[DEBUG] " + plPrefix + text));

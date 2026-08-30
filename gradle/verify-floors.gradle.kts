@@ -142,7 +142,16 @@ val verifyFloors = tasks.register("verifyFloors") {
             }
         }
         // A walker that matches nothing passes forever.
-        if (inspected < 1000) {
+        //
+        // Was 1000 until 2026-08-30, when :text stopped being shaded into this jar and the count fell
+        // from 1484 to 463. That is 1484 minus the 1021 relocated Adventure classes, which is the
+        // whole of the change and nothing else. The guard caught it, which is the point of having it.
+        //
+        // 400 rather than 460: close enough to catch a walker that has stopped matching, loose enough
+        // that adding or removing a handful of NMS classes does not require editing this number. The
+        // relocated Adventure is covered by verifyTextFloor against its own artifact, which still
+        // reports 1021 classes.
+        if (inspected < 400) {
             throw GradleException("verifyFloors only inspected $inspected classes, far below the expected count")
         }
         if (ceilingViolations.isNotEmpty()) {

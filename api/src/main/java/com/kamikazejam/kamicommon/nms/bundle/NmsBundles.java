@@ -30,13 +30,6 @@ public final class NmsBundles {
      */
     private static final Map<String, NmsBundle> BUNDLES = new HashMap<String, NmsBundle>();
 
-    /**
-     * Cached separately from {@link #BUNDLES}, and loaded only when a caller actually asks for a
-     * shaded Adventure component. See {@link ShadedComponentBridge} for why this cannot live on
-     * {@link NmsBundle}.
-     */
-    private static final Map<String, ShadedComponentBridge> BRIDGES = new HashMap<String, ShadedComponentBridge>();
-
     private static final String PACKAGE = "com.kamikazejam.kamicommon.nms.bundle.";
 
     private NmsBundles() {}
@@ -71,79 +64,6 @@ public final class NmsBundles {
             throw new IllegalStateException(
                     "No NMS adapter " + className + ". Either the version module was excluded from the"
                             + " shaded jar, or a dispatch table names a module that does not exist.", e);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Could not instantiate " + className, e);
-        }
-    }
-
-    /**
-     * That module's shaded-Adventure bridge.
-     * <p>
-     * <b>Loading the returned class resolves the shaded Adventure copy</b>, so call this only when a
-     * shaded component is genuinely wanted. Everything else should go through {@link NmsBundle}.
-     * </p>
-     *
-     * @param module the Gradle module name, e.g. {@code v1_17_R1}
-     */
-    public static synchronized @NotNull ShadedComponentBridge forShadedBridge(@NotNull String module) {
-        ShadedComponentBridge bridge = BRIDGES.get(module);
-        if (bridge == null) {
-            bridge = loadBridge(module);
-            BRIDGES.put(module, bridge);
-        }
-        return bridge;
-    }
-
-    /**
-     * The shaded bridge belonging to the same module as {@code bundle}.
-     * <p>
-     * Derived from the adapter's own package rather than by re-running a dispatch ladder. Running a
-     * second ladder would mean two answers for the same server the moment one drifted, which this
-     * project has already been bitten by. Deriving it also keeps the single ladder written as
-     * {@code forModule("...")} literals, which is the form {@code verifyDispatchFloors} parses; a
-     * ladder rewritten to return bare module strings would silently stop being checked.
-     * </p>
-     */
-    public static @NotNull ShadedComponentBridge shadedBridgeFor(@NotNull NmsBundle bundle) {
-        String name = bundle.getClass().getName();
-        if (!name.startsWith(PACKAGE)) {
-            throw new IllegalStateException(
-                    "Adapter " + name + " is not under " + PACKAGE + ", so its module cannot be"
-                            + " derived. Adapters must stay in their generated package.");
-        }
-        int end = name.lastIndexOf('.');
-        int start = name.lastIndexOf('.', end - 1);
-        String module = name.substring(start + 1, end);
-        if (module.isEmpty()) {
-            throw new IllegalStateException("Could not derive a module name from adapter " + name);
-        }
-        return forShadedBridge(module);
-    }
-
-    private static @NotNull ShadedComponentBridge loadBridge(@NotNull String module) {
-        String className = PACKAGE + module + ".ShadedComponentBridgeImpl";
-        try {
-            Class<?> type = Class.forName(className);
-            return (ShadedComponentBridge) type.getDeclaredConstructor().newInstance();
-        } catch (UnsupportedClassVersionError e) {
-            throw new IllegalStateException(
-                    "KamiCommon's '" + module + "' support module needs a newer Java version than"
-                            + " this server is running (" + System.getProperty("java.version") + ")."
-                            + " This is a server configuration problem, not a KamiCommon bug.", e);
-        } catch (NoClassDefFoundError e) {
-            // Distinct from the ClassNotFoundException below: the bridge class exists but the shaded
-            // Adventure it references does not. That is what happens when spigot-nms-text has been
-            // excluded from a shaded jar, and it deserves to say so rather than surface a relocated
-            // class name nobody recognises.
-            throw new IllegalStateException(
-                    "The bundled Adventure copy is missing, so shaded components are unavailable."
-                            + " It ships in com.kamikazejam.kamicommon:spigot-nms-text; a shade"
-                            + " configuration that excludes it breaks this path.", e);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(
-                    "No shaded component bridge " + className + ". Either the version module was"
-                            + " excluded from the shaded jar, or a dispatch table names a module that"
-                            + " does not exist.", e);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("Could not instantiate " + className, e);
         }

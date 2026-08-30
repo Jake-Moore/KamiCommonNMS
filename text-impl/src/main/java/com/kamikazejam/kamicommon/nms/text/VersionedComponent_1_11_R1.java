@@ -1,6 +1,7 @@
 package com.kamikazejam.kamicommon.nms.text;
 
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
@@ -12,42 +13,58 @@ import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.Mini
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Confirmed For: 1_17_R1, 1_18_R1
+ * Confirmed For: 1_8_R1, 1_8_R2, 1_8_R3, 1_9_R1, 1_9_R2, 1_10_R1, 1_11_R1
  */
-@SuppressWarnings("deprecation")
-public class VersionedComponent_1_17_R1 implements VersionedComponent {
-    final @NotNull Component component;
-    public VersionedComponent_1_17_R1(@NotNull Component component) {
+public class VersionedComponent_1_11_R1 implements VersionedComponent, ShadedBacked {
+    private final @NotNull Component component;
+    public VersionedComponent_1_11_R1(@NotNull Component component) {
         this.component = component;
     }
 
     @Override
     public void sendTo(@NotNull CommandSender sender) {
-        // Use direct spigot method (deprecated, but lacks MiniMessage in 1.17 to fix)
-        //   Have to use this because paper apis don't allow converting MiniMessage strings yet
-        //    and thus we cannot obtain the right Component instance to use the paper method.
-        sender.spigot().sendMessage(BungeeComponentSerializer.get().serialize(this.component));
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            // Use direct spigot method
+            player.spigot().sendMessage(BungeeComponentSerializer.legacy().serialize(this.component));
+        } else {
+            // Wrap into legacy string format to use String message method
+            BaseComponent[] baseComponents = BungeeComponentSerializer.legacy().serialize(this.component);
+            sender.sendMessage((new TextComponent(baseComponents)).toLegacyText());
+        }
     }
 
     @Override
     public @NotNull String serializeMiniMessage() {
-        return MiniMessage.miniMessage().serialize(component);
+        return MiniMessage.miniMessage().serialize(this.component);
+    }
+
+    @Override
+    public @NotNull String serializeJson() {
+        return JSONComponentSerializer.json().serialize(this.component);
+    }
+
+    @Override
+    public @NotNull String serializePlainText() {
+        return PlainTextComponentSerializer.plainText().serialize(this.component);
     }
 
     @Override
@@ -61,15 +78,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
     }
 
     @Override
-    public @NotNull String serializePlainText() {
-        return PlainTextComponentSerializer.plainText().serialize(this.component);
-    }
-
-    @Override
     public @NotNull Inventory createInventory(@NotNull InventoryHolder owner, int size) {
-        // Use direct spigot method (deprecated, but lacks MiniMessage in 1.17 to fix)
-        //   Have to use this because paper apis don't allow converting MiniMessage strings yet
-        //    and thus we cannot obtain the right Component instance to use the paper method.
         // Needs to be serialized into legacy string that contains section symbols for title
         String title = LegacyComponentSerializer.legacySection().serialize(this.component);
         return Bukkit.createInventory(owner, size, title);
@@ -77,37 +86,34 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
 
     @Override
     public @NotNull Inventory createInventory(@NotNull InventoryHolder owner, @NotNull InventoryType type) {
-        // Use direct spigot method (deprecated, but lacks MiniMessage in 1.17 to fix)
-        //   Have to use this because paper apis don't allow converting MiniMessage strings yet
-        //    and thus we cannot obtain the right Component instance to use the paper method.
         // Needs to be serialized into legacy string that contains section symbols for title
         String title = LegacyComponentSerializer.legacySection().serialize(this.component);
         return Bukkit.createInventory(owner, type, title);
     }
 
     @Override
-    public @NotNull Component asInternalComponent() {
+    public @NotNull Component shadedComponent() {
         return this.component;
     }
 
     @Override
     public @NotNull VersionedComponent append(@NotNull VersionedComponent other) {
-        return new VersionedComponent_1_17_R1(this.component.append(other.asInternalComponent()));
+        return new VersionedComponent_1_11_R1(this.component.append(ShadedBacked.of(other)));
     }
 
     @Override
     public @NotNull VersionedComponent click(@NotNull ClickAction action, @NotNull String value) {
-        return new VersionedComponent_1_17_R1(this.component.clickEvent(toClickEvent(action, value)));
+        return new VersionedComponent_1_11_R1(this.component.clickEvent(toClickEvent(action, value)));
     }
 
     @Override
     public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
-        return new VersionedComponent_1_17_R1(this.component.hoverEvent(HoverEvent.showText(tooltip.asInternalComponent())));
+        return new VersionedComponent_1_11_R1(this.component.hoverEvent(HoverEvent.showText(ShadedBacked.of(tooltip))));
     }
 
     @Override
     public @NotNull VersionedComponent decorate(@NotNull TextDecoration decoration, boolean value) {
-        return new VersionedComponent_1_17_R1(this.component.decoration(toDecoration(decoration), value));
+        return new VersionedComponent_1_11_R1(this.component.decoration(toDecoration(decoration), value));
     }
 
     private static @NotNull ClickEvent toClickEvent(@NotNull ClickAction action, @NotNull String value) {
@@ -115,7 +121,9 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
             case RUN_COMMAND: return ClickEvent.runCommand(value);
             case SUGGEST_COMMAND: return ClickEvent.suggestCommand(value);
             case OPEN_URL: return ClickEvent.openUrl(value);
-            case COPY_TO_CLIPBOARD: return ClickEvent.copyToClipboard(value);
+            case COPY_TO_CLIPBOARD: throw new UnsupportedOperationException(
+                    "COPY_TO_CLIPBOARD needs Minecraft 1.15 or newer; this server dispatches to "
+                            + VersionedComponent_1_11_R1.class.getSimpleName());
         }
         // Unreachable today. Kept so that adding a constant to ClickAction fails here rather than
         // silently dropping the behaviour on this version.
@@ -156,11 +164,11 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
     // strings on every version this library supports. What is NOT identical is the type the two
     // read methods construct, and that decides how the result serializes when it is later sent.
     // LegacyComponentSerializer.legacySection() decodes the section-x hex form, so a component read
-    // back off an ItemMeta really can carry a hex colour, and VersionedComponent_1_17_R1's sendTo is the
+    // back off an ItemMeta really can carry a hex colour, and VersionedComponent_1_11_R1's sendTo is the
     // one that knows whether this server can render it. Routing every version at one module put a
     // hex-capable component on servers that predate hex.
     //
-    // Serves 1.17 through 1.21.3.
+    // Serves 1.8 through 1.11.2.
 
     @SuppressWarnings("deprecation")
     public static @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent name) {
@@ -168,7 +176,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
             meta.setDisplayName(null);
             return meta;
         }
-        meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(name.asInternalComponent()));
+        meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(ShadedBacked.of(name)));
         return meta;
     }
 
@@ -179,7 +187,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
             return meta;
         }
         List<String> serializedLore = lore.stream()
-                .map(vc -> LegacyComponentSerializer.legacySection().serialize(vc.asInternalComponent()))
+                .map(vc -> LegacyComponentSerializer.legacySection().serialize(ShadedBacked.of(vc)))
                 .collect(Collectors.toList());
         meta.setLore(serializedLore);
         return meta;
@@ -195,7 +203,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
             return null;
         }
         return lore.stream()
-                .map(line -> (VersionedComponent) new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacySection().deserialize(line)))
+                .map(line -> (VersionedComponent) new VersionedComponent_1_11_R1(LegacyComponentSerializer.legacySection().deserialize(line)))
                 .collect(Collectors.toList());
     }
 
@@ -205,14 +213,14 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
             return null;
         }
         String name = meta.getDisplayName();
-        return new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacySection().deserialize(name));
+        return new VersionedComponent_1_11_R1(LegacyComponentSerializer.legacySection().deserialize(name));
     }
 
     @SuppressWarnings("deprecation")
     public static @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent line) {
         List<String> lore = (meta.hasLore() && meta.getLore() != null) ? meta.getLore() : Collections.emptyList();
         List<String> newLore = new ArrayList<>(lore);
-        newLore.add(LegacyComponentSerializer.legacySection().serialize(line.asInternalComponent()));
+        newLore.add(LegacyComponentSerializer.legacySection().serialize(ShadedBacked.of(line)));
         meta.setLore(newLore);
         return meta;
     }
@@ -228,7 +236,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
      */
     @Internal
     public static @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
-        return new VersionedComponent_1_17_R1(MiniMessage.miniMessage().deserialize(miniMessage, toResolver(placeholders)));
+        return new VersionedComponent_1_11_R1(MiniMessage.miniMessage().deserialize(miniMessage, toResolver(placeholders)));
     }
 
     private static @NotNull TagResolver toResolver(@NotNull TextPlaceholder[] placeholders) {
@@ -243,7 +251,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
                     resolvers[i] = Placeholder.parsed(placeholder.getKey(), placeholder.getStringValue());
                     break;
                 case COMPONENT:
-                    resolvers[i] = Placeholder.component(placeholder.getKey(), placeholder.getComponentValue().asInternalComponent());
+                    resolvers[i] = Placeholder.component(placeholder.getKey(), ShadedBacked.of(placeholder.getComponentValue()));
                     break;
                 default:
                     // Adding a Kind without handling it here would otherwise drop the replacement
@@ -263,22 +271,22 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent {
     // commandMapModifier dispatches here.
     @Internal
     public static @NotNull VersionedComponent fromPlainText(@NotNull String text) {
-        return new VersionedComponent_1_17_R1(PlainTextComponentSerializer.plainText().deserialize(text));
+        return new VersionedComponent_1_11_R1(PlainTextComponentSerializer.plainText().deserialize(text));
     }
 
     @Internal
     public static @NotNull VersionedComponent fromMiniMessage(@NotNull String miniMessage) {
-        return new VersionedComponent_1_17_R1(MiniMessage.miniMessage().deserialize(miniMessage));
+        return new VersionedComponent_1_11_R1(MiniMessage.miniMessage().deserialize(miniMessage));
     }
 
     @Internal
     public static @NotNull VersionedComponent fromLegacyAmpersand(@NotNull String legacy) {
-        return new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
+        return new VersionedComponent_1_11_R1(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
     }
 
     @Internal
     public static @NotNull VersionedComponent fromLegacySection(@NotNull String legacy) {
-        return new VersionedComponent_1_17_R1(LegacyComponentSerializer.legacySection().deserialize(legacy));
+        return new VersionedComponent_1_11_R1(LegacyComponentSerializer.legacySection().deserialize(legacy));
     }
 
 }

@@ -135,6 +135,9 @@ public interface NmsBundle {
 
     default @NotNull VersionedComponent componentFromPlainText(@NotNull String text) { throw missing("componentFromPlainText"); }
 
+    /** JSON in, component out. How the two Adventure tiers exchange content without shared types. */
+    default @NotNull VersionedComponent componentFromJson(@NotNull String json) { throw missing("componentFromJson"); }
+
     default @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) { throw missing("componentFromMiniMessage"); }
 
     /**

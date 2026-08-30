@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.bundle.worlds6;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundle;
 import com.kamikazejam.kamicommon.nms.library.worldedit.WorldEdit6;
 import com.kamikazejam.kamicommon.nms.library.worldedit.WorldEditApi;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
  * accessor here, or {@code :core} cannot reach it.
  * </p>
  */
+@ApiStatus.Internal
 public class NmsBundleImpl implements NmsBundle {
 
     @Override

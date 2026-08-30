@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.abstraction.mainhand.AbstractMainHand;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see AbstractMainHand
  */
+@ApiStatus.Internal
 public class MainHandProvider extends Provider<AbstractMainHand> {
     /**
      * {@inheritDoc}

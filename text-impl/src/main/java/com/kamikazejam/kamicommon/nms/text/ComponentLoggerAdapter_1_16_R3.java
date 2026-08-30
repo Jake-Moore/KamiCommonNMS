@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.util.LegacyColors;
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ import java.util.logging.Level;
  * and keep the naming. Here it applies to a JVM boundary instead of an API one.
  * </p>
  */
+@ApiStatus.Internal
 public class ComponentLoggerAdapter_1_16_R3 implements ComponentLoggerAdapter {
     public void log(@NotNull Plugin plugin, @NotNull VersionedComponent message, @NotNull Level level) {
         // This is an implementation for versions before paper added adventure support

@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.plugin.Plugin;
@@ -10,6 +11,7 @@ import java.util.logging.Level;
 /**
  * Confirmed For: 1_18_R2 --> 1.21.8, 1.21.9
  */
+@ApiStatus.Internal
 public class ComponentLoggerAdapter_1_18_R2 implements ComponentLoggerAdapter {
     public void log(@NotNull Plugin plugin, @NotNull VersionedComponent message, @NotNull Level level) {
         // This is the new implementation for versions after paper added adventure support

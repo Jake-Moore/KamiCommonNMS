@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.bundle;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import java.util.Map;
  * but a consumer shading this library under its own relocation rules would break it.
  * </p>
  */
+@ApiStatus.Internal
 public final class NmsBundles {
 
     /**

@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.Map;
  * 1.21.4 upward the server has Adventure natively and {@code v1_21_4} implements text directly with
  * no indirection.
  */
+@ApiStatus.Internal
 public final class TextBundles {
 
     private static final Map<String, TextBundle> CACHE = new HashMap<String, TextBundle>();

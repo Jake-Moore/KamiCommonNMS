@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.bundle.v1_21_4;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
 import com.kamikazejam.kamicommon.nms.block.BlockUtil1_21_4;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundle;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * accessor here, or {@code :core} cannot reach it.
  * </p>
  */
+@ApiStatus.Internal
 public class NmsBundleImpl implements NmsBundle {
 
     @Override

@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.*;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see NMSPacketHandler
  */
+@ApiStatus.Internal
 public class PacketHandlerProvider extends Provider<NMSPacketHandler> {
     /**
      * {@inheritDoc}

@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.abstraction.enchantid.AbstractEnchantID;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see AbstractEnchantID
  */
+@ApiStatus.Internal
 public class EnchantIDProvider extends Provider<AbstractEnchantID> {
     /**
      * {@inheritDoc}

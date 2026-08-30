@@ -9,7 +9,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
 }
 
-val highestPaperDep = "26.2.build.120-stable"
+val highestPaperDep = "26.2.build.121-stable"
 
 // Testing server APIs (the earliest supported version, and the latest PaperMC version)
 val oldestServerAPI = "net.techcable.tacospigot:server:1.8.8-R0.2-REDUCED-KC"

@@ -14,6 +14,7 @@ import com.kamikazejam.kamicommon.nms.entity.EntityMethods_1_17_R1;
 import com.kamikazejam.kamicommon.nms.item.NmsItemMethods_1_17_R1;
 import com.kamikazejam.kamicommon.nms.provider.Provider;
 import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_17_R1;
+import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_17_R1;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
@@ -100,6 +101,11 @@ public class NmsBundleImpl implements NmsBundle {
     @Override
     public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) {
         return new VersionedComponent_1_17_R1(MiniMessage.miniMessage().deserialize(miniMessage));
+    }
+
+    @Override
+    public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+        return VersionedComponent_1_17_R1.fromMiniMessage(miniMessage, placeholders);
     }
 
     @Override

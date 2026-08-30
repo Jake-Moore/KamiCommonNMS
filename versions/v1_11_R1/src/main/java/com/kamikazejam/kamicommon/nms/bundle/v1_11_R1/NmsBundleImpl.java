@@ -20,6 +20,7 @@ import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld_1_11_R1;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_11_R1;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
@@ -97,6 +98,11 @@ public class NmsBundleImpl implements NmsBundle {
     @Override
     public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) {
         return new VersionedComponent_1_11_R1(MiniMessage.miniMessage().deserialize(miniMessage));
+    }
+
+    @Override
+    public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+        return VersionedComponent_1_11_R1.fromMiniMessage(miniMessage, placeholders);
     }
 
     @Override

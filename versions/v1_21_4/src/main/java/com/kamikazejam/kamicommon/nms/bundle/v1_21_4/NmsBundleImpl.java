@@ -4,6 +4,7 @@ import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
 import com.kamikazejam.kamicommon.nms.block.BlockUtil1_21_4;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundle;
 import com.kamikazejam.kamicommon.nms.provider.Provider;
+import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_21_4;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
@@ -57,6 +58,11 @@ public class NmsBundleImpl implements NmsBundle {
     @Override
     public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) {
         return VersionedComponent_1_21_4.fromMiniMessage(miniMessage);
+    }
+
+    @Override
+    public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+        return VersionedComponent_1_21_4.fromMiniMessage(miniMessage, placeholders);
     }
 
     @Override

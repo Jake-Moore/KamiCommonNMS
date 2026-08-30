@@ -85,6 +85,47 @@ public interface VersionedComponent {
     @NotNull VersionedComponent append(@NotNull VersionedComponent other);
 
     /**
+     * Returns a copy of this component with a click behaviour attached.
+     * <p>
+     * Use this rather than reaching through {@link #asInternalComponent()} to call Adventure's
+     * {@code clickEvent}. Anything outside the {@code versions/*} modules that names the shaded
+     * Adventure copy pins it onto every server, including the modern ones that have Adventure
+     * natively and do not need it.
+     * </p>
+     *
+     * @param action what the click does
+     * @param value  the command or URL the action applies to, without a leading slash for commands
+     * @throws UnsupportedOperationException if this server version cannot express the action; see
+     *                                       {@link ClickAction#COPY_TO_CLIPBOARD}
+     */
+    default @NotNull VersionedComponent click(@NotNull ClickAction action, @NotNull String value) {
+        throw new UnsupportedOperationException(
+                "click(ClickAction, String) is not implemented by " + this.getClass().getName());
+    }
+
+    /**
+     * Returns a copy of this component with hover text attached.
+     *
+     * @param tooltip the component shown on hover
+     */
+    default @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
+        throw new UnsupportedOperationException(
+                "hover(VersionedComponent) is not implemented by " + this.getClass().getName());
+    }
+
+    /**
+     * Returns a copy of this component with a style flag explicitly set.
+     * <p>
+     * The common case is {@code decorate(TextDecoration.ITALIC, false)} before writing a component
+     * into {@code ItemMeta}, because Minecraft italicises item names and lore automatically.
+     * </p>
+     */
+    default @NotNull VersionedComponent decorate(@NotNull TextDecoration decoration, boolean value) {
+        throw new UnsupportedOperationException(
+                "decorate(TextDecoration, boolean) is not implemented by " + this.getClass().getName());
+    }
+
+    /**
      * Sends the current message component to multiple senders.
      */
     default void sendTo(@NotNull CommandSender... senders) {

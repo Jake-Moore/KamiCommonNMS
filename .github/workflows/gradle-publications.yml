@@ -38,7 +38,7 @@ jobs:
       alreadyPublished: ${{ steps.published_check.outputs.already }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # Label escape hatch. This workflow triggers on push, where there is no PR context, so the
       # merge commit is mapped back to its pull request and that PR's labels are read.
@@ -59,7 +59,7 @@ jobs:
           fi
 
       - name: Set up JDKs 17, 21 and 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: |
             17
@@ -71,7 +71,7 @@ jobs:
 
       # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Cache paperweight setup
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             .gradle/caches/paperweight
@@ -149,10 +149,10 @@ jobs:
       packages: write # Access to Publish a Package
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     
     - name: Set up JDKs 17, 21 and 25
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         java-version: |
           17
@@ -164,7 +164,7 @@ jobs:
 
       # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Cache paperweight setup
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           .gradle/caches/paperweight
@@ -223,9 +223,9 @@ jobs:
       id-token: write      # Allow OIDC token for authentication
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDKs 17, 21 and 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: |
             17
@@ -235,7 +235,7 @@ jobs:
 
       # Configure: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Cache paperweight setup
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             .gradle/caches/paperweight
@@ -255,7 +255,7 @@ jobs:
         run: gradle :core:aggregateJavadoc
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: gh-pages
           path: gh-pages

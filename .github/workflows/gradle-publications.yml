@@ -24,6 +24,9 @@ on:
       - '.gitignore'
       - 'LICENSE'
       - 'renovate.json'
+  # Manual trigger, so a release can be cut without pushing, and so the workflow can be
+  # exercised without waiting for a qualifying change.
+  workflow_dispatch:
 
 jobs:
   validate:

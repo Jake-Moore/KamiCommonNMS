@@ -14,6 +14,7 @@ import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.Mini
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONOptions;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -36,7 +37,8 @@ import org.jetbrains.annotations.Nullable;
  */
 @ApiStatus.Internal
 public class VersionedComponent_1_15_R1 implements VersionedComponent, ShadedBacked {
-    // BungeeComponentSerializer.legacy() with one addition, an explicit legacy hover serializer.
+    // BungeeComponentSerializer.legacy() with two additions, an explicit legacy hover serializer and
+    // a click event key mode.
     //
     // legacy() is GsonComponentSerializer.builder().downsampleColors().emitLegacyHoverEvent(), and
     // emitLegacyHoverEvent on its own cannot write an item hover. Adventure has no default
@@ -45,14 +47,21 @@ public class VersionedComponent_1_15_R1 implements VersionedComponent, ShadedBac
     // and throws NullPointerException when it is absent, so sending an item hover failed outright.
     // NBTLegacyHoverEventSerializer is what reassembles {id:...,Count:Nb,tag:{...}} into that field.
     //
-    // Output for every other component is unchanged. Measured against the bungee-chat shipped in
-    // Paper 1.8.8 and 1.12.2 for plain, coloured, hex-downsampled, click, show_text and nested
-    // components: byte-identical to legacy() in all of them.
+    // emitLegacyHoverEvent has no click counterpart, so EMIT_CLICK_EVENT_TYPE kept Adventure's
+    // default of the flattened "click_event" key introduced in 1.21.5. The bungee-chat of these
+    // versions does not read that name and discarded the event, so click() produced a component
+    // carrying only its text. BOTH emits the older "clickEvent" name alongside the newer one rather
+    // than in place of it.
+    //
+    // Output is otherwise unchanged. Measured against the bungee-chat shipped in Paper 1.8.8 and
+    // 1.12.2 for plain, coloured, hex-downsampled, show_text and show_item components: byte-identical
+    // to legacy(), with the click event the only difference.
     private static final BungeeComponentSerializer SERIALIZER = BungeeComponentSerializer.of(
             GsonComponentSerializer.builder()
                     .downsampleColors()
                     .emitLegacyHoverEvent()
                     .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .editOptions(b -> b.value(JSONOptions.EMIT_CLICK_EVENT_TYPE, JSONOptions.ClickEventValueMode.BOTH))
                     .build(),
             LegacyComponentSerializer.legacySection());
 

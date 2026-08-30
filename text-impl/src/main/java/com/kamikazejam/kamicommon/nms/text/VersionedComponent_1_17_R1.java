@@ -12,6 +12,8 @@ import com.kamikazejam.kamicommon.nms.text.ClickAction;
 import com.kamikazejam.kamicommon.nms.text.TextDecoration;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONOptions;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -36,6 +38,33 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("deprecation")
 @ApiStatus.Internal
 public class VersionedComponent_1_17_R1 implements VersionedComponent, ShadedBacked {
+
+    /**
+     * The world data version of 1.17.1, read from that server's own {@code version.json}.
+     *
+     * <p>This tier serves 1.17 through 1.18.1, data versions 2724 to 2865. Adventure groups its
+     * JSON options into ranges, and the range opened by 1.16 at 2526 is not closed until 1.20.3 at
+     * 3679, so every version this tier serves selects the same option set and one pin covers all of
+     * them.
+     */
+    private static final int DATA_VERSION_1_17_1 = 2730;
+
+    // BungeeComponentSerializer.get() pinned to the client generation this tier serves.
+    //
+    // get() serializes with GsonComponentSerializer.gson(), whose defaults track current Minecraft
+    // and emit the flattened "hover_event" and "click_event" keys introduced in 1.21.5. The
+    // bungee-chat shipped with 1.17 and 1.18 reads "hoverEvent" and "clickEvent", so it discarded
+    // both events and the component arrived carrying only its text. hover() and click() were
+    // therefore no-ops on every server this tier serves.
+    //
+    // No legacy hover serializer is supplied, unlike v1_16_R3. That one exists to write a show_item
+    // hover, and hoverItem(ItemStack) throws on this tier, so nothing here can produce one.
+    private static final BungeeComponentSerializer SERIALIZER = BungeeComponentSerializer.of(
+            GsonComponentSerializer.builder()
+                    .options(JSONOptions.byDataVersion().at(DATA_VERSION_1_17_1))
+                    .build(),
+            LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build());
+
     final @NotNull Component component;
     public VersionedComponent_1_17_R1(@NotNull Component component) {
         this.component = component;
@@ -46,7 +75,7 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent, ShadedBac
         // Use direct spigot method (deprecated, but lacks MiniMessage in 1.17 to fix)
         //   Have to use this because paper apis don't allow converting MiniMessage strings yet
         //    and thus we cannot obtain the right Component instance to use the paper method.
-        sender.spigot().sendMessage(BungeeComponentSerializer.get().serialize(this.component));
+        sender.spigot().sendMessage(SERIALIZER.serialize(this.component));
     }
 
     @Override

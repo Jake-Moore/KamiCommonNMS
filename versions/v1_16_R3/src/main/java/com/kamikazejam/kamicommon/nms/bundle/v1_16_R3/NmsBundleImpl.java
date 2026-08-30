@@ -25,10 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_16_R3;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -80,19 +76,15 @@ public class NmsBundleImpl implements NmsBundle {
         return new Teleporter1_16_R3();
     }
 
-    @Override
-    public @NotNull VersionedComponent componentFrom(@NotNull Component component) {
-        return new VersionedComponent_1_16_R3(component);
-    }
 
     @Override
     public @NotNull VersionedComponent componentFromPlainText(@NotNull String text) {
-        return new VersionedComponent_1_16_R3(PlainTextComponentSerializer.plainText().deserialize(text));
+        return VersionedComponent_1_16_R3.fromPlainText(text);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) {
-        return new VersionedComponent_1_16_R3(MiniMessage.miniMessage().deserialize(miniMessage));
+        return VersionedComponent_1_16_R3.fromMiniMessage(miniMessage);
     }
 
     @Override
@@ -102,12 +94,12 @@ public class NmsBundleImpl implements NmsBundle {
 
     @Override
     public @NotNull VersionedComponent componentFromLegacyAmpersand(@NotNull String legacy) {
-        return new VersionedComponent_1_16_R3(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
+        return VersionedComponent_1_16_R3.fromLegacyAmpersand(legacy);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromLegacySection(@NotNull String legacy) {
-        return new VersionedComponent_1_16_R3(LegacyComponentSerializer.legacySection().deserialize(legacy));
+        return VersionedComponent_1_16_R3.fromLegacySection(legacy);
     }
 
     @Override

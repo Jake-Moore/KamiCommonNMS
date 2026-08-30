@@ -17,7 +17,6 @@ import com.kamikazejam.kamicommon.nms.provider.Provider;
 import com.kamikazejam.kamicommon.nms.text.ComponentLoggerAdapter;
 import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import com.kamikazejam.kamicommon.nms.wrappers.NMSWrapper;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.NMSPacketHandler;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
@@ -129,7 +128,10 @@ public interface NmsBundle {
     // because they are not equivalent. The native serializers are the reason there is a boundary
     // here at all.
 
-    default @NotNull VersionedComponent componentFrom(@NotNull Component component) { throw missing("componentFrom"); }
+    // componentFrom(Component) deliberately does NOT live here. A shaded-typed method declared on
+    // this interface is harmless in a descriptor, but each module's NmsBundleImpl OVERRODE it, and
+    // verifying an override loads the parameter type. That made Class.forName on any adapter resolve
+    // the shaded Adventure copy. It now lives on ShadedComponentBridge, loaded on demand.
 
     default @NotNull VersionedComponent componentFromPlainText(@NotNull String text) { throw missing("componentFromPlainText"); }
 

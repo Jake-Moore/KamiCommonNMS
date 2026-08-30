@@ -57,7 +57,12 @@ public class VersionedComponentSerializer {
 
     public @NotNull VersionedComponent fromInternalComponent(@NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component component) {
         Preconditions.checkNotNull(component, "component cannot be null");
-        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFrom(component);
+        // Routed through the shaded bridge rather than the adapter. Declaring a shaded-typed method
+        // on NmsBundleImpl made loading ANY capability from a module resolve the shaded Adventure:
+        // on 26.2, commandMapModifier dispatches to v1_17_R1 and dragged it in on a server that has
+        // Adventure natively. See ShadedComponentBridge.
+        NmsBundle bundle = bundleFor(NmsVersion.getFormattedNmsInteger());
+        return NmsBundles.shadedBridgeFor(bundle).componentFrom(component);
     }
 
     public @NotNull VersionedComponent fromPlainText(@NotNull String text) {

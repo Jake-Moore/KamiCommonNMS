@@ -1,0 +1,71 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Auto-merge GitHub Actions updates.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github-actions",
+      "groupSlug": "github-actions",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "minimumReleaseAge": "0 days"
+    },
+    {
+      "description": "Group all non-major updates together and auto-merge. bumpVersions is what stops an auto-merged update releasing over the top of the previous one: a merge to main publishes immediately, and the publish overwrites whatever is already at that coordinate. Note this project uses `val VERSION`, not `var`, and plain semver with no prerelease suffix.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "automerge": true,
+      "bumpVersions": [
+        {
+          "filePatterns": [
+            "^build\\.gradle\\.kts$"
+          ],
+          "matchStrings": [
+            "^[\\s]*val\\s+VERSION\\s*=\\s*\"(\\d+\\.\\d+\\.\\d+)\"[\\s]*(?://.*)?$"
+          ],
+          "bumpType": "patch"
+        }
+      ]
+    },
+    {
+      "description": "Require approval for major updates.",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "Keep gradle-wrapper on its own branch. Updating it makes Renovate run ./gradlew in its container, which fails on this build because it needs JDK 17 and 25 through foojay. While the wrapper shared a branch with everything else, that one failure errored the entire non-major batch, and the last successful grouped PR on the sibling repo was nine months before anyone noticed.",
+      "matchManagers": [
+        "gradle-wrapper"
+      ],
+      "groupName": "gradle-wrapper",
+      "automerge": false
+    },
+    {
+      "description": "paperweight-userdev is never auto-merged. It decompiles and remaps Paper, and CI keys its paperweight cache on the build files while falling back to restore-keys, so a plugin bump restores the PREVIOUS version's derived output and goes green without ever exercising the new one. The beta.22 to beta.23 bump passed CI that way. Until the cache key includes the plugin version, a human has to confirm this one really built.",
+      "matchPackageNames": [
+        "io.papermc.paperweight.userdev",
+        "io.papermc.paperweight**"
+      ],
+      "automerge": false
+    }
+  ],
+  "ignoreUnstable": true,
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "timezone": "America/Los_Angeles",
+  "schedule": [
+    "* 0-6 * * *"
+  ]
+}

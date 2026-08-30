@@ -19,7 +19,7 @@ public enum ClickAction {
     /**
      * Copies the value to the player's clipboard.
      * <p>
-     * <b>Not available before 1.15.</b> Implementations below that version throw
+     * <b>Not available before 1.16.</b> Implementations below that version throw
      * {@link UnsupportedOperationException} naming the server version rather than dropping the
      * behaviour silently, because a click that quietly does nothing is worse than one that fails
      * loudly during development.

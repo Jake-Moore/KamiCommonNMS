@@ -80,7 +80,7 @@ jobs:
           restore-keys: paperweight-${{ runner.os }}-
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
         with:
           # Follow the wrapper rather than pinning. These were pinned to a fixed version while the
           # wrapper said something else, so CI and local builds ran different Gradle versions and a
@@ -173,7 +173,7 @@ jobs:
         restore-keys: paperweight-${{ runner.os }}-
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+      uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
       with:
         # Follow the wrapper rather than pinning. These were pinned to a fixed version while the
         # wrapper said something else, so CI and local builds ran different Gradle versions and a
@@ -192,7 +192,7 @@ jobs:
 
       # Update the README.md Badge with the new version
     - name: Create Version Badge
-      uses: schneegans/dynamic-badges-action@v1.7.0
+      uses: schneegans/dynamic-badges-action@v1.9.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: 25b97e226e0ecf38e0135223111fd115
@@ -203,7 +203,7 @@ jobs:
 
       # Update the README.md Badge with the new paper version
     - name: Create Paper NMS Version Badge
-      uses: schneegans/dynamic-badges-action@v1.7.0
+      uses: schneegans/dynamic-badges-action@v1.9.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: 25b97e226e0ecf38e0135223111fd115
@@ -244,7 +244,7 @@ jobs:
           restore-keys: paperweight-${{ runner.os }}-
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
         with:
           # Follow the wrapper rather than pinning. These were pinned to a fixed version while the
           # wrapper said something else, so CI and local builds ran different Gradle versions and a

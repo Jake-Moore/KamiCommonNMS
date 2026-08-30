@@ -45,12 +45,11 @@
       "automerge": false
     },
     {
-      "description": "NEVER update the per-module server API pins. These are not outdated dependencies, they ARE the multi-version architecture: versions/v1_10_R1 must compile against 1.10.2's NMS, v1_8_R1 against 1.8's, and so on. Renovate's first batch collapsed all sixteen org.spigotmc:spigot-server pins onto 1.16.5-R0.1, which would have pointed every module at one Minecraft version. It also rewrote the tacospigot coordinate from 1.8.8-R0.2-REDUCED-KC to 1.8.8-R0.2-REDUCED, dropping a custom suffix because REDUCED sorts above REDUCED-KC. com.sk89q.worldedit:bukkit is pinned at 6.1.9 because worlds6 targets the WorldEdit 6 API on purpose. There is no correct newer version for any of these. com.sk89q.worldedit:fawe is pinned for the same reason as tacospigot: only two versions exist on the Nexus, 2.4.5 from 2024 and 19.11.13 which is a 2019 build with a date-style version that sorts higher. Renovate proposed it as an upgrade; it is 5.7MB against 14.9MB and does not contain com.fastasyncworldedit.core.extent.clipboard.io, which WorldEdit7 imports.",
+      "description": "NEVER update the per-module server API pins. These are not outdated dependencies, they ARE the multi-version architecture: versions/v1_10_R1 must compile against 1.10.2's NMS, v1_8_R1 against 1.8's, and so on. Renovate's first batch collapsed all sixteen org.spigotmc:spigot-server pins onto 1.16.5-R0.1, which would have pointed every module at one Minecraft version. It also rewrote the tacospigot coordinate from 1.8.8-R0.2-REDUCED-KC to 1.8.8-R0.2-REDUCED, dropping a custom suffix because REDUCED sorts above REDUCED-KC. com.sk89q.worldedit:bukkit is pinned at 6.1.9 because worlds6 targets the WorldEdit 6 API on purpose. There is no correct newer version for any of these.",
       "matchPackageNames": [
         "org.spigotmc:spigot-server",
         "net.techcable.tacospigot:server",
-        "com.sk89q.worldedit:bukkit",
-        "com.sk89q.worldedit:fawe"
+        "com.sk89q.worldedit:bukkit"
       ],
       "enabled": false
     },
@@ -104,6 +103,13 @@
         "com.sk89q.worldguard:worldguard-bukkit"
       ],
       "allowedVersions": "<=7.0.9"
+    },
+    {
+      "description": "FAWE stays on the 2.x line. This is a version-sorting trap, not a version decision: only two builds exist on the Nexus, 2.4.5 from 2024 and 19.11.13, which is a 2019 build whose date-style version sorts higher than every real release. Renovate proposed it as an upgrade. It is 5.7MB against 14.9MB and does not contain com.fastasyncworldedit.core.extent.clipboard.io, which WorldEdit7 imports. A cap rather than enabled:false, so a genuine 2.x release is still offered while anything date-shaped is excluded. Disabling outright would have hidden real updates too, and a closed PR guards nothing because Renovate simply reopens it.",
+      "matchPackageNames": [
+        "com.sk89q.worldedit:fawe"
+      ],
+      "allowedVersions": "<3.0.0"
     }
   ],
   "ignoreUnstable": true,

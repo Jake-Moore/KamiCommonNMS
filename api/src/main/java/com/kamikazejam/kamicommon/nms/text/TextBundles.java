@@ -13,9 +13,9 @@ import java.util.Map;
  * loads adapters from the plugin classloader; these come from the CHILD loader that holds the
  * relocated Adventure, because they are the implementations that name it.
  *
- * <p>Only the tiers that use the relocated copy go through here, meaning servers below 1.21.4. From
- * 1.21.4 upward the server has Adventure natively and {@code v1_21_4} implements text directly with
- * no indirection.
+ * <p>Only the tiers that use the relocated copy go through here, meaning servers below 1.18.2:
+ * {@code v1_11_R1}, {@code v1_15_R1}, {@code v1_16_R3} and {@code v1_17_R1}. From 1.18.2 upward the
+ * server has Adventure natively and those modules implement text directly with no indirection.
  */
 @ApiStatus.Internal
 public final class TextBundles {

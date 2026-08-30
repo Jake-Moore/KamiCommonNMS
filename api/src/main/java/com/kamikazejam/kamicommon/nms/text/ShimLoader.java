@@ -15,7 +15,7 @@ import java.net.URLClassLoader;
  * CHILD classloader.
  *
  * <p><b>Why a nested jar rather than shading it flat.</b> The relocated Adventure exists only for
- * servers with no native Adventure, meaning everything below 1.21.4. Shading it as ordinary class
+ * servers with no native Adventure, meaning everything below 1.18.2. Shading it as ordinary class
  * entries made it importable by every consumer, and dependency scoping cannot fix that: measured
  * 2026-08-30, a {@code spigot-jar} consumer compiled against the shaded Adventure successfully even
  * with the dependency declared runtime-only, because scope metadata cannot hide bytes that are

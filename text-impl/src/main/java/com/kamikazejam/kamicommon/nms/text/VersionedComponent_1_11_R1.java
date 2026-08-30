@@ -124,7 +124,7 @@ public class VersionedComponent_1_11_R1 implements VersionedComponent, ShadedBac
             case SUGGEST_COMMAND: return ClickEvent.suggestCommand(value);
             case OPEN_URL: return ClickEvent.openUrl(value);
             case COPY_TO_CLIPBOARD: throw new UnsupportedOperationException(
-                    "COPY_TO_CLIPBOARD needs Minecraft 1.15 or newer; this server dispatches to "
+                    "COPY_TO_CLIPBOARD needs Minecraft 1.16 or newer; this server dispatches to "
                             + VersionedComponent_1_11_R1.class.getSimpleName());
         }
         // Unreachable today. Kept so that adding a constant to ClickAction fails here rather than

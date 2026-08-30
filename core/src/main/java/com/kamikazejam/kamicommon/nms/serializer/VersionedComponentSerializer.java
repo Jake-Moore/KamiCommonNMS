@@ -17,8 +17,8 @@ public class VersionedComponentSerializer {
      * <p>
      * The thresholds are unchanged; they were simply repeated in all five factories below, which is
      * five places to keep in step. The modules up to 1.18.1 wrap the <i>shaded</i> adventure, while
-     * {@code v_latest} delegates to the server's own. That difference is the reason 1.18.2 is a
-     * boundary at all, so both paths are kept.
+     * every module from 1.18.2 up delegates to the server's own. That difference is the reason
+     * 1.18.2 is a boundary at all, so both paths are kept.
      * </p>
      *
      * @param ver the formatted NMS version integer
@@ -47,8 +47,8 @@ public class VersionedComponentSerializer {
         if (ver < f("1.17")) { return NmsBundles.forModule("v1_16_R3"); }
         // uses shaded serializers - 1.17.X to 1.18.1 (has adventure, but not MiniMessage)
         // 1.17 runs Java 16, so this cannot be v1_18_R1 (floor 17).
-        // Everything below 1.21.4 uses the shaded Adventure: the native implementation needs
-        // ItemMeta.customName(), which Paper only added in 1.21.4.
+        // Everything below 1.18.2 uses the shaded Adventure: those servers have no native
+        // Adventure of their own to delegate to.
         if (ver < f("1.18.2")) { return NmsBundles.forModule("v1_17_R1"); }
         // 1.18.2 is where native MiniMessage arrives. Everything from here up uses the server's own
         // Adventure, not the relocated copy, which also means these servers never extract the nested

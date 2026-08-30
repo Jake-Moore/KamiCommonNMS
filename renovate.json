@@ -45,11 +45,12 @@
       "automerge": false
     },
     {
-      "description": "NEVER update the per-module server API pins. These are not outdated dependencies, they ARE the multi-version architecture: versions/v1_10_R1 must compile against 1.10.2's NMS, v1_8_R1 against 1.8's, and so on. Renovate's first batch collapsed all sixteen org.spigotmc:spigot-server pins onto 1.16.5-R0.1, which would have pointed every module at one Minecraft version. It also rewrote the tacospigot coordinate from 1.8.8-R0.2-REDUCED-KC to 1.8.8-R0.2-REDUCED, dropping a custom suffix because REDUCED sorts above REDUCED-KC. com.sk89q.worldedit:bukkit is pinned at 6.1.9 because worlds6 targets the WorldEdit 6 API on purpose. There is no correct newer version for any of these.",
+      "description": "NEVER update the per-module server API pins. These are not outdated dependencies, they ARE the multi-version architecture: versions/v1_10_R1 must compile against 1.10.2's NMS, v1_8_R1 against 1.8's, and so on. Renovate's first batch collapsed all sixteen org.spigotmc:spigot-server pins onto 1.16.5-R0.1, which would have pointed every module at one Minecraft version. It also rewrote the tacospigot coordinate from 1.8.8-R0.2-REDUCED-KC to 1.8.8-R0.2-REDUCED, dropping a custom suffix because REDUCED sorts above REDUCED-KC. com.sk89q.worldedit:bukkit is pinned at 6.1.9 because worlds6 targets the WorldEdit 6 API on purpose. There is no correct newer version for any of these. com.sk89q.worldedit:fawe is pinned for the same reason as tacospigot: only two versions exist on the Nexus, 2.4.5 from 2024 and 19.11.13 which is a 2019 build with a date-style version that sorts higher. Renovate proposed it as an upgrade; it is 5.7MB against 14.9MB and does not contain com.fastasyncworldedit.core.extent.clipboard.io, which WorldEdit7 imports.",
       "matchPackageNames": [
         "org.spigotmc:spigot-server",
         "net.techcable.tacospigot:server",
-        "com.sk89q.worldedit:bukkit"
+        "com.sk89q.worldedit:bukkit",
+        "com.sk89q.worldedit:fawe"
       ],
       "enabled": false
     },
@@ -84,6 +85,25 @@
       "groupName": "build system",
       "groupSlug": "build-system",
       "automerge": false
+    },
+    {
+      "description": "Adventure stays on 4.x. Adventure 5 is compiled at Java 21, and :text is the shaded Adventure that a 1.8.8 server loads, so taking it would end Java 8 support outright. verifyTextFloor caught this on the 5.2.0 PR by reading the class file: PlainTextComponentSerializer$Builder is class-file major 65 against a declared floor of 8. Revisit only if the floor for :text ever moves.",
+      "matchPackageNames": [
+        "net.kyori:adventure-api",
+        "net.kyori:adventure-text-minimessage",
+        "net.kyori:adventure-text-serializer-gson",
+        "net.kyori:adventure-text-serializer-plain",
+        "net.kyori:adventure-text-serializer-legacy",
+        "net.kyori:adventure-text-serializer-bungeecord"
+      ],
+      "allowedVersions": "<5.0.0"
+    },
+    {
+      "description": "worldguard-bukkit stays below any version needing Java 25. 7.0.18 declares org.gradle.jvm.version 25, and worlds7 compiles at Java 17 because worldguard-bukkit 7.0.9 is class-file major 61. Resolution fails outright rather than compiling, so this is not a soft warning. Revisit if the worlds7 floor ever moves.",
+      "matchPackageNames": [
+        "com.sk89q.worldguard:worldguard-bukkit"
+      ],
+      "allowedVersions": "<=7.0.9"
     }
   ],
   "ignoreUnstable": true,

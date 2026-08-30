@@ -79,11 +79,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
         with:
-          # Follow the wrapper rather than pinning. These were pinned to 9.0.0 while the wrapper
-        # said something else, so CI and local builds ran different Gradle versions and a
-        # wrapper bump could never affect CI. That is why the shadow 9.6.1 update stayed red
-        # even once the wrapper bump was in the same PR.
-        gradle-version: wrapper
+          # Follow the wrapper rather than pinning. These were pinned to a fixed version while the
+          # wrapper said something else, so CI and local builds ran different Gradle versions and a
+          # wrapper bump could never affect CI.
+          gradle-version: wrapper
 
       - name: Build with Gradle (1.8.8)
         run: gradle build
@@ -173,10 +172,9 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
       with:
-        # Follow the wrapper rather than pinning. These were pinned to 9.0.0 while the wrapper
-        # said something else, so CI and local builds ran different Gradle versions and a
-        # wrapper bump could never affect CI. That is why the shadow 9.6.1 update stayed red
-        # even once the wrapper bump was in the same PR.
+        # Follow the wrapper rather than pinning. These were pinned to a fixed version while the
+        # wrapper said something else, so CI and local builds ran different Gradle versions and a
+        # wrapper bump could never affect CI.
         gradle-version: wrapper
 
     - name: Publish with Gradle
@@ -245,11 +243,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
         with:
-          # Follow the wrapper rather than pinning. These were pinned to 9.0.0 while the wrapper
-        # said something else, so CI and local builds ran different Gradle versions and a
-        # wrapper bump could never affect CI. That is why the shadow 9.6.1 update stayed red
-        # even once the wrapper bump was in the same PR.
-        gradle-version: wrapper
+          # Follow the wrapper rather than pinning. These were pinned to a fixed version while the
+          # wrapper said something else, so CI and local builds ran different Gradle versions and a
+          # wrapper bump could never affect CI.
+          gradle-version: wrapper
 
       - name: Generate Javadocs
         run: gradle :core:aggregateJavadoc

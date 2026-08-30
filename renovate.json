@@ -53,6 +53,16 @@
       "automerge": false
     },
     {
+      "description": "Anything that RUNS the build gets its own branch and a human. Anything the build merely compiles against can batch and auto-merge. Every stuck batch on these repos has been the same shape: a build-system component bundled with libraries, where one incompatible member blocks all the rest. gradle-wrapper did it by erroring inside Renovate's container, which killed the grouped batch on KamiCommon for nine months. com.gradleup.shadow 9.6.1 then did it by needing a newer Gradle than the wrapper provides, failing with AdhocComponentWithVariants.addVariantsFromConfiguration on BOTH repos at once. The first instance was fixed specifically rather than as a class, so the second arrived unguarded. Measured locally: Gradle 9.7.1 with shadow 9.6.1 builds clean, so the wrapper is the unblocker. Expect a shadow PR to sit red until the wrapper moves. That is the signal, not a fault, and it no longer holds a dozen unrelated library updates hostage.",
+      "matchPackageNames": [
+        "com.gradleup.shadow",
+        "org.gradle.toolchains.foojay-resolver-convention"
+      ],
+      "groupName": "build system",
+      "groupSlug": "build-system",
+      "automerge": false
+    },
+    {
       "description": "NEVER update the per-module server API pins. These are not outdated dependencies, they ARE the multi-version architecture: versions/v1_10_R1 must compile against 1.10.2's NMS, v1_8_R1 against 1.8's, and so on. Renovate's first batch collapsed all sixteen org.spigotmc:spigot-server pins onto 1.16.5-R0.1, which would have pointed every module at one Minecraft version. It also rewrote the tacospigot coordinate from 1.8.8-R0.2-REDUCED-KC to 1.8.8-R0.2-REDUCED, dropping a custom suffix because REDUCED sorts above REDUCED-KC. com.sk89q.worldedit:bukkit is pinned at 6.1.9 because worlds6 targets the WorldEdit 6 API on purpose. There is no correct newer version for any of these.",
       "matchPackageNames": [
         "org.spigotmc:spigot-server",

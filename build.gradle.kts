@@ -2,7 +2,7 @@
 val VERSION = "1.2.23" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
 
 plugins {
-    id("com.gradleup.shadow") version "9.2.2" apply false
+    id("com.gradleup.shadow") version "9.6.1" apply false
     // beta.23's own task classes are Java 21, and paperweight runs its workers in each module's
     //  toolchain JVM. That is fine because no module's toolchain is below 21: see the TOOLCHAIN
     //  note in versions/build.gradle.kts, where the toolchain is deliberately not the floor.

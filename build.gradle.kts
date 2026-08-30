@@ -32,7 +32,15 @@ ext {
     // project property exposing the highest paper version currently verified to work
     //   the project may support newer versions, but we have not tested or compiled against them yet
     set("highestPaperDep", highestPaperDep)
-    // NOTE: The standalone-utils module must support Java 17 since it's used in nms modules requiring Java 17
+    // standalone-utils is compileOnly in all four places NMS references it, so it is never bundled:
+    // the parser that actually runs arrives inside the consuming KamiCommon jar. That is also what
+    // stops the two repos deadlocking, since standalone-utils names nothing from NMS.
+    // The pin still matters for COMPILE-time correctness: anything reasoning about dispatch from
+    // this classpath gets that version's answers. Verified 2026-08-30 against alpha.40, which
+    // encodes 26.2.build.115 as 260200 and 1.21.11 as 12111, so it reads both eras correctly.
+    // (The previous note here claimed this module must support Java 17 'since it's used in nms
+    //  modules requiring Java 17'. That predates the floor work: standalone-utils is floor 8 now
+    //  and every versions/* toolchain is 21 or 25, so the constraint it described no longer exists.)
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.40")
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.46")

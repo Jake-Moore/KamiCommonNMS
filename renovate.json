@@ -110,6 +110,13 @@
         "com.sk89q.worldedit:fawe"
       ],
       "allowedVersions": "<3.0.0"
+    },
+    {
+      "description": "gradle/actions stays on the 5.x line, for two independent reasons. TECHNICAL: v6.3.0 breaks the build. :versions:v1_17_R1:paperweightUserdevSetup fails with paperweight's own GenerateMappingsParams (class-file major 65) running on a Java 17 runtime, while the module's toolchain is 21. Confirmed by controlled elimination, not by guessing: PR #96 and PR #94 shared base 472a574c, both took actions/checkout v7, actions/setup-java v6 and actions/cache v4->v6, and the ONLY difference between them was setup-gradle v5.0.2 versus v6.3.0. #96 was green, #94 was red. The mechanism is still unknown; the cause is not. LICENSING: v6 extracts caching into gradle-actions-caching, a proprietary component not covered by the MIT licence, and the release notes state that upgrading constitutes acceptance of separate Terms of Use. These workflows enable caching, so that component would be in use. Revisit only if both the build failure is understood and the licence terms are accepted.",
+      "matchPackageNames": [
+        "gradle/actions"
+      ],
+      "allowedVersions": "<6.0.0"
     }
   ],
   "ignoreUnstable": true,

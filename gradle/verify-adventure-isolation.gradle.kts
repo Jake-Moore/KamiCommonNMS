@@ -102,7 +102,39 @@ val verifyAdventureIsolation = tasks.register("verifyAdventureIsolation") {
             )
         }
 
-        // 3. nothing loose, anywhere
+        // 3. the nested jar's own classes must still meet the floor. verifyFloors walks loose entries
+        //    and cannot see inside a jar-in-jar, so without this the classes that moved in there
+        //    stopped being floor-checked entirely. They load on 1.8.8, so they must be major 52.
+        var worstMajor = 0
+        var worstName = ""
+        ZipInputStream(bytes.inputStream()).use { zin ->
+            while (true) {
+                val e = zin.nextEntry ?: break
+                if (!e.name.endsWith(".class")) continue
+                val head = ByteArrayOutputStream()
+                val buf = ByteArray(8)
+                var read = 0
+                while (read < 8) {
+                    val n = zin.read(buf, 0, 8 - read)
+                    if (n <= 0) break
+                    head.write(buf, 0, n); read += n
+                }
+                val b = head.toByteArray()
+                if (b.size < 8) continue
+                val major = ((b[6].toInt() and 0xFF) shl 8) or (b[7].toInt() and 0xFF)
+                if (major > worstMajor) { worstMajor = major; worstName = e.name }
+            }
+        }
+        if (worstMajor > 52) {
+            throw GradleException(
+                "the nested jar contains class-file major $worstMajor ($worstName), above Java 8. " +
+                        "Everything in there loads on a 1.8.8 server through the child classloader, so " +
+                        "anything above major 52 is an UnsupportedClassVersionError waiting for the " +
+                        "first old server that touches text."
+            )
+        }
+
+        // 4. nothing loose, anywhere
         if (looseRelocated > 0) {
             throw GradleException(
                 "$looseRelocated relocated Adventure classes are loose in the jar. They must live " +
@@ -129,7 +161,7 @@ val verifyAdventureIsolation = tasks.register("verifyAdventureIsolation") {
         }
         println("verifyAdventureIsolation: $scanned classes outside the nested jar reference no " +
                 "relocated Adventure, $nestedRelocated relocated classes and $nestedImpls text " +
-                "implementations sealed inside it")
+                "implementations sealed inside it, highest major $worstMajor")
     }
 }
 

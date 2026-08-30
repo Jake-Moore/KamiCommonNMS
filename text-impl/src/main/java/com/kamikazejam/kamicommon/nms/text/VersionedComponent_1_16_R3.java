@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * Uses BungeeComponentSerializer.get() since 1.16 added hex color support
  */
+@ApiStatus.Internal
 public class VersionedComponent_1_16_R3 implements VersionedComponent, ShadedBacked {
     private final @NotNull Component component;
     public VersionedComponent_1_16_R3(@NotNull Component component) {

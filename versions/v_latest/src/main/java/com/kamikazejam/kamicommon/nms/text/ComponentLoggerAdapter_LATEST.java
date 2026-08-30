@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.plugin.Plugin;
@@ -22,6 +23,7 @@ import java.util.logging.Level;
  * finding: fix it here and in the twin, and add a ladder branch if the two must now differ.
  * </p>
  */
+@ApiStatus.Internal
 public class ComponentLoggerAdapter_LATEST implements ComponentLoggerAdapter {
     public void log(@NotNull Plugin plugin, @NotNull VersionedComponent message, @NotNull Level level) {
         // This is the new implementation for versions after paper added adventure support

@@ -29,14 +29,27 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Confirmed For: 1_18_R2 to 1.21.8, 1.21.9
- * <br>
- * 1_18_R2 was the first version of paper to ship with kyori adventure **MiniMessage** support.
+ * The native Adventure implementation for 1.18.2 through 1.21.3.
+ *
+ * <p>These servers have had native Adventure with MiniMessage since 1.18.2 and were only using the
+ * relocated copy because {@code VersionedComponent_1_21_4} needs {@code ItemMeta.customName()},
+ * which Paper added in 1.21.4. That is avoidable: {@code ItemMeta.setDisplayName(String)} has existed
+ * since 1.8, so this writes item names as legacy section-coded strings and uses native Adventure for
+ * everything else.
+ *
+ * <p>Worth more than it looks. Since the relocated Adventure moved into a nested jar, every server
+ * below 1.21.4 extracts roughly 1.5 MB to disk at enable and builds a child classloader to read it.
+ * This tier removes that for ten versions, 1.18.2 through 1.21.3, and renders through the server's
+ * own Adventure rather than a bundled 4.x copy.
+ *
+ * <p>The fidelity cost is real and bounded: legacy section codes cannot express hover or click on an
+ * item name, which item names do not support anyway, and cannot express full RGB below 1.16. Every
+ * server this tier serves is 1.18.2 or newer, so RGB is available through the section-code extension.
  */
 @ApiStatus.Internal
-public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
+public class VersionedComponent_1_18_R2 implements ModernVersionedComponent {
     private final @NotNull Component component;
-    private VersionedComponent_1_21_4(@NotNull Component component) {
+    private VersionedComponent_1_18_R2(@NotNull Component component) {
         this.component = component;
     }
 
@@ -77,37 +90,40 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
     }
 
     @Internal
-    public static @NotNull VersionedComponent_1_21_4 fromJson(@NotNull String json) {
-        return new VersionedComponent_1_21_4(net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().deserialize(json));
+    public static @NotNull VersionedComponent_1_18_R2 fromJson(@NotNull String json) {
+        return new VersionedComponent_1_18_R2(net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(json));
     }
 
     @Internal
-    public static @NotNull VersionedComponent_1_21_4 fromPlainText(@NotNull String plainText) {
+    public static @NotNull VersionedComponent_1_18_R2 fromPlainText(@NotNull String plainText) {
         Preconditions.checkNotNull(plainText, "plainText cannot be null");
-        return new VersionedComponent_1_21_4(PlainTextComponentSerializer.plainText().deserialize(plainText));
+        return new VersionedComponent_1_18_R2(PlainTextComponentSerializer.plainText().deserialize(plainText));
     }
 
     @Internal
-    public static @NotNull VersionedComponent_1_21_4 fromMiniMessage(@NotNull String miniMessage) {
+    public static @NotNull VersionedComponent_1_18_R2 fromMiniMessage(@NotNull String miniMessage) {
         Preconditions.checkNotNull(miniMessage, "miniMessage cannot be null");
-        return new VersionedComponent_1_21_4(MiniMessage.miniMessage().deserialize(miniMessage));
+        return new VersionedComponent_1_18_R2(MiniMessage.miniMessage().deserialize(miniMessage));
     }
 
     @Internal
-    public static @NotNull VersionedComponent_1_21_4 fromLegacyAmpersand(@NotNull String legacy) {
+    public static @NotNull VersionedComponent_1_18_R2 fromLegacyAmpersand(@NotNull String legacy) {
         Preconditions.checkNotNull(legacy, "legacy cannot be null");
-        return new VersionedComponent_1_21_4(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
+        return new VersionedComponent_1_18_R2(LegacyComponentSerializer.legacyAmpersand().deserialize(legacy));
     }
 
     @Internal
-    public static @NotNull VersionedComponent_1_21_4 fromLegacySection(@NotNull String legacy) {
+    public static @NotNull VersionedComponent_1_18_R2 fromLegacySection(@NotNull String legacy) {
         Preconditions.checkNotNull(legacy, "legacy cannot be null");
-        return new VersionedComponent_1_21_4(LegacyComponentSerializer.legacySection().deserialize(legacy));
+        return new VersionedComponent_1_18_R2(LegacyComponentSerializer.legacySection().deserialize(legacy));
     }
 
+    // GsonComponentSerializer, not JSONComponentSerializer. The latter did not exist in the Adventure
+    // Paper shipped with 1.18.2; it arrived later in 4.x. Both emit Minecraft's component JSON, so the
+    // wire format is identical and a component crosses between this tier and v1_21_4 unchanged.
     @Override
     public @NotNull String serializeJson() {
-        return net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().serialize(this.component);
+        return net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serialize(this.component);
     }
 
     @Override
@@ -118,28 +134,28 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
     @Override
     public @NotNull VersionedComponent append(@NotNull VersionedComponent other) {
         @NotNull Component otherComp;
-        if (other instanceof VersionedComponent_1_21_4 vcLatest) {
+        if (other instanceof VersionedComponent_1_18_R2 vcLatest) {
             otherComp = vcLatest.component;
         } else {
             String miniMessage = other.serializeMiniMessage();
             otherComp = MiniMessage.miniMessage().deserialize(miniMessage);
         }
-        return new VersionedComponent_1_21_4(this.component.append(otherComp));
+        return new VersionedComponent_1_18_R2(this.component.append(otherComp));
     }
 
     @Override
     public @NotNull VersionedComponent click(@NotNull ClickAction action, @NotNull String value) {
-        return new VersionedComponent_1_21_4(this.component.clickEvent(toClickEvent(action, value)));
+        return new VersionedComponent_1_18_R2(this.component.clickEvent(toClickEvent(action, value)));
     }
 
     @Override
     public @NotNull VersionedComponent hover(@NotNull VersionedComponent tooltip) {
-        return new VersionedComponent_1_21_4(this.component.hoverEvent(HoverEvent.showText(nativeOf(tooltip))));
+        return new VersionedComponent_1_18_R2(this.component.hoverEvent(HoverEvent.showText(nativeOf(tooltip))));
     }
 
     @Override
     public @NotNull VersionedComponent decorate(@NotNull TextDecoration decoration, boolean value) {
-        return new VersionedComponent_1_21_4(this.component.decoration(toDecoration(decoration), value));
+        return new VersionedComponent_1_18_R2(this.component.decoration(toDecoration(decoration), value));
     }
 
     /**
@@ -152,7 +168,7 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
      * </p>
      */
     private static @NotNull Component nativeOf(@NotNull VersionedComponent other) {
-        if (other instanceof VersionedComponent_1_21_4 same) {
+        if (other instanceof VersionedComponent_1_18_R2 same) {
             return same.component;
         }
         return MiniMessage.miniMessage().deserialize(other.serializeMiniMessage());
@@ -184,20 +200,15 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
     // ------------------------------------------------------------ //
     //                        STATIC METHODS                        //
     // ------------------------------------------------------------ //
+    @SuppressWarnings("deprecation")
     public static @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent name) {
         if (name == null) {
-            meta.displayName(null);
+            meta.setDisplayName(null);
             return meta;
         }
-
-        @NotNull Component nameComponent;
-        if (name instanceof VersionedComponent_1_21_4 vcLatest) {
-            nameComponent = vcLatest.component;
-        } else {
-            String miniMessage = name.serializeMiniMessage();
-            nameComponent = MiniMessage.miniMessage().deserialize(miniMessage);
-        }
-        meta.customName(nameComponent);
+        // Legacy section codes rather than customName(), which is the whole reason this tier exists.
+        // setDisplayName(String) has existed since 1.8; customName() arrived in Paper 1.21.4.
+        meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(nativeOf(name)));
         return meta;
     }
     public static @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
@@ -207,7 +218,7 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
         }
         List<Component> serializedLore = new ArrayList<>();
         for (VersionedComponent vc : lore) {
-            if (vc instanceof VersionedComponent_1_21_4 vcLatest) {
+            if (vc instanceof VersionedComponent_1_18_R2 vcLatest) {
                 serializedLore.add(vcLatest.component);
             } else {
                 String miniMessage = vc.serializeMiniMessage();
@@ -228,24 +239,22 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
         }
         List<VersionedComponent> vcList = new ArrayList<>();
         for (Component line : lore) {
-            vcList.add(new VersionedComponent_1_21_4(line));
+            vcList.add(new VersionedComponent_1_18_R2(line));
         }
         return vcList;
     }
+    @SuppressWarnings("deprecation")
     public static @Nullable VersionedComponent getDisplayName(@NotNull ItemMeta meta) {
-        if (!meta.hasCustomName()) {
+        if (!meta.hasDisplayName()) {
             return null;
         }
-        Component name = meta.customName();
-        if (name == null) {
-            return null;
-        }
-        return new VersionedComponent_1_21_4(name);
+        return new VersionedComponent_1_18_R2(
+                LegacyComponentSerializer.legacySection().deserialize(meta.getDisplayName()));
     }
     public static @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent line) {
         List<Component> lore = (meta.hasLore() && meta.lore() != null) ? meta.lore() : Collections.emptyList();
         List<Component> newLore = new ArrayList<>(Objects.requireNonNull(lore));
-        if (line instanceof VersionedComponent_1_21_4 vcLatest) {
+        if (line instanceof VersionedComponent_1_18_R2 vcLatest) {
             newLore.add(vcLatest.component);
         } else {
             String miniMessage = line.serializeMiniMessage();
@@ -282,8 +291,8 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
      * </p>
      */
     @Internal
-    public static @NotNull VersionedComponent_1_21_4 fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
-        return new VersionedComponent_1_21_4(MiniMessage.miniMessage().deserialize(miniMessage, toResolver(placeholders)));
+    public static @NotNull VersionedComponent_1_18_R2 fromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
+        return new VersionedComponent_1_18_R2(MiniMessage.miniMessage().deserialize(miniMessage, toResolver(placeholders)));
     }
 
     private static @NotNull TagResolver toResolver(@NotNull TextPlaceholder[] placeholders) {

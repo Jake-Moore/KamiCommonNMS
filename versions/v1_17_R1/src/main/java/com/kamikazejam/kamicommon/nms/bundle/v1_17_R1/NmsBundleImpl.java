@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.bundle.v1_17_R1;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.AbstractMessageManager;
 import com.kamikazejam.kamicommon.nms.abstraction.command.CommandMapModifier;
@@ -39,6 +40,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  * accessor here, or {@code :core} cannot reach it.
  * </p>
  */
+@ApiStatus.Internal
 public class NmsBundleImpl implements NmsBundle {
 
     @Override

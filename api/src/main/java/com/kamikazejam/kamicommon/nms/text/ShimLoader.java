@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -38,6 +39,7 @@ import java.net.URLClassLoader;
  * three-plugin topology where one plugin shades this library, a second depends on that plugin, and a
  * third shades its own copy.
  */
+@ApiStatus.Internal
 public final class ShimLoader {
 
     private static final String NESTED = "internal-libs/adventure.jar";

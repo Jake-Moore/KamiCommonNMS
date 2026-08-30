@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.NmsAPI;
 import com.kamikazejam.kamicommon.nms.abstraction.chat.AbstractMessageManager;
 import com.kamikazejam.kamicommon.nms.abstraction.itemtext.AbstractItemTextPre_1_17;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see AbstractMessageManager
  */
+@ApiStatus.Internal
 public class MessageManagerProvider extends Provider<AbstractMessageManager> {
     /**
      * {@inheritDoc}

@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,7 @@ import java.util.List;
  * classloader. Lives in the nested jar because everything it delegates to names the relocated
  * Adventure.
  */
+@ApiStatus.Internal
 public final class TextBundleImpl_v1_16_R3 implements TextBundle {
 
     @Override

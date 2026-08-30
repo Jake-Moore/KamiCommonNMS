@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.provider;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundles;
 import com.kamikazejam.kamicommon.nms.text.ComponentLoggerAdapter;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see ComponentLoggerAdapter
  */
+@ApiStatus.Internal
 public class ComponentLoggerAdapterProvider extends Provider<ComponentLoggerAdapter> {
     /**
      * {@inheritDoc}

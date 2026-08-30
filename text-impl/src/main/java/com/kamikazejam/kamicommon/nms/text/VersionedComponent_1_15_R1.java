@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Confirmed For: 1_12_R1, 1_13_R1, 1_14_R1, 1_15_R1
  */
+@ApiStatus.Internal
 public class VersionedComponent_1_15_R1 implements VersionedComponent, ShadedBacked {
     private final @NotNull Component component;
     public VersionedComponent_1_15_R1(@NotNull Component component) {

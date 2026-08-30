@@ -49,7 +49,12 @@ public class VersionedComponentSerializer {
         // 1.17 runs Java 16, so this cannot be v1_18_R1 (floor 17).
         // Everything below 1.21.4 uses the shaded Adventure: the native implementation needs
         // ItemMeta.customName(), which Paper only added in 1.21.4.
-        if (ver < f("1.21.4")) { return NmsBundles.forModule("v1_17_R1"); }
+        if (ver < f("1.18.2")) { return NmsBundles.forModule("v1_17_R1"); }
+        // 1.18.2 is where native MiniMessage arrives. Everything from here up uses the server's own
+        // Adventure, not the relocated copy, which also means these servers never extract the nested
+        // jar or build the child classloader. v1_18_R2 writes item names as legacy section codes
+        // because ItemMeta.customName() does not exist until 1.21.4.
+        if (ver < f("1.21.4")) { return NmsBundles.forModule("v1_18_R2"); }
         // 1.21.4+ can use the native Adventure apis, because that is where ItemMeta.customName()
         // arrived. That is v1_21_4, not v_latest: 1.21.4 runs Java 21 and v_latest targets 25.
         return NmsBundles.forModule("v1_21_4");

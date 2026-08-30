@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.text;
 
+import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.util.Preconditions;
 import java.util.Collections;
 import net.kyori.adventure.text.Component;
@@ -43,6 +44,7 @@ import java.util.Objects;
  * Everything that actually calls a Paper API is identical, which is the part being checked.
  * </p>
  */
+@ApiStatus.Internal
 public class VersionedComponent_LATEST implements VersionedComponent {
     private final @NotNull Component component;
     private VersionedComponent_LATEST(@NotNull Component component) {

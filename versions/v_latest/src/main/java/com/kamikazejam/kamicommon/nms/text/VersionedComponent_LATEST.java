@@ -1,6 +1,5 @@
 package com.kamikazejam.kamicommon.nms.text;
 
-import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import com.kamikazejam.kamicommon.util.Preconditions;
 import java.util.Collections;
 import net.kyori.adventure.text.Component;
@@ -87,10 +86,7 @@ public class VersionedComponent_LATEST implements VersionedComponent {
     }
 
     @Internal
-    public static @NotNull VersionedComponent_LATEST fromInternalComponent(@NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component component) {
-        Preconditions.checkNotNull(component, "component cannot be null");
-        // Use JSON to convert between shaded and native component types
-        String json = JSONComponentSerializer.json().serialize(component);
+    public static @NotNull VersionedComponent_LATEST fromJson(@NotNull String json) {
         return new VersionedComponent_LATEST(net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().deserialize(json));
     }
 
@@ -119,10 +115,8 @@ public class VersionedComponent_LATEST implements VersionedComponent {
     }
 
     @Override
-    public @NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component asInternalComponent() {
-        // We need to adapt the native component to the shaded component type. Use JSON as a bridge
-        String json = net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().serialize(this.component);
-        return JSONComponentSerializer.json().deserialize(json);
+    public @NotNull String serializeJson() {
+        return net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().serialize(this.component);
     }
 
     // Declared by ModernVersionedComponent, which this canary cannot implement. See the class

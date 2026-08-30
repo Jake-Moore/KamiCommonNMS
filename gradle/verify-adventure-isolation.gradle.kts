@@ -1,73 +1,28 @@
-import java.io.DataInputStream
+import java.io.ByteArrayOutputStream
 import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
-// No NmsBundleImpl may name the shaded Adventure in a method signature.
+// The relocated Adventure must exist ONLY inside internal-libs/adventure.jar, and nothing outside it
+// may reference the relocated package at all.
 //
-// Why this shape, and what it does NOT claim. On 2026-08-30 a 26.2 server booted from a jar with the
-// shaded Adventure deleted died at plugin enable:
+// Why nested rather than shaded flat. The relocated copy serves servers with no native Adventure,
+// meaning everything below 1.21.4. Shaded flat, its classes are ordinary classpath entries and every
+// consumer can import them. Dependency scoping cannot fix that: measured 2026-08-30, a spigot-jar
+// consumer compiled against the shaded Adventure successfully while it was declared runtime-only,
+// because scope metadata cannot hide bytes that are physically present. Nested, the classes are not
+// classpath entries at all, and that survives a consumer shading this library into their own uber
+// jar, which is the property scoping could not give.
 //
-//   NoClassDefFoundError: ...nms/text/kyori/adventure/text/Component
-//       at NmsBundles.load(NmsBundles.java:54)
-//       at CommandMapModifierProvider.provide(...)
-//
-// commandMapModifier dispatches to v1_17_R1, so loading that module's adapter for a capability with
-// nothing to do with text dragged the shaded copy onto a server that has Adventure natively. The
-// adapter declared componentFrom(Component), inherited from NmsBundle.
-//
-// I could not reproduce that load-time resolution outside a real server. Class.forName plus
-// newInstance in an isolated URLClassLoader loads the same adapter cleanly, with the same bug
-// deliberately reinjected and confirmed present in the jar. HotSpot defers this; Bukkit's
-// PluginClassLoader evidently does not. So a behavioural probe would be a check whose failure branch
-// I cannot demonstrate, which is worth nothing.
-//
-// This checks the PATTERN instead, which is deterministic: the shaded type must not appear in any
-// adapter's method signatures. That is exactly the shape that broke, it is provable, and its failure
-// branch is demonstrated by reinjecting the bug. It does not claim to catch every possible way a
-// module could reach the shaded copy; the server-level strip test in
-// runs/2026-08-30-adventure-strip-acceptance.md remains the behavioural acceptance.
+// This check is deliberately stricter than the one it replaces. That one allowed the relocated
+// package in any class except an NmsBundleImpl signature. Now the answer is simply zero, outside the
+// nested jar, which is an invariant with no exemption list to rot.
 
-val SHADED_DESCRIPTOR = "Lcom/kamikazejam/kamicommon/nms/text/kyori/"
-
-/** Every method descriptor a class declares, read straight from the constant pool. */
-fun methodDescriptors(bytes: ByteArray): List<Pair<String, String>> {
-    DataInputStream(bytes.inputStream()).use { input ->
-        require(input.readInt() == -0x35014542) { "not a class file" }
-        input.readUnsignedShort(); input.readUnsignedShort()
-        val count = input.readUnsignedShort()
-        val utf8 = HashMap<Int, String>()
-        var i = 1
-        while (i < count) {
-            when (input.readUnsignedByte()) {
-                1 -> utf8[i] = input.readUTF()
-                7, 8, 16, 19, 20 -> input.skipBytes(2)
-                15 -> input.skipBytes(3)
-                3, 4, 9, 10, 11, 12, 17, 18 -> input.skipBytes(4)
-                5, 6 -> { input.skipBytes(8); i++ }
-                else -> throw IllegalStateException("unknown constant pool tag")
-            }
-            i++
-        }
-        input.skipBytes(2); input.skipBytes(2); input.skipBytes(2)
-        input.skipBytes(input.readUnsignedShort() * 2)                       // interfaces
-        repeat(input.readUnsignedShort()) {                                  // fields
-            input.skipBytes(6)
-            repeat(input.readUnsignedShort()) { input.skipBytes(2); input.skipBytes(input.readInt()) }
-        }
-        val out = ArrayList<Pair<String, String>>()
-        repeat(input.readUnsignedShort()) {                                  // methods
-            input.skipBytes(2)
-            val name = utf8[input.readUnsignedShort()] ?: "?"
-            val desc = utf8[input.readUnsignedShort()] ?: "?"
-            out.add(name to desc)
-            repeat(input.readUnsignedShort()) { input.skipBytes(2); input.skipBytes(input.readInt()) }
-        }
-        return out
-    }
-}
+val RELOCATED = "com/kamikazejam/kamicommon/nms/text/kyori/"
+val RELOCATED_DESC = "Lcom/kamikazejam/kamicommon/nms/text/kyori/"
 
 val verifyAdventureIsolation = tasks.register("verifyAdventureIsolation") {
     group = "verification"
-    description = "No NMS adapter may name the shaded Adventure in a method signature"
+    description = "The relocated Adventure exists only inside the nested jar"
 
     val shadowJarTask = tasks.named<org.gradle.jvm.tasks.Jar>("shadowJar")
     dependsOn(shadowJarTask)
@@ -76,55 +31,105 @@ val verifyAdventureIsolation = tasks.register("verifyAdventureIsolation") {
     outputs.upToDateWhen { false }
 
     doLast {
+        val jar = jarFile.get().asFile
+        var nested: ByteArray? = null
+        var looseRelocated = 0
         val offenders = ArrayList<String>()
-        var adapters = 0
-        var bridges = 0
-        ZipFile(jarFile.get().asFile).use { zip ->
+        var scanned = 0
+
+        ZipFile(jar).use { zip ->
             for (entry in zip.entries()) {
                 val n = entry.name
-                if (!n.endsWith("/NmsBundleImpl.class") && !n.endsWith("/ShadedComponentBridgeImpl.class")) continue
-                val isBridge = n.endsWith("/ShadedComponentBridgeImpl.class")
-                if (isBridge) bridges++ else adapters++
-                if (isBridge) continue   // the bridge exists to name it; that is its whole job
-                val bytes = zip.getInputStream(entry).readBytes()
-                for ((name, desc) in methodDescriptors(bytes)) {
-                    if (desc.contains(SHADED_DESCRIPTOR)) {
-                        offenders.add("$n  ->  $name$desc")
-                    }
+                if (n == "internal-libs/adventure.jar") {
+                    nested = zip.getInputStream(entry).readBytes()
+                    continue
+                }
+                if (n.startsWith(RELOCATED)) { looseRelocated++; continue }
+                if (!n.endsWith(".class")) continue
+                scanned++
+                // Any mention at all, in a signature or a body. There is no legitimate reference to
+                // the relocated package from outside the nested jar any more.
+                val text = String(zip.getInputStream(entry).readBytes(), Charsets.ISO_8859_1)
+                if (text.contains(RELOCATED) || text.contains(RELOCATED_DESC)) {
+                    offenders.add(n)
                 }
             }
         }
 
-        // A scan that matched almost nothing reports success no matter what is wrong.
-        if (adapters < 25) {
+        // 1. the nested jar must be there, or nothing renders text below 1.21.4
+        val bytes = nested ?: throw GradleException(
+            "internal-libs/adventure.jar is missing from the shipped jar. It carries the relocated " +
+                    "Adventure that every server below 1.21.4 needs. A build that drops it produces a " +
+                    "library that cannot render text on those versions."
+        )
+
+        // 2. it must actually contain Adventure, not be an empty shell
+        var nestedEntries = 0
+        var nestedRelocated = 0
+        ZipInputStream(bytes.inputStream()).use { zin ->
+            while (true) {
+                val e = zin.nextEntry ?: break
+                nestedEntries++
+                if (e.name.startsWith(RELOCATED)) nestedRelocated++
+            }
+        }
+        // The nested jar must also carry the IMPLEMENTATIONS, not just the library. Embedding :text
+        // instead of :text-impl produced a jar with 839 Adventure classes and no implementations,
+        // which every other check passed and which would have thrown ClassNotFoundException on the
+        // first text call on any server below 1.21.4.
+        var nestedImpls = 0
+        ZipInputStream(bytes.inputStream()).use { zin ->
+            while (true) {
+                val e = zin.nextEntry ?: break
+                if (e.name.endsWith(".class") && e.name.contains("TextBundleImpl_")) nestedImpls++
+            }
+        }
+        if (nestedImpls < 4) {
             throw GradleException(
-                "only $adapters NmsBundleImpl classes were found in the jar. This project has 31 " +
-                        "version modules, so a scan finding almost none is looking in the wrong place " +
-                        "and proves nothing."
+                "internal-libs/adventure.jar contains only $nestedImpls TextBundleImpl classes; there " +
+                        "is one per shaded tier and there should be at least 4. The nested jar was " +
+                        "built from the relocated Adventure alone rather than from :text-impl, so " +
+                        "TextBundles.forModule would throw ClassNotFoundException at runtime on every " +
+                        "server below 1.21.4."
             )
         }
-        // The bridges are the positive control: they are the one place the shaded type is allowed, so
-        // if none exist the exemption above is silently covering nothing.
-        if (bridges == 0) {
+        if (nestedRelocated < 500) {
             throw GradleException(
-                "no ShadedComponentBridgeImpl found. Either they were removed, in which case the " +
-                        "shaded-Adventure entry point moved somewhere this check is not looking, or the " +
-                        "jar is not what it should be."
+                "internal-libs/adventure.jar holds only $nestedRelocated relocated Adventure classes " +
+                        "out of $nestedEntries entries; it should hold over 800. Either the relocation " +
+                        "target moved and this check is looking for a package that no longer exists, or " +
+                        "the nested jar was built from the wrong thing."
             )
         }
 
-        if (offenders.isNotEmpty()) {
+        // 3. nothing loose, anywhere
+        if (looseRelocated > 0) {
             throw GradleException(
-                "these adapters name the shaded Adventure in a method signature:\n  " +
-                        offenders.joinToString("\n  ") +
-                        "\n\nAn adapter is loaded whenever ANY capability from its module is used. On " +
-                        "26.2 that happens through commandMapModifier reaching v1_17_R1, and it dragged " +
-                        "the shaded copy onto a server that has Adventure natively and never touches it." +
-                        "\nMove the method to ShadedComponentBridge, which is loaded on demand."
+                "$looseRelocated relocated Adventure classes are loose in the jar. They must live " +
+                        "ONLY inside internal-libs/adventure.jar. Loose entries are classpath entries, " +
+                        "and every consumer can import them."
             )
         }
-        println("verifyAdventureIsolation: $adapters adapters name no shaded Adventure in any " +
-                "signature, $bridges bridges hold it on purpose")
+        if (offenders.isNotEmpty()) {
+            throw GradleException(
+                "these classes reference the relocated Adventure from outside the nested jar:\n  " +
+                        offenders.sorted().joinToString("\n  ") +
+                        "\n\nThey will fail at runtime, because the relocated package is loaded by a " +
+                        "CHILD classloader they cannot see into. Move them into :text-impl, or route " +
+                        "through TextBundle, which names nothing relocated."
+            )
+        }
+
+        // A scan that inspected almost nothing passes forever.
+        if (scanned < 300) {
+            throw GradleException(
+                "only $scanned classes were scanned, far below the expected count. This check is " +
+                        "looking at the wrong artifact and proves nothing."
+            )
+        }
+        println("verifyAdventureIsolation: $scanned classes outside the nested jar reference no " +
+                "relocated Adventure, $nestedRelocated relocated classes and $nestedImpls text " +
+                "implementations sealed inside it")
     }
 }
 

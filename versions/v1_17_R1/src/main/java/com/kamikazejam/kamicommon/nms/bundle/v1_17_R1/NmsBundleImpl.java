@@ -15,8 +15,8 @@ import com.kamikazejam.kamicommon.nms.item.NmsItemMethods_1_17_R1;
 import com.kamikazejam.kamicommon.nms.provider.Provider;
 import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_17_R1;
 import com.kamikazejam.kamicommon.nms.text.TextPlaceholder;
+import com.kamikazejam.kamicommon.nms.text.TextBundles;
 import com.kamikazejam.kamicommon.nms.text.VersionedComponent;
-import com.kamikazejam.kamicommon.nms.text.VersionedComponent_1_17_R1;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.NMSPacketHandler;
 import com.kamikazejam.kamicommon.nms.wrappers.packet.NMSPacketHandler_1_17_R1;
 import com.kamikazejam.kamicommon.nms.wrappers.world.NMSWorld;
@@ -86,53 +86,58 @@ public class NmsBundleImpl implements NmsBundle {
     // Java 16 and that module targets 17.
 
     @Override
+    public @NotNull VersionedComponent componentFromJson(@NotNull String json) {
+        return TextBundles.forModule("v1_17_R1").fromJson(json);
+    }
+
+    @Override
     public @NotNull VersionedComponent componentFromPlainText(@NotNull String text) {
-        return VersionedComponent_1_17_R1.fromPlainText(text);
+        return TextBundles.forModule("v1_17_R1").fromPlainText(text);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage) {
-        return VersionedComponent_1_17_R1.fromMiniMessage(miniMessage);
+        return TextBundles.forModule("v1_17_R1").fromMiniMessage(miniMessage);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromMiniMessage(@NotNull String miniMessage, @NotNull TextPlaceholder... placeholders) {
-        return VersionedComponent_1_17_R1.fromMiniMessage(miniMessage, placeholders);
+        return TextBundles.forModule("v1_17_R1").fromMiniMessage(miniMessage, placeholders);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromLegacyAmpersand(@NotNull String legacy) {
-        return VersionedComponent_1_17_R1.fromLegacyAmpersand(legacy);
+        return TextBundles.forModule("v1_17_R1").fromLegacyAmpersand(legacy);
     }
 
     @Override
     public @NotNull VersionedComponent componentFromLegacySection(@NotNull String legacy) {
-        return VersionedComponent_1_17_R1.fromLegacySection(legacy);
+        return TextBundles.forModule("v1_17_R1").fromLegacySection(legacy);
     }
 
     @Override
     public @NotNull ItemMeta setDisplayName(@NotNull ItemMeta meta, @Nullable VersionedComponent component) {
-        return VersionedComponent_1_17_R1.setDisplayName(meta, component);
+        return TextBundles.forModule("v1_17_R1").setDisplayName(meta, component);
     }
 
     @Override
     public @Nullable VersionedComponent getDisplayName(@NotNull ItemMeta meta) {
-        return VersionedComponent_1_17_R1.getDisplayName(meta);
+        return TextBundles.forModule("v1_17_R1").getDisplayName(meta);
     }
 
     @Override
     public @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
-        return VersionedComponent_1_17_R1.setLore(meta, lore);
+        return TextBundles.forModule("v1_17_R1").setLore(meta, lore);
     }
 
     @Override
     public @Nullable List<VersionedComponent> getLore(@NotNull ItemMeta meta) {
-        return VersionedComponent_1_17_R1.getLore(meta);
+        return TextBundles.forModule("v1_17_R1").getLore(meta);
     }
 
     @Override
     public @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent component) {
-        return VersionedComponent_1_17_R1.addLoreLine(meta, component);
+        return TextBundles.forModule("v1_17_R1").addLoreLine(meta, component);
     }
 
 }

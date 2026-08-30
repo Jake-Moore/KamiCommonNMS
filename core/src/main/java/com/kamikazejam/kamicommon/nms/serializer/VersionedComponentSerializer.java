@@ -55,14 +55,16 @@ public class VersionedComponentSerializer {
         return NmsBundles.forModule("v1_21_4");
     }
 
-    public @NotNull VersionedComponent fromInternalComponent(@NotNull com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.Component component) {
-        Preconditions.checkNotNull(component, "component cannot be null");
-        // Routed through the shaded bridge rather than the adapter. Declaring a shaded-typed method
-        // on NmsBundleImpl made loading ANY capability from a module resolve the shaded Adventure:
-        // on 26.2, commandMapModifier dispatches to v1_17_R1 and dragged it in on a server that has
-        // Adventure natively. See ShadedComponentBridge.
-        NmsBundle bundle = bundleFor(NmsVersion.getFormattedNmsInteger());
-        return NmsBundles.shadedBridgeFor(bundle).componentFrom(component);
+    /**
+     * Builds a component from Minecraft's JSON representation.
+     *
+     * <p>Replaced {@code fromInternalComponent(Component)}, removed 2026-08-30. That method required
+     * the caller to construct a relocated Adventure component, which is impossible once the relocated
+     * package is hidden, so it was unusable in the same way its counterpart was.
+     */
+    public @NotNull VersionedComponent fromJson(@NotNull String json) {
+        Preconditions.checkNotNull(json, "json cannot be null");
+        return bundleFor(NmsVersion.getFormattedNmsInteger()).componentFromJson(json);
     }
 
     public @NotNull VersionedComponent fromPlainText(@NotNull String text) {
@@ -79,7 +81,7 @@ public class VersionedComponentSerializer {
      * MiniMessage with tag replacements.
      * <p>
      * Replaces the pattern of building an Adventure {@code TagResolver} at the call site and passing
-     * the result through {@link #fromInternalComponent}, which required naming the shaded Adventure
+     * the result through the removed fromInternalComponent, which required naming the shaded Adventure
      * copy from outside the {@code versions/*} modules.
      * </p>
      */

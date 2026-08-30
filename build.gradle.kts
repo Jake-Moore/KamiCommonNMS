@@ -1,5 +1,5 @@
 @Suppress("PropertyName")
-val VERSION = "1.2.26" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
+val VERSION = "1.2.27" // -SNAPSHOT marks WIP versions (snapshots are not CI published)
 
 plugins {
     id("com.gradleup.shadow") version "9.6.1" apply false
@@ -41,7 +41,7 @@ ext {
     // (The previous note here claimed this module must support Java 17 'since it's used in nms
     //  modules requiring Java 17'. That predates the floor work: standalone-utils is floor 8 now
     //  and every versions/* toolchain is 21 or 25, so the constraint it described no longer exists.)
-    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.40")
+    set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.43")
     // Lombok Dependency
     set("lombokDep", "org.projectlombok:lombok:1.18.46")
     set("jetbrainsDep", "org.jetbrains:annotations:26.1.0")

@@ -46,6 +46,11 @@ public class NmsBundleImpl implements NmsBundle {
     // would have hit NoSuchMethodError on any display-name operation.
 
     @Override
+    public @NotNull VersionedComponent componentFromJson(@NotNull String json) {
+        return VersionedComponent_1_21_4.fromJson(json);
+    }
+
+    @Override
     public @NotNull VersionedComponent componentFromPlainText(@NotNull String text) {
         return VersionedComponent_1_21_4.fromPlainText(text);
     }

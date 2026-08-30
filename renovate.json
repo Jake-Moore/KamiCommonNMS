@@ -45,26 +45,6 @@
       "automerge": false
     },
     {
-      "description": "Keep gradle-wrapper on its own branch. Updating it makes Renovate run ./gradlew in its container, which fails on this build because it needs JDK 17 and 25 through foojay. While the wrapper shared a branch with everything else, that one failure errored the entire non-major batch, and the last successful grouped PR on the sibling repo was nine months before anyone noticed.",
-      "matchManagers": [
-        "gradle-wrapper"
-      ],
-      "groupName": "gradle-wrapper",
-      "automerge": false
-    },
-    {
-      "description": "Anything that RUNS the build gets its own branch and a human. Anything the build merely compiles against can batch and auto-merge. Every stuck batch here has been the same shape: a build-system component bundled with libraries, where one incompatible member blocks all the rest. gradle-wrapper did it by erroring inside Renovate's container, which killed the grouped batch for nine months. com.gradleup.shadow 9.6.1 then did it by needing a newer Gradle than the wrapper provides, failing with AdhocComponentWithVariants.addVariantsFromConfiguration. Matched on depType rather than by name. Renovate's Gradle manager assigns depType 'plugin' to anything in a plugins block, which is documented, whereas two earlier attempts to name the plugin failed: matchPackageNames misses because a plugin's packageName is the marker artifact com.gradleup.shadow:com.gradleup.shadow.gradle.plugin, and matchDepNames with the plugin id also matched nothing across a full branch wipe and rescan. Matching the type is also the more durable rule: a plugin added later is covered without anyone remembering to list it.",
-      "groupName": "build system",
-      "groupSlug": "build-system",
-      "automerge": false,
-      "matchManagers": [
-        "gradle"
-      ],
-      "matchDepTypes": [
-        "plugin"
-      ]
-    },
-    {
       "description": "NEVER update the per-module server API pins. These are not outdated dependencies, they ARE the multi-version architecture: versions/v1_10_R1 must compile against 1.10.2's NMS, v1_8_R1 against 1.8's, and so on. Renovate's first batch collapsed all sixteen org.spigotmc:spigot-server pins onto 1.16.5-R0.1, which would have pointed every module at one Minecraft version. It also rewrote the tacospigot coordinate from 1.8.8-R0.2-REDUCED-KC to 1.8.8-R0.2-REDUCED, dropping a custom suffix because REDUCED sorts above REDUCED-KC. com.sk89q.worldedit:bukkit is pinned at 6.1.9 because worlds6 targets the WorldEdit 6 API on purpose. There is no correct newer version for any of these.",
       "matchPackageNames": [
         "org.spigotmc:spigot-server",
@@ -82,6 +62,27 @@
       ],
       "groupName": "server platform and mappings",
       "groupSlug": "server-platform",
+      "automerge": false
+    },
+    {
+      "description": "Anything that RUNS the build: the Gradle wrapper and every Gradle plugin, in ONE group. Two rules share a groupName because Renovate ANDs match types within a rule, so manager and depType cannot be expressed as an OR in a single rule. They are grouped together because they are COUPLED. Shipping them separately guarantees one is red: shadow 9.6.1 needs a newer Gradle than the wrapper provides, so a standalone shadow PR cannot go green until a standalone wrapper PR merges first. Together they build clean, measured locally at Gradle 9.7.1 with shadow 9.6.1. What must stay separate is build-system from LIBRARIES. That is the failure this config exists for: the wrapper errors inside Renovate's container, and while it shared a branch with the libraries it killed the whole grouped batch for nine months. Splitting build-system further, into wrapper versus plugins, was over-separation and broke the coupling above.",
+      "matchManagers": [
+        "gradle-wrapper"
+      ],
+      "groupName": "build system",
+      "groupSlug": "build-system",
+      "automerge": false
+    },
+    {
+      "description": "The plugin half of the build system group above; same groupName so both land in one PR.",
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchDepTypes": [
+        "plugin"
+      ],
+      "groupName": "build system",
+      "groupSlug": "build-system",
       "automerge": false
     }
   ],

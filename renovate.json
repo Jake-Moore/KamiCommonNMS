@@ -53,11 +53,24 @@
       "automerge": false
     },
     {
-      "description": "paperweight-userdev is never auto-merged. It decompiles and remaps Paper, and CI keys its paperweight cache on the build files while falling back to restore-keys, so a plugin bump restores the PREVIOUS version's derived output and goes green without ever exercising the new one. The beta.22 to beta.23 bump passed CI that way. Until the cache key includes the plugin version, a human has to confirm this one really built.",
+      "description": "NEVER update the per-module server API pins. These are not outdated dependencies, they ARE the multi-version architecture: versions/v1_10_R1 must compile against 1.10.2's NMS, v1_8_R1 against 1.8's, and so on. Renovate's first batch collapsed all sixteen org.spigotmc:spigot-server pins onto 1.16.5-R0.1, which would have pointed every module at one Minecraft version. It also rewrote the tacospigot coordinate from 1.8.8-R0.2-REDUCED-KC to 1.8.8-R0.2-REDUCED, dropping a custom suffix because REDUCED sorts above REDUCED-KC. com.sk89q.worldedit:bukkit is pinned at 6.1.9 because worlds6 targets the WorldEdit 6 API on purpose. There is no correct newer version for any of these.",
       "matchPackageNames": [
-        "io.papermc.paperweight.userdev",
+        "org.spigotmc:spigot-server",
+        "net.techcable.tacospigot:server",
+        "com.sk89q.worldedit:bukkit"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "These CAN move, but each one changes something a build check reasons about, so they get their own branch and a human. worldguard-bukkit and fawe are what justify the Java 17 floor on worlds7, since worldguard-bukkit 7.0.9 is entirely class-file major 61. paper-api drives highestPaperDep, which is what makes v_latest a compile check against bleeding-edge Paper and what triggers paperweight re-derivation. paperweight-userdev decompiles and remaps Paper, and CI keys its cache on the build files while falling back to restore-keys, so a bump restores the PREVIOUS version's output and goes green without exercising the new one. Grouped separately rather than merely automerge:false, because a non-automergeable member inside all-minor-patch blocks the entire batch.",
+      "matchPackageNames": [
+        "com.sk89q.worldguard:worldguard-bukkit",
+        "com.sk89q.worldedit:fawe",
+        "io.papermc.paper:paper-api",
         "io.papermc.paperweight**"
       ],
+      "groupName": "server platform and mappings",
+      "groupSlug": "server-platform",
       "automerge": false
     }
   ],

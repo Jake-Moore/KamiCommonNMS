@@ -193,6 +193,27 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
         throw new UnsupportedOperationException("Unhandled TextDecoration: " + decoration);
     }
 
+    /**
+     * The component to hand to {@link ItemMeta}, with italics suppressed where the caller left them
+     * unset.
+     * <p>
+     * Minecraft italicises a custom name and every lore line by default, so a component handed over
+     * natively renders italic while the same text written as section-coded text does not. Only the
+     * unset state is changed, so a caller that asked for italic through
+     * {@link VersionedComponent#decorate(TextDecoration, boolean)} still gets it.
+     * </p>
+     *
+     * @param component the component about to be written into item meta
+     * @return the same component, italic explicitly off unless it was already stated
+     */
+    private static @NotNull Component suppressItalic(@NotNull Component component) {
+        net.kyori.adventure.text.format.TextDecoration italic = net.kyori.adventure.text.format.TextDecoration.ITALIC;
+        if (component.style().decoration(italic) != net.kyori.adventure.text.format.TextDecoration.State.NOT_SET) {
+            return component;
+        }
+        return component.decoration(italic, false);
+    }
+
     // ------------------------------------------------------------ //
     //                        STATIC METHODS                        //
     // ------------------------------------------------------------ //
@@ -202,14 +223,7 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
             return meta;
         }
 
-        @NotNull Component nameComponent;
-        if (name instanceof VersionedComponent_1_21_4 vcLatest) {
-            nameComponent = vcLatest.component;
-        } else {
-            String miniMessage = name.serializeMiniMessage();
-            nameComponent = MiniMessage.miniMessage().deserialize(miniMessage);
-        }
-        meta.customName(nameComponent);
+        meta.customName(suppressItalic(nativeOf(name)));
         return meta;
     }
     public static @NotNull ItemMeta setLore(@NotNull ItemMeta meta, @Nullable List<VersionedComponent> lore) {
@@ -219,13 +233,7 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
         }
         List<Component> serializedLore = new ArrayList<>();
         for (VersionedComponent vc : lore) {
-            if (vc instanceof VersionedComponent_1_21_4 vcLatest) {
-                serializedLore.add(vcLatest.component);
-            } else {
-                String miniMessage = vc.serializeMiniMessage();
-                Component comp = MiniMessage.miniMessage().deserialize(miniMessage);
-                serializedLore.add(comp);
-            }
+            serializedLore.add(suppressItalic(nativeOf(vc)));
         }
         meta.lore(serializedLore);
         return meta;
@@ -257,13 +265,7 @@ public class VersionedComponent_1_21_4 implements ModernVersionedComponent {
     public static @NotNull ItemMeta addLoreLine(@NotNull ItemMeta meta, @NotNull VersionedComponent line) {
         List<Component> lore = (meta.hasLore() && meta.lore() != null) ? meta.lore() : Collections.emptyList();
         List<Component> newLore = new ArrayList<>(Objects.requireNonNull(lore));
-        if (line instanceof VersionedComponent_1_21_4 vcLatest) {
-            newLore.add(vcLatest.component);
-        } else {
-            String miniMessage = line.serializeMiniMessage();
-            Component comp = MiniMessage.miniMessage().deserialize(miniMessage);
-            newLore.add(comp);
-        }
+        newLore.add(suppressItalic(nativeOf(line)));
         meta.lore(newLore);
         return meta;
     }

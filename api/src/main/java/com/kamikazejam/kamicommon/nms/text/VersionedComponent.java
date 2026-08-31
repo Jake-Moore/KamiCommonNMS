@@ -149,8 +149,9 @@ public interface VersionedComponent {
     /**
      * Returns a copy of this component with a style flag explicitly set.
      * <p>
-     * The common case is {@code decorate(TextDecoration.ITALIC, false)} before writing a component
-     * into {@code ItemMeta}, because Minecraft italicises item names and lore automatically.
+     * Minecraft italicises custom item names and lore by default, and this library suppresses that
+     * where the caller left italic unset, so no call is needed before writing a component into
+     * {@code ItemMeta}. Pass {@code ITALIC} with {@code true} to ask for italics there anyway.
      * </p>
      */
     default @NotNull VersionedComponent decorate(@NotNull TextDecoration decoration, boolean value) {

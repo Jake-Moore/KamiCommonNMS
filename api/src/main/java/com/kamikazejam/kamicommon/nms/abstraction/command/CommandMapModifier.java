@@ -53,6 +53,13 @@ public interface CommandMapModifier {
      * allowing inspection of all registered commands. The returned map
      * maps command names to their corresponding {@link Command} instances.
      * </p>
+     * <p>
+     * The map is the server's own, live and not a copy, so its behaviour is the server's. From 1.20.6
+     * Paper returns a view backed by its Brigadier dispatcher rather than a {@link java.util.HashMap},
+     * and on Paper 1.21.4 that view's {@code isEmpty()} is inverted: it answers {@code true} while
+     * {@code size()} reports hundreds of commands. Judge emptiness by {@code size()}, which is
+     * correct on every version.
+     * </p>
      *
      * @return a {@link Map} of command names to {@link Command} instances
      *         representing all known commands in the server

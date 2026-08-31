@@ -7,6 +7,7 @@ import com.kamikazejam.kamicommon.nms.abstraction.command.CommandMapModifier;
 import com.kamikazejam.kamicommon.nms.abstraction.enchantid.AbstractEnchantID;
 import com.kamikazejam.kamicommon.nms.abstraction.entity.AbstractEntityMethods;
 import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemEditor;
+import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemNbt;
 import com.kamikazejam.kamicommon.nms.abstraction.item.NmsItemMethods;
 import com.kamikazejam.kamicommon.nms.abstraction.itemtext.AbstractItemTextPre_1_17;
 import com.kamikazejam.kamicommon.nms.abstraction.mainhand.AbstractMainHand;
@@ -79,6 +80,18 @@ public interface NmsBundle {
     default @NotNull AbstractItemEditor itemEditor() { throw missing("itemEditor"); }
 
     default @NotNull AbstractItemTextPre_1_17 itemText() { throw missing("itemText"); }
+
+    /**
+     * The item NBT an Adventure {@code show_item} hover is built from.
+     * <p>
+     * Only 1.17 and 1.18.1 implement this. Below 1.17 the same values come from {@link #itemText()},
+     * whose interface extends {@link AbstractItemNbt}, and from 1.18.2 the server's own Adventure
+     * supplies the hover directly.
+     * </p>
+     *
+     * @return this module's item NBT reader
+     */
+    default @NotNull AbstractItemNbt itemNbt() { throw missing("itemNbt"); }
 
     default @NotNull AbstractMainHand mainHand() { throw missing("mainHand"); }
 

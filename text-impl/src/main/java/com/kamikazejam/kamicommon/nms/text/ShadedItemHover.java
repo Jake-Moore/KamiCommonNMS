@@ -1,7 +1,7 @@
 package com.kamikazejam.kamicommon.nms.text;
 
-import com.kamikazejam.kamicommon.nms.abstraction.itemtext.AbstractItemTextPre_1_17;
-import com.kamikazejam.kamicommon.nms.provider.ItemTextProviderPre_1_17;
+import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemNbt;
+import com.kamikazejam.kamicommon.nms.provider.ItemNbtProvider;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.key.Key;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.nbt.api.BinaryTagHolder;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.event.HoverEvent;
@@ -13,12 +13,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Builds the Adventure {@code show_item} hover for the tiers backed by the relocated Adventure copy.
  *
- * <p>Package-private, and shared by the three tiers that can express an item hover: {@code
- * VersionedComponent_1_11_R1}, {@code VersionedComponent_1_15_R1} and {@code
- * VersionedComponent_1_16_R3}. They differ in how they serialize on the way out, not in how they
- * read an item, so this is one copy rather than three.
+ * <p>Package-private, and shared by all four shaded tiers: {@code VersionedComponent_1_11_R1},
+ * {@code VersionedComponent_1_15_R1}, {@code VersionedComponent_1_16_R3} and {@code
+ * VersionedComponent_1_17_R1}. They differ in how they serialize on the way out, not in how they
+ * read an item, so this is one copy rather than four.
  *
- * <p>The NBT comes from {@link AbstractItemTextPre_1_17}, which lives in {@code :api}. These classes
+ * <p>The NBT comes from {@link AbstractItemNbt}, which lives in {@code :api}. These classes
  * load in a child classloader whose parent holds {@code :api}, and delegation is parent-first, so
  * the interface, the provider and {@code NmsBundles} all resolve upward. Nothing here names a
  * third-party library, which it could not do: a reference from inside the nested jar is never
@@ -30,7 +30,7 @@ final class ShadedItemHover {
      * One provider, resolved once. {@code Provider} caches its capability after the first call, so
      * the version ladder and the reflective adapter load happen on the first hover and never again.
      */
-    private static final ItemTextProviderPre_1_17 ITEM_TEXT = new ItemTextProviderPre_1_17();
+    private static final ItemNbtProvider ITEM_NBT = new ItemNbtProvider();
 
     private ShadedItemHover() {}
 
@@ -48,12 +48,12 @@ final class ShadedItemHover {
         if (item.getType() == Material.AIR) {
             throw new IllegalArgumentException("hoverItem(ItemStack) was given air, which has no item to show");
         }
-        AbstractItemTextPre_1_17 itemText = ITEM_TEXT.get();
-        String id = itemText.getItemId(item);
+        AbstractItemNbt itemNbt = ITEM_NBT.get();
+        String id = itemNbt.getItemId(item);
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("no item id for " + item.getType() + ", so it cannot be shown on hover");
         }
-        @Nullable String tag = itemText.getNbtTag(item);
+        @Nullable String tag = itemNbt.getNbtTag(item);
         @Nullable BinaryTagHolder nbt = (tag == null) ? null : BinaryTagHolder.binaryTagHolder(tag);
         return HoverEvent.showItem(Key.key(id), item.getAmount(), nbt);
     }

@@ -38,10 +38,12 @@ val serverJvms = listOf(
 //   WorldEditHook::worldEdit          selects on the WorldEdit plugin instance, not the version
 //   WorldGuardHook::get               branches on ver.startsWith("6"), a WorldGuard version string
 //   ItemTextProviderPre_1_17::provide throws above 1.16.5 by design, so it has no branch to take
+//   ItemNbtProvider::provide          throws above 1.18.1 by design, for the same reason
 val handChecked = setOf(
     "library/worldedit/WorldEditHook.java::worldEdit",
     "library/worldguard/WorldGuardHook.java::get",
     "provider/ItemTextProviderPre_1_17.java::provide",
+    "provider/ItemNbtProvider.java::provide",
 )
 
 val moduleFloors = java.util.Properties().apply {
@@ -319,7 +321,11 @@ val verifyDispatchFloors = tasks.register("verifyDispatchFloors") {
         // 1.16.5 and /kc nmsproviders reports it as "n/a on this version", so a 26.x twin would be a
         // twin of something 26.x never runs. It appears here only because it is a parameter type on
         // adapters that DO serve 26.x. The assertion below keeps the exemption honest.
-        val noLatestByDesign = setOf("ItemText")
+        // ItemNbt is exempt for the same reason: ItemNbtProvider throws above 1.18.1, so the 26.x
+        // ladders that reach v1_17_R1 for commandMapModifier and messageManager never call itemNbt()
+        // on it. This scan reads the whole adapter rather than the capabilities those ladders ask
+        // for, which is why the class is visible here at all.
+        val noLatestByDesign = setOf("ItemText", "ItemNbt")
         val latestDir = rootProject.file("versions/v_latest/src/main/java")
         val latestTwins = latestDir.walkTopDown().filter { it.name.endsWith("_LATEST.java") }
             .map { it.name.removeSuffix(".java").removeSuffix("_LATEST") }.toSet()

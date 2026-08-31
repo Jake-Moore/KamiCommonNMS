@@ -1,6 +1,8 @@
 package com.kamikazejam.kamicommon.nms.item;
 
 import com.kamikazejam.kamicommon.nms.abstraction.item.NmsItemMethods;
+import net.minecraft.server.v1_16_R2.LocaleLanguage;
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 public class NmsItemMethods_1_16_R2 implements NmsItemMethods {
     @Override
     public @NotNull String getI18NItemName(@NotNull ItemStack itemStack) {
-        throw new UnsupportedOperationException("Not supported.");
+        net.minecraft.server.v1_16_R2.ItemStack nmsCopy = CraftItemStack.asNMSCopy(itemStack);
+        // The stack's own translation key, which for items such as potions and spawn eggs differs
+        // from the item's. LocaleLanguage returns the key unchanged when it carries no translation.
+        return LocaleLanguage.a().a(nmsCopy.j());
     }
 }

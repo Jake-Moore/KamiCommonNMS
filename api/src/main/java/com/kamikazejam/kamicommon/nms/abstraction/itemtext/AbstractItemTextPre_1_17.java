@@ -1,5 +1,6 @@
 package com.kamikazejam.kamicommon.nms.abstraction.itemtext;
 
+import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemNbt;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,9 +18,14 @@ import org.bukkit.inventory.ItemStack;
  * provides methods for accessing item information in formats that were
  * standard before the modern component system restructuring.
  * </p>
+ * <p>
+ * {@code getItemId} and {@code getNbtTag} are inherited from {@link AbstractItemNbt}, which the
+ * 1.17 and 1.18.1 modules also implement. They are declared there because an item hover needs them
+ * on versions this interface does not cover.
+ * </p>
  */
 @SuppressWarnings("unused")
-public interface AbstractItemTextPre_1_17 {
+public interface AbstractItemTextPre_1_17 extends AbstractItemNbt {
 
     /**
      * Retrieves the text components that represent the item's display information.
@@ -59,25 +65,4 @@ public interface AbstractItemTextPre_1_17 {
      * @return the NBT string representation of the item's tooltip
      */
     String getNbtStringTooltip(ItemStack item);
-
-    /**
-     * The item's namespaced id, as the server's own item registry writes it.
-     *
-     * @param item the {@link ItemStack} to read
-     * @return the namespaced id, for example {@code minecraft:wool}, or an empty string for air
-     */
-    String getItemId(ItemStack item);
-
-    /**
-     * The item's {@code tag} compound as an SNBT string, or {@code null} when it has none.
-     * <p>
-     * This is the inner compound holding the display name, lore and enchantments. It is not the
-     * whole item NBT that {@link #getNbtStringTooltip(ItemStack)} returns, which also carries
-     * {@code id}, {@code Count} and, below 1.13, {@code Damage}.
-     * </p>
-     *
-     * @param item the {@link ItemStack} to read
-     * @return the {@code tag} compound as SNBT, or {@code null} when the item carries no tag
-     */
-    String getNbtTag(ItemStack item);
 }

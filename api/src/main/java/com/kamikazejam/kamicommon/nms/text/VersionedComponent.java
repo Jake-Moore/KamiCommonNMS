@@ -125,9 +125,9 @@ public interface VersionedComponent {
      * Returns a copy of this component whose hover shows the given item, with its name, lore and
      * enchantments as a player would see them in an inventory.
      * <p>
-     * Servers from 1.17 through 1.18.1 throw. The item NBT this library reads below 1.18.2 comes
-     * from {@code AbstractItemTextPre_1_17}, which stops at 1.16.5, and those two versions have
-     * neither that nor native Adventure.
+     * Supported on every version from 1.8. Servers from 1.18.2 build the hover from their own
+     * Adventure; below that the item's id, count and {@code tag} compound are read from NMS and
+     * assembled into the same hover.
      * </p>
      * <p>
      * On 1.8 through 1.12 the hover carries the item's {@code tag} compound, so the name, lore and
@@ -139,8 +139,7 @@ public interface VersionedComponent {
      * </p>
      *
      * @param item the item shown on hover
-     * @throws IllegalArgumentException      if the item is air, which has no item to show
-     * @throws UnsupportedOperationException on 1.17 through 1.18.1
+     * @throws IllegalArgumentException if the item is air, which has no item to show
      */
     default @NotNull VersionedComponent hoverItem(@NotNull ItemStack item) {
         throw new UnsupportedOperationException(

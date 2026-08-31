@@ -3,11 +3,13 @@ package com.kamikazejam.kamicommon.nms.bundle.v1_18_R1;
 import org.jetbrains.annotations.ApiStatus;
 import com.kamikazejam.kamicommon.nms.abstraction.block.AbstractBlockUtil;
 import com.kamikazejam.kamicommon.nms.abstraction.entity.AbstractEntityMethods;
+import com.kamikazejam.kamicommon.nms.abstraction.item.AbstractItemNbt;
 import com.kamikazejam.kamicommon.nms.abstraction.item.NmsItemMethods;
 import com.kamikazejam.kamicommon.nms.abstraction.teleport.AbstractTeleporter;
 import com.kamikazejam.kamicommon.nms.block.BlockUtil1_18_R1;
 import com.kamikazejam.kamicommon.nms.bundle.NmsBundle;
 import com.kamikazejam.kamicommon.nms.entity.EntityMethods_1_18_R1;
+import com.kamikazejam.kamicommon.nms.item.ItemNbt_1_18_R1;
 import com.kamikazejam.kamicommon.nms.item.NmsItemMethods_1_18_R1;
 import com.kamikazejam.kamicommon.nms.provider.Provider;
 import com.kamikazejam.kamicommon.nms.teleport.Teleporter1_18_R1;
@@ -47,6 +49,11 @@ public class NmsBundleImpl implements NmsBundle {
     @Override
     public @NotNull NmsItemMethods nmsItemMethods() {
         return new NmsItemMethods_1_18_R1();
+    }
+
+    @Override
+    public @NotNull AbstractItemNbt itemNbt() {
+        return new ItemNbt_1_18_R1();
     }
 
     @Override

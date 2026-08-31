@@ -13,6 +13,7 @@ import com.kamikazejam.kamicommon.nms.text.TextDecoration;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.minimessage.MiniMessage;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.json.JSONOptions;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.kamikazejam.kamicommon.nms.text.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -57,11 +58,13 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent, ShadedBac
     // both events and the component arrived carrying only its text. hover() and click() were
     // therefore no-ops on every server this tier serves.
     //
-    // No legacy hover serializer is supplied, unlike v1_16_R3. That one exists to write a show_item
-    // hover, and hoverItem(ItemStack) throws on this tier, so nothing here can produce one.
+    // The legacy hover serializer is supplied for the same reason v1_16_R3 supplies one. Adventure
+    // ships no default, so a show_item hover would serialize with no tag and no value field at all,
+    // and the receiving bungee-chat throws NullPointerException on the missing value.
     private static final BungeeComponentSerializer SERIALIZER = BungeeComponentSerializer.of(
             GsonComponentSerializer.builder()
                     .options(JSONOptions.byDataVersion().at(DATA_VERSION_1_17_1))
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
                     .build(),
             LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build());
 
@@ -143,22 +146,9 @@ public class VersionedComponent_1_17_R1 implements VersionedComponent, ShadedBac
         return new VersionedComponent_1_17_R1(this.component.hoverEvent(HoverEvent.showText(ShadedBacked.of(tooltip))));
     }
 
-    /**
-     * Always throws. 1.17 and 1.18.1 have no item NBT source in this library and no native
-     * Adventure, so there is nothing to build an item hover from.
-     * <p>
-     * {@code AbstractItemTextPre_1_17} stops at 1.16.5, as its name says, and native Adventure
-     * arrives in 1.18.2. Throwing here is the same choice {@link ClickAction#COPY_TO_CLIPBOARD}
-     * makes below 1.16: a hover that quietly shows the wrong thing is worse than one that fails
-     * while it is being written.
-     * </p>
-     */
     @Override
     public @NotNull VersionedComponent hoverItem(@NotNull ItemStack item) {
-        throw new UnsupportedOperationException(
-                "hoverItem(ItemStack) needs Minecraft 1.18.2 or newer, or 1.16.5 or older; this server"
-                        + " runs " + Bukkit.getVersion() + " and dispatches to "
-                        + VersionedComponent_1_17_R1.class.getSimpleName());
+        return new VersionedComponent_1_17_R1(this.component.hoverEvent(ShadedItemHover.of(item)));
     }
 
     @Override

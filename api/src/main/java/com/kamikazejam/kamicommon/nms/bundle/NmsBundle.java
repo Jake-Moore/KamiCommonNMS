@@ -144,7 +144,7 @@ public interface NmsBundle {
     // componentFrom(Component) deliberately does NOT live here. A shaded-typed method declared on
     // this interface is harmless in a descriptor, but each module's NmsBundleImpl OVERRODE it, and
     // verifying an override loads the parameter type. That made Class.forName on any adapter resolve
-    // the shaded Adventure copy. It now lives on ShadedComponentBridge, loaded on demand.
+    // the shaded Adventure copy. The shaded-typed methods live on TextBundle instead, behind the classloader boundary.
 
     default @NotNull VersionedComponent componentFromPlainText(@NotNull String text) { throw missing("componentFromPlainText"); }
 

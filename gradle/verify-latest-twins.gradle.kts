@@ -91,9 +91,12 @@ fun surfaceOf(bytes: ByteArray): Triple<String, List<String>, Set<String>> {
 // Teleporter_LATEST with Teleporter1_21_9, and would silently pair the wrong two the day a module
 // is added.
 //
-// A _LATEST class with no such sentence is not a canary: it is the implementation 26.x actually
-// dispatches to, and its counterpart in a lower module is a fork that is MEANT to differ. Those are
-// the six capabilities whose ladders already terminate at v_latest.
+// A _LATEST class with no such sentence is not compared. Its counterpart in a lower module, if there
+// is one, is a fork that is MEANT to differ.
+//
+// Declaring a twin and being dispatched to are independent. Nine dispatch sites terminate at
+// v_latest, and several of those implementations declare a twin as well, because a class can both
+// serve 26.x and be checked against the tier it mirrors.
 val twinDeclaration = Regex("""twin of \{@code (\w+)} in \{@code versions/(\w+)}""")
 
 // The count this project has today. A floor rather than an equality, because adding a canary must

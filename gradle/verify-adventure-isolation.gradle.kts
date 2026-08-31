@@ -6,7 +6,7 @@ import java.util.zip.ZipInputStream
 // may reference the relocated package at all.
 //
 // Why nested rather than shaded flat. The relocated copy serves servers with no native Adventure,
-// meaning everything below 1.21.4. Shaded flat, its classes are ordinary classpath entries and every
+// meaning everything below 1.18.2. Shaded flat, its classes are ordinary classpath entries and every
 // consumer can import them. Dependency scoping cannot fix that: measured 2026-08-30, a spigot-jar
 // consumer compiled against the shaded Adventure successfully while it was declared runtime-only,
 // because scope metadata cannot hide bytes that are physically present. Nested, the classes are not
@@ -56,10 +56,10 @@ val verifyAdventureIsolation = tasks.register("verifyAdventureIsolation") {
             }
         }
 
-        // 1. the nested jar must be there, or nothing renders text below 1.21.4
+        // 1. the nested jar must be there, or nothing renders text below 1.18.2
         val bytes = nested ?: throw GradleException(
             "internal-libs/adventure.jar is missing from the shipped jar. It carries the relocated " +
-                    "Adventure that every server below 1.21.4 needs. A build that drops it produces a " +
+                    "Adventure that every server below 1.18.2 needs. A build that drops it produces a " +
                     "library that cannot render text on those versions."
         )
 
@@ -76,7 +76,7 @@ val verifyAdventureIsolation = tasks.register("verifyAdventureIsolation") {
         // The nested jar must also carry the IMPLEMENTATIONS, not just the library. Embedding :text
         // instead of :text-impl produced a jar with 839 Adventure classes and no implementations,
         // which every other check passed and which would have thrown ClassNotFoundException on the
-        // first text call on any server below 1.21.4.
+        // first text call on any server below 1.18.2.
         var nestedImpls = 0
         ZipInputStream(bytes.inputStream()).use { zin ->
             while (true) {
@@ -90,7 +90,7 @@ val verifyAdventureIsolation = tasks.register("verifyAdventureIsolation") {
                         "is one per shaded tier and there should be at least 4. The nested jar was " +
                         "built from the relocated Adventure alone rather than from :text-impl, so " +
                         "TextBundles.forModule would throw ClassNotFoundException at runtime on every " +
-                        "server below 1.21.4."
+                        "server below 1.18.2."
             )
         }
         if (nestedRelocated < 500) {

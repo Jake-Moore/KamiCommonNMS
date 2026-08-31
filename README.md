@@ -66,10 +66,11 @@ and the build would not notice until a server did. The `_LATEST` copies compile 
 Paper. If a copy stops compiling, that is the finding.
 
 `verifyDispatchFloors` enforces it: any implementation a 26.x server reaches with no `_LATEST` twin
-fails the build. Ten had already drifted out before that check existed. The single exemption is
-`ItemText`, which throws above 1.16.5 by design, and the check fails if a twin for it ever appears.
+fails the build. Ten had already drifted out before that check existed. The exemptions are
+`ItemText` and `ItemNbt`, which stop below 26.x by design, and the check fails if a twin for either
+ever appears.
 
-Four build tasks keep this honest.
+Six build tasks keep this honest.
 
 - `verifyFloors` checks every class in the shaded jar against its module's floor, checks that no
   lower-floor class names a higher-floor one, and checks the published metadata against the bytecode.

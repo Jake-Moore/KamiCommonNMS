@@ -54,7 +54,7 @@ dependencies {
     // :text-impl, NOT :text. :text is the relocated Adventure alone; :text-impl merges it with the
     // classes that use it. Embedding :text shipped a nested jar with 839 Adventure classes and zero
     // implementations, so TextBundles.forModule would have thrown ClassNotFoundException on every
-    // server below 1.21.4. All six build checks passed on that jar.
+    // server below 1.18.2. All six build checks passed on that jar.
     textShim(project(":text-impl"))
     // :text is compiled against but not shaded in as loose classes. It is embedded as a NESTED JAR
     // instead; see the shadowJar block.
@@ -92,7 +92,7 @@ tasks {
         // configurations = listOf(project.configurations.shadow.get())
 
         // :text is not shaded in as loose classes. It is the relocated Adventure, and it exists only
-        // for servers with no native Adventure, meaning everything below 1.21.4.
+        // for servers with no native Adventure, meaning everything below 1.18.2.
         //
         // Shading it flat put the bytes in the jar as ordinary class entries, and javac has no notion
         // of an internal package, so every consumer could import

@@ -308,3 +308,4 @@ apply(from = "$rootDir/gradle/verify-dispatch-floors.gradle.kts")
 
 
 apply(from = "$rootDir/gradle/verify-adventure-isolation.gradle.kts")
+apply(from = "$rootDir/gradle/verify-latest-twins.gradle.kts")

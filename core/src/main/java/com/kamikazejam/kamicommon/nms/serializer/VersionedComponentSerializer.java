@@ -56,8 +56,12 @@ public class VersionedComponentSerializer {
         // because ItemMeta.customName() does not exist until 1.21.4.
         if (ver < f("1.21.4")) { return NmsBundles.forModule("v1_18_R2"); }
         // 1.21.4+ can use the native Adventure apis, because that is where ItemMeta.customName()
-        // arrived. That is v1_21_4, not v_latest: 1.21.4 runs Java 21 and v_latest targets 25.
-        return NmsBundles.forModule("v1_21_4");
+        // arrived. Everything below 26.x runs on Java 21 or lower, so it comes from v1_21_4. The
+        // v_latest twin below is the same source compiled against Paper 26.x, which targets
+        // Java 25 because 26.x requires it. Routing a 1.21 server there would fail to load.
+        if (ver < f("26")) { return NmsBundles.forModule("v1_21_4"); }
+        // 26.x only, and compiled against it.
+        return NmsBundles.forModule("v_latest");
     }
 
     /**

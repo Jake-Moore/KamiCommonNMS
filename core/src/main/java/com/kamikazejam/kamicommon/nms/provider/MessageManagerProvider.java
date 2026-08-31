@@ -57,8 +57,14 @@ public class MessageManagerProvider extends Provider<AbstractMessageManager> {
         }
 
         // Use kyori adventure Component post 1.17
-        // Adventure Components arrived on the server in 1.17, which runs Java 16. v1_17_R1 is
-        // the lowest-floor module that can hold this; v_latest would demand Java 21.
-        return NmsBundles.forModule("v1_17_R1").messageManager();
+        // Adventure Components arrived on the server in 1.17, which runs Java 16, so everything
+        // below 26.x comes from v1_17_R1. The v_latest twin below is the same source compiled
+        // against Paper 26.x, which targets Java 25 because 26.x requires it. Routing a 1.17
+        // server there would fail to load.
+        if (ver < f("26")) {
+            return NmsBundles.forModule("v1_17_R1").messageManager();
+        }
+        // 26.x only, and compiled against it.
+        return NmsBundles.forModule("v_latest").messageManager();
     }
 }

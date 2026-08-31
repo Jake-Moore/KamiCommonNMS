@@ -50,10 +50,15 @@ public class CommandMapModifierProvider extends Provider<CommandMapModifier> {
 
         if (ver < f("1.17")) {
             return NmsBundles.forModule("v1_8_R1").commandMapModifier();
-        }else {
-        // 1.17 is the boundary here, and 1.17 servers run Java 16, so this belongs in
-        // v1_17_R1 (floor 16), not v_latest (floor 21).
+        }
+        // 1.17 is the boundary here, and 1.17 servers run Java 16, so everything below 26.x comes
+        // from v1_17_R1. The v_latest twin below is the same source compiled against Paper 26.x,
+        // which targets Java 25 because 26.x requires it. Routing a 1.17 server there would fail
+        // to load.
+        if (ver < f("26")) {
             return NmsBundles.forModule("v1_17_R1").commandMapModifier();
         }
+        // 26.x only, and compiled against it.
+        return NmsBundles.forModule("v_latest").commandMapModifier();
     }
 }

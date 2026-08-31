@@ -39,15 +39,16 @@ import java.util.Objects;
  * {@code ItemMeta.customName()}, which is exactly the surface Paper moves. Compiling it against
  * {@code highestPaperDep} means bumping that version proves those calls still exist.
  * </p><p>
- * Two deliberate differences from the twin, neither of which touches a method body. It implements
- * {@code VersionedComponent} rather than {@code ModernVersionedComponent}, because that interface
- * lives in {@code versions/v1_18_R2} and a second copy of it in this package would collide with the
- * first in the shaded jar; and {@code asNativeComponent()} therefore carries no {@code @Override}.
- * Everything that actually calls a Paper API is identical, which is the part being checked.
+ * It implements {@code ModernVersionedComponent}, which is declared in {@code versions/v1_18_R2} and
+ * reached from here through the {@code compileOnly} dependency on that module. The interface is part
+ * of the contract, not decoration: {@code ComponentLoggerAdapter} selects the native path with
+ * {@code instanceof ModernVersionedComponent}, and the interface documents that a component is
+ * castable to it from 1.18.2 upward. A twin that omitted it would answer that cast differently from
+ * {@code VersionedComponent_1_21_4} on the versions dispatched here.
  * </p>
  */
 @ApiStatus.Internal
-public class VersionedComponent_LATEST implements VersionedComponent {
+public class VersionedComponent_LATEST implements ModernVersionedComponent {
     private final @NotNull Component component;
     private VersionedComponent_LATEST(@NotNull Component component) {
         this.component = component;
@@ -123,8 +124,7 @@ public class VersionedComponent_LATEST implements VersionedComponent {
         return net.kyori.adventure.text.serializer.json.JSONComponentSerializer.json().serialize(this.component);
     }
 
-    // Declared by ModernVersionedComponent, which this canary cannot implement. See the class
-    // javadoc: the method body is what is being compile-checked, not the interface wiring.
+    @Override
     public @NotNull Component asNativeComponent() {
         return this.component;
     }

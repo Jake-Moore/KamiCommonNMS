@@ -107,7 +107,7 @@ public abstract class AbstractMessageManager {
      * @param actions the {@link Action} instances to attach to the message
      */
     public final void processAndSend(@NotNull CommandSender sender, @NotNull String line, boolean translate, @NotNull Action... actions) {
-        this.processAndSendInternal(sender, new KMessageSingle(line).setTranslate(translate));
+        this.processAndSendInternal(sender, new KMessageSingle(line, actions).setTranslate(translate));
     }
 
     /**

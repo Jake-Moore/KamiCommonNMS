@@ -43,7 +43,7 @@ ext {
     //  and every versions/* toolchain is 21 or 25, so the constraint it described no longer exists.)
     set("standaloneUtils", "com.kamikazejam.kamicommon:standalone-utils:5.0.0-alpha.50")
     // Lombok Dependency
-    set("lombokDep", "org.projectlombok:lombok:1.18.46")
+    set("lombokDep", "org.projectlombok:lombok:1.18.48")
     set("jetbrainsDep", "org.jetbrains:annotations:26.1.0")
     set("adventureDep", ":text")
 }

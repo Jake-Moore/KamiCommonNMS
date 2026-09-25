@@ -3,10 +3,11 @@ val VERSION = "1.2.39-SNAPSHOT" // -SNAPSHOT marks WIP versions (snapshots are n
 
 plugins {
     id("com.gradleup.shadow") version "9.6.1" apply false
-    // beta.23's own task classes are Java 21, so versions/build.gradle.kts pins paperweight's workers
-    //  to each module's toolchain, which is never below 21: see the TOOLCHAIN note there, where the
-    //  toolchain is deliberately not the floor.
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
+    // Held at beta.22, the newest release whose own classes are Java 17 (beta.23 is Java 21).
+    //  paperweight sets up the older dev-bundle formats, v1_17_R1 among them, on Java 17 whatever
+    //  the module toolchain, and forcing them onto 21 makes v1_17_R1's applyDevBundlePatches fail.
+    //  renovate.json holds this version.
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.22" apply false
 }
 
 val highestPaperDep = "26.2.build.121-stable"

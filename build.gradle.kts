@@ -50,7 +50,7 @@ ext {
 }
 extra["commonDependencies"] = listOf(
     // 2.15.3's MinecraftVersion stops at MC1_21_R6; 2.16.0 adds MC26_1 and MC26_2.
-    "de.tr7zw:item-nbt-api:2.16.0",
+    "de.tr7zw:item-nbt-api:2.16.1",
     // 13.5.1 reads only a single-digit major and throws from XMaterial's <clinit> on 26.x.
     "com.github.cryptomorin:XSeries:13.8.0",
 )

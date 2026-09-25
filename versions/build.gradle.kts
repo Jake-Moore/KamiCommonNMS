@@ -10,9 +10,10 @@ subprojects {
     // the provider that did it. verifyNmsBundles is what stops that.
     //
     // The TOOLCHAIN stays 21 for every module except v_latest, and is deliberately NOT the floor.
-    // javac runs on it, so a module compiling to Java 17 still compiles on 21, and only the emitted
-    // target moves with the floor. paperweight's setup does not follow it for older dev bundles:
-    // see the plugin note in the root build.gradle.kts.
+    // javac and paperweight's workers both run on it (paperweight is pinned to it below), so a module
+    // compiling to Java 17 still runs on 21. That is what lets paperweight-userdev sit at
+    // 2.0.0-beta.23, whose own task classes are Java 21: no module hosts them on anything lower.
+    // Only the emitted target moves with the floor.
 
     // The floor table lives in gradle/module-floors.properties so that this file, verifyFloors and
     // verifyDispatchFloors all read one copy. See that file for why each module sits where it does.
@@ -74,5 +75,16 @@ subprojects {
 
         // Add our shaded Adventure version so that subprojects can use it in their code
         dependencies.add("compileOnly", project.dependencies.project(project.property("adventureDep") as String))
+    }
+
+    // The setup handlers for older dev-bundle formats (V2 and V5) default paperweight's launcher to
+    // Java 17, which cannot load beta.23's classes. An explicit value overrides that convention.
+    plugins.withId("io.papermc.paperweight.userdev") {
+        val launcher = extensions.getByType<JavaToolchainService>().launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(toolchainVersion))
+        }
+        extensions.configure<io.papermc.paperweight.userdev.PaperweightUserExtension> {
+            javaLauncher.set(launcher)
+        }
     }
 }

@@ -7,7 +7,7 @@ plugins {
     //  to each module's toolchain, which is never below 21: see the TOOLCHAIN note there, where the
     //  toolchain is deliberately not the floor. Decompiling on 21 is why versions/v1_17_R1 respells
     //  one of its bundle's patches.
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.24" apply false
 }
 
 val highestPaperDep = "26.2.build.124-stable"
